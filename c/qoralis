@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""Qoralis command entry point; delegates to the compatible engine."""
+import os, runpy, sys
+here = os.path.dirname(os.path.realpath(__file__))
+legacy = os.path.join(here, "coli")
+if not os.path.isfile(legacy): raise SystemExit("Qoralis launcher could not find c/coli")
+sys.path.insert(0, here); sys.argv[0] = legacy
+runpy.run_path(legacy, run_name="__main__")

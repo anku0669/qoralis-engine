@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 120" role="img" aria-label="Qoralis Engine">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#71e0d1"/><stop offset="1" stop-color="#6687ff"/></linearGradient></defs>
+<circle cx="56" cy="58" r="39" fill="none" stroke="url(#g)" stroke-width="8"/><path d="m83 85 24 24" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+<rect x="43" y="45" width="26" height="26" rx="7" fill="#f5f7fb"/><circle cx="51" cy="53" r="3" fill="#71e0d1"/><circle cx="62" cy="53" r="3" fill="#6687ff"/><path d="M51 63h11" stroke="#71e0d1" stroke-width="3" stroke-linecap="round"/>
+<text x="130" y="79" font-family="Inter,Arial,sans-serif" font-size="68" font-weight="750" letter-spacing="-3" fill="#edf4f5">QORALIS</text><text x="490" y="78" font-family="Inter,Arial,sans-serif" font-size="25" font-weight="600" letter-spacing="3" fill="#8ea5b0">ENGINE</text></svg>

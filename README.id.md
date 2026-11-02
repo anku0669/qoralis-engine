@@ -3,12 +3,12 @@
 </p>
 
 <p align="center">
-  <a href="https://anku0669.github.io/qoralis-engine"><img src="https://img.shields.io/badge/website-anku0669.github.io%2Fqoralis--engine-1f6feb" alt="Situs web"></a>
+  <a href="https://anku0669.github.io/qoralis-engine/index.html"><img src="https://img.shields.io/badge/website-anku0669.github.io%2Fqoralis--engine-1f6feb" alt="Situs web"></a>
   <a href="https://github.com/JustVugg/colibri/releases"><img src="https://img.shields.io/github/v/release/anku0669/qoralis-engine?color=2ea043" alt="Rilis terbaru"></a>
 </p>
 
 <p align="center">
-  <a href="https://anku0669.github.io/qoralis-engine"><b>Situs Web</b></a> ·
+  <a href="https://anku0669.github.io/qoralis-engine/index.html"><b>Situs Web</b></a> ·
   <a href="https://discord.gg/RXV83nSZdk"><b>Discord</b></a> ·
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.ja.md">日本語</a> · Bahasa Indonesia · <a href="README.pt-BR.md">Português (Brasil)</a>
 </p>

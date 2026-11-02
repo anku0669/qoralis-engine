@@ -3,12 +3,12 @@
 </p>
 
 <p align="center">
-  <a href="https://anku0669.github.io/qoralis-engine/index.html"><img src="https://img.shields.io/badge/website-anku0669.github.io%2Fqoralis--engine-1f6feb" alt="Website"></a>
+  <a href="https://qoralis-engine.netlify.app/"><img src="https://img.shields.io/badge/website-anku0669.github.io%2Fqoralis--engine-1f6feb" alt="Website"></a>
   <a href="https://github.com/anku0669/qoralis-engine/releases"><img src="https://img.shields.io/github/v/release/anku0669/qoralis-engine?color=2ea043" alt="Latest release"></a>
 </p>
 
 <p align="center">
-  <a href="https://anku0669.github.io/qoralis-engine/index.html"><b>Website</b></a> ·
+  <a href="https://qoralis-engine.netlify.app/"><b>Website</b></a> ·
   <a href="https://discord.gg/RXV83nSZdk"><b>Discord</b></a> ·
   English · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.ja.md">日本語</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.pt-BR.md">Português (Brasil)</a>
 </p>
@@ -43,6 +43,16 @@ $ ./c/qoralis chat
   <br>
   <sub>Qoralis is free and open source. If it has earned a place on your machine, a coffee helps pay for the next engine and the next speedup.</sub>
 </p>
+
+## Desktop application
+
+Native installers are published with each tagged release. The Windows release
+includes an EXE setup installer and an MSI; macOS ships a DMG; Linux ships an
+executable AppImage and a Debian DEB package.
+
+Download them from [GitHub Releases](https://github.com/anku0669/qoralis-engine/releases).
+The desktop shell connects to an OpenAI-compatible inference server you configure
+in the app; model weights and the inference engine remain separately installed.
 
 <a id="get-started"></a>
 <a id="the-one-step-way"></a>

@@ -203,3 +203,6 @@ c/qwen36_tiny_mtp*/
 # Python build outputs
 /build/
 *.egg-info/
+
+# Netlify local project state
+.netlify

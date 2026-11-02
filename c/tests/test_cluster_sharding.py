@@ -54,7 +54,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 C_DIR = HERE.parent
-ENGINE = C_DIR / "Qoralis"
+ENGINE = C_DIR / "qoralis_engine"
 FMT6 = C_DIR / "glm_tiny_fmt6"
 FMT4 = C_DIR / "glm_tiny_fmt4"
 

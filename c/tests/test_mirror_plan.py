@@ -208,7 +208,7 @@ class MirrorPlannerTest(unittest.TestCase):
         wrapper = tool.parent.parent / "coli"
         commands = ([sys.executable, str(tool)],
                     [sys.executable, str(wrapper), "mirror"])
-        environment = dict(os.environ, COLI_ENGINE=str(tool.parent.parent / "Qoralis"),
+        environment = dict(os.environ, COLI_ENGINE=str(tool.parent.parent / "qoralis_engine"),
                            COLI_MODEL_DIRS="")
         for command in commands:
             for model, expected in ((self.model, 0), (self.split, 4)):

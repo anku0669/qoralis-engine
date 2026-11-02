@@ -96,7 +96,7 @@ class DecisionWeightsTest(unittest.TestCase):
                 result = subprocess.run(
                     [sys.executable, str(cli), "doctor", "--model", str(self.model), "--json"],
                     capture_output=True, text=True, timeout=15,
-                    env=dict(os.environ, COLI_ENGINE=str(cli.parent / "Qoralis")))
+                    env=dict(os.environ, COLI_ENGINE=str(cli.parent / "qoralis_engine")))
                 report = json.loads(result.stdout)
                 check = next(c for c in report["checks"] if c["id"] == "memory.ram")
                 self.assertEqual(check["status"], "pass")
@@ -111,7 +111,7 @@ class DecisionWeightsTest(unittest.TestCase):
         result = subprocess.run(
             [sys.executable, str(cli), "doctor", "--model", str(self.model), "--json"],
             capture_output=True, text=True, timeout=15,
-            env=dict(os.environ, COLI_ENGINE=str(cli.parent / "Qoralis")))
+            env=dict(os.environ, COLI_ENGINE=str(cli.parent / "qoralis_engine")))
         self.assertEqual(result.returncode, 1, result.stderr)
         report = json.loads(result.stdout)
         self.assertTrue(any(c["id"] == "model.weights" and c["status"] == "fail"

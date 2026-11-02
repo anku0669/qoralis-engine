@@ -60,7 +60,8 @@ class RegistryEngineAgreementTest(unittest.TestCase):
                 continue
             with self.subTest(family=family.id):
                 env = family.limits.context_env
-                source = (ROOT / f"{family.engine_artifact}.c").read_text(
+                source_name = "colibri" if family.id == "glm" else family.engine_artifact
+                source = (ROOT / f"{source_name}.c").read_text(
                     encoding="utf-8", errors="replace")
                 self.assertTrue(
                     f'getenv("{env}")' in source,

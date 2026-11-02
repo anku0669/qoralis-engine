@@ -28,12 +28,12 @@ class DiagnosticEngineDiscovery(unittest.TestCase):
             cwd = engine_dir if location == "engine" else unrelated
             if package_directory:
                 cwd = engine_dir.parent
-                (cwd / "Qoralis").mkdir()
+                (cwd / "qoralis_engine").mkdir()
             engine = (cwd if name == "glm" else engine_dir) / name
             engine.write_bytes(b"fixture engine path; inference is validated separately\n")
             engine.chmod(0o755)
             if both:
-                alternate = engine_dir / ("colibri.exe" if name == "Qoralis" else "Qoralis")
+                alternate = engine_dir / ("colibri.exe" if name.endswith(".exe") else "colibri")
                 alternate.write_bytes(b"other platform engine path\n")
                 alternate.chmod(0o755)
             snapshot = root / "snapshot"
@@ -56,22 +56,22 @@ class DiagnosticEngineDiscovery(unittest.TestCase):
                 os.chdir(original_cwd)
 
     def test_current_unix_engine_in_working_directory(self):
-        self.exercise("Qoralis")
+        self.exercise("qoralis_engine")
 
     def test_current_unix_engine_found_relative_to_script(self):
-        self.exercise("Qoralis", "unrelated")
+        self.exercise("qoralis_engine", "unrelated")
 
     def test_current_windows_engine_found_relative_to_script(self):
-        self.exercise("colibri.exe", "unrelated")
+        self.exercise("qoralis_engine.exe", "unrelated", reported_platform="win32")
 
     def test_repository_python_package_is_not_selected_as_binary(self):
-        self.exercise("Qoralis", package_directory=True)
+        self.exercise("qoralis_engine", package_directory=True)
 
     def test_native_unix_binary_preferred_when_both_names_exist(self):
-        self.exercise("Qoralis", both=True, reported_platform="linux")
+        self.exercise("qoralis_engine", both=True, reported_platform="linux")
 
     def test_native_windows_binary_preferred_when_both_names_exist(self):
-        self.exercise("colibri.exe", both=True, reported_platform="win32")
+        self.exercise("qoralis_engine.exe", both=True, reported_platform="win32")
 
     def test_legacy_engine_remains_supported(self):
         self.exercise("glm")

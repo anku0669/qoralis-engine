@@ -91,12 +91,12 @@ MINIMAX_M3_FIXTURE = FamilyDescriptor(
     model_types=("minimax_m3",),
     display_name="MiniMax M3",
     display_scale="",
-    engine_artifact="Qoralis",
+    engine_artifact="qoralis_engine",
     engine_aliases=(),
     engine_group="colibri-core",
     internal_arch="minimax_m3",
-    build_target="Qoralis",
-    process_names=("Qoralis",),
+    build_target="qoralis_engine",
+    process_names=("qoralis_engine", "Qoralis"),
     default_model_id="minimax-m3-colibri",
     cli_adapter="minimax_m3",
     gateway_adapter="minimax_m3",
@@ -1194,7 +1194,7 @@ class FamilyRegistryTest(unittest.TestCase):
             (root / "config.json").write_text(
                 json.dumps({"model_type": "mixtral"}), encoding="utf-8")
             (root / "tokenizer.json").write_text("{}", encoding="utf-8")
-            report = run_doctor(root, engine_path=root / "Qoralis",
+            report = run_doctor(root, engine_path=root / "qoralis_engine",
                                 available_memory=16_000_000_000,
                                 available_disk=1, gpus=[],
                                 linkage={"linked": False, "missing": False})
@@ -1212,7 +1212,7 @@ class FamilyRegistryTest(unittest.TestCase):
                 json.dumps({"model_type": "kimi_k3"}), encoding="utf-8")
             (root / "tokenizer.json").write_text("{}", encoding="utf-8")
             report = run_doctor(
-                root, engine_path=root / "Qoralis",
+                root, engine_path=root / "qoralis_engine",
                 engine_error=UnknownFamilyError("this image contains only GLM"),
                 available_memory=16_000_000_000, available_disk=1, gpus=[],
                 linkage={"linked": False, "missing": False})
@@ -1586,7 +1586,7 @@ class GlmFamilyNamesBothModelsTest(unittest.TestCase):
         v53 = dict(self.BASE, transformers_version="5.15.0",
                    moe_router_dtype="float32")
         self.assertEqual(family_for_config(v52).id, family_for_config(v53).id)
-        self.assertEqual(family_for_config(v53).engine_artifact, "Qoralis")
+        self.assertEqual(family_for_config(v53).engine_artifact, "qoralis_engine")
 
     def test_the_only_differences_are_not_discriminators(self):
         """Neither key can carry the decision, so neither may be read as if it

@@ -22,7 +22,7 @@ from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent.parent
-QORALIS = HERE / ("colibri.exe" if sys.platform == "win32" else "Qoralis")
+QORALIS = HERE / ("qoralis_engine.exe" if sys.platform == "win32" else "qoralis_engine")
 
 
 def _binary_has_cuda():

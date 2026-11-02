@@ -264,7 +264,7 @@ def _default_engine():
             candidate = C_DIR / (name + suffix)
             if candidate.exists():
                 return candidate
-    return C_DIR / "Qoralis"
+    return C_DIR / "qoralis_engine"
 
 
 ENGINE = Path(ENGINE_OVERRIDE) if ENGINE_OVERRIDE else _default_engine()

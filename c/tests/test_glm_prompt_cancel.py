@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from prefix_serve_harness import PromptCancelContract, ServeEngine  # noqa: E402
 
 HERE = Path(__file__).resolve().parent.parent
-BINARY = next((path for path in (HERE / "colibri.exe", HERE / "Qoralis") if path.exists()), None)
+BINARY = next((path for path in (HERE / "qoralis_engine.exe", HERE / "qoralis_engine", HERE / "colibri.exe", HERE / "colibri") if path.exists()), None)
 FIXTURE = Path(os.environ.get("COLI_ORACLE_FIXTURE", ""))
 SLOT_PREFIX = re.compile(r"\[API\] KV slot 0 prefix (\d+)/(\d+) token")
 

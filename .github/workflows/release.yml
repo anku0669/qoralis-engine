@@ -37,7 +37,7 @@ jobs:
             # The engines with a Metal backend get it (opt-in at run time: COLI_METAL=1,
             # K3_METAL=1 for Kimi K3; docs/metal.md). Metal is part of macOS, so nothing
             # changes where it is not asked for.
-            metal: "Qoralis inkling kimi_k3"
+            metal: "qoralis_engine inkling kimi_k3"
             # arm64 macOS joined COLI_V4_SUPPORTED; the archive verify step
             # asserts the engine is present and dispatchable like the others.
             v4: "1"
@@ -95,12 +95,12 @@ jobs:
       - name: Build engines
         run: |
           cd c
-          for t in Qoralis glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide; do
+          for t in colibri qoralis_engine glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide; do
             extra=""
             case " ${{ matrix.metal }} " in *" $t "*) extra="METAL=1" ;; esac
             make $t ${{ matrix.make_args }} $extra
           done
-          ls -lh Qoralis${{ matrix.ext }} glm53${{ matrix.ext }} inkling${{ matrix.ext }} kimi_k3${{ matrix.ext }} olmoe${{ matrix.ext }} qwen36${{ matrix.ext }} qwen38${{ matrix.ext }} deepseek_v41${{ matrix.ext }} mimo${{ matrix.ext }}
+          ls -lh qoralis_engine${{ matrix.ext }} colibri${{ matrix.ext }} glm53${{ matrix.ext }} inkling${{ matrix.ext }} kimi_k3${{ matrix.ext }} olmoe${{ matrix.ext }} qwen36${{ matrix.ext }} qwen38${{ matrix.ext }} deepseek_v41${{ matrix.ext }} mimo${{ matrix.ext }}
 
       # DeepSeek V4 has its own Makefile and its own target name (`deepseek-v4`,
       # producing `deepseek_v4`), so it never joined the loop above -- and #858 is
@@ -143,11 +143,12 @@ jobs:
         run: |
           mkdir -p dist
           # The engine goes in under its PLAIN name. `coli` locates the engine by looking for
-          # "Qoralis"/"colibri.exe" (then "glm") next to itself, so shipping it as
+          # "qoralis_engine"/"colibri.exe" (then "glm") next to itself, so shipping it as
           # colibri-<tag>-<platform>.exe made every downloaded archive fail with
           # "engine is not built. Run: coli build" -- with the engine sitting right there.
           # The version lives in the ARCHIVE name, which is where a downloader looks for it.
           cp c/colibri${{ matrix.ext }} dist/colibri${{ matrix.ext }}
+          cp c/qoralis_engine${{ matrix.ext }} dist/qoralis_engine${{ matrix.ext }}
           cp c/glm53${{ matrix.ext }} dist/glm53${{ matrix.ext }}
           # The sibling engines go in under their plain names too: `coli` resolves the
           # engine from the model's config.json and looks for kimi_k3/inkling next to
@@ -228,7 +229,8 @@ jobs:
           else
             tar xzf ../dist/colibri-${TAG}-${{ matrix.name }}.tar.gz
           fi
-          test -x Qoralis${{ matrix.ext }} || { echo "engine missing from archive"; ls -la; exit 1; }
+          test -x qoralis_engine${{ matrix.ext }} || { echo "Qoralis engine missing from archive"; ls -la; exit 1; }
+          test -x colibri${{ matrix.ext }} || { echo "colibri compatibility engine missing from archive"; ls -la; exit 1; }
           # The sibling engines, asserted the same way. #720 was exactly this failure:
           # a green build, green tests, and an archive with no engine for the model the
           # user actually had. Presence is not enough -- assert they are executable, and
@@ -354,7 +356,7 @@ jobs:
           for f in ../c/shaders/*.spv; do
             test -f "shaders/$(basename "$f")" || { echo "FAIL: shaders/$(basename "$f") missing from archive"; exit 1; }
           done
-          ENGINES="Qoralis glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide"
+          ENGINES="qoralis_engine glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide"
           if [ "${{ matrix.v4 }}" = "1" ]; then ENGINES="$ENGINES deepseek_v4"; fi
           COLI_ENGINES="$ENGINES" python3 - <<'PYCHK'
           import os, sys
@@ -449,16 +451,17 @@ jobs:
         run: |
           cd c
           make cuda-dll CUDA_ARCH=portable
-          # .exe names: only Qoralis has a phony alias (ci.yml, windows-cuda-build)
+          # Windows aliases route to the .exe targets; build both GLM names with CUDA.
           for t in colibri.exe qwen36.exe kimi_k3.exe; do make $t CUDA_DLL=1 VK=1 XDNA=1; done
+          make qoralis_engine.exe CUDA_DLL=1 VK=1 XDNA=1
           make cuda-dsv4-dll CUDA_ARCH=portable DSV4_TC=0
           make cuda-dsv4-dg-dll DSV4_TC=0
-          ls -l coli_cuda.dll coli_cuda_dsv4.dll coli_cuda_dsv4_dg.dll colibri.exe qwen36.exe kimi_k3.exe
+          ls -l coli_cuda.dll coli_cuda_dsv4.dll coli_cuda_dsv4_dg.dll colibri.exe qoralis_engine.exe qwen36.exe kimi_k3.exe
       - name: Package
         shell: bash
         run: |
           mkdir -p dist/pkg
-          cp c/coli_cuda.dll c/coli_cuda_dsv4.dll c/coli_cuda_dsv4_dg.dll c/colibri.exe c/qwen36.exe c/kimi_k3.exe dist/pkg/
+          cp c/coli_cuda.dll c/coli_cuda_dsv4.dll c/coli_cuda_dsv4_dg.dll c/colibri.exe c/qoralis_engine.exe c/qwen36.exe c/kimi_k3.exe dist/pkg/
           cp "$CUDA_PATH"/bin/cudart64_*.dll dist/pkg/
           printf '%s\r\n' \
             "Qoralis ${TAG}: the CUDA backend for Windows" \
@@ -483,7 +486,7 @@ jobs:
           mkdir -p verify && cd verify
           7z x ../dist/colibri-${TAG}-windows-x86_64-cuda.zip > /dev/null
           ls -l
-          for f in coli_cuda.dll coli_cuda_dsv4.dll coli_cuda_dsv4_dg.dll colibri.exe qwen36.exe kimi_k3.exe README-CUDA.txt; do
+          for f in coli_cuda.dll coli_cuda_dsv4.dll coli_cuda_dsv4_dg.dll colibri.exe qoralis_engine.exe qwen36.exe kimi_k3.exe README-CUDA.txt; do
             test -f $f || { echo "FAIL: $f missing from the CUDA package"; exit 1; }
           done
           # the DLL links the runtime that is beside it, and the engines neither CUDA
@@ -497,7 +500,7 @@ jobs:
           if objdump -p coli_cuda_dsv4.dll coli_cuda_dsv4_dg.dll | grep -qi 'DLL Name: cublas'; then
             echo "FAIL: a DeepSeek V4 DLL links cuBLAS, which the package does not carry"; exit 1
           fi
-          for e in Qoralis qwen36 kimi_k3; do
+          for e in colibri qoralis_engine qwen36 kimi_k3; do
             deps=$(objdump -p $e.exe | grep 'DLL Name')
             if echo "$deps" | grep -qiE 'cudart|vulkan|coli_cuda'; then echo "FAIL: $e.exe links $deps"; exit 1; fi
           done
@@ -506,11 +509,11 @@ jobs:
           sys.path.insert(0, "../c")
           from doctor import windows_backend_dll
           from setup_flow import binary_backends
-          for e in ("Qoralis", "qwen36", "kimi_k3"):
+          for e in ("colibri", "qoralis_engine", "qwen36", "kimi_k3"):
               image = open(e + ".exe", "rb").read()
               if windows_backend_dll(image) != "coli_cuda.dll" or binary_backends(e + ".exe") != {"cuda", "vulkan"}:
                   sys.exit(f"FAIL: {e}.exe is not a CUDA_DLL + Vulkan build")
-          print("OK: Qoralis, qwen36 and kimi_k3 load coli_cuda.dll and carry Vulkan")
+          print("OK: colibri, qoralis_engine, qwen36 and kimi_k3 load coli_cuda.dll and carry Vulkan")
           PYCHK
       - uses: actions/upload-artifact@v4
         with:

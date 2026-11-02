@@ -94,12 +94,16 @@ _TUNE_ROTATION_PROMPT = (
 # guess is right (e.g. a custom packaging layout).
 _EXE = ".exe" if sys.platform == "win32" else ""
 _LIBEXEC = os.path.join(os.path.dirname(HERE), "libexec", "colibri")
+_here_qoralis_engine = os.path.join(HERE, "qoralis_engine" + _EXE)
 _here_colibri = os.path.join(HERE, "colibri" + _EXE)
 _here_glm = os.path.join(HERE, "glm" + _EXE)
 
 if os.environ.get("COLI_ENGINE"):
     GLM = os.environ["COLI_ENGINE"]
     TOOLS = os.path.join(os.path.dirname(GLM), "tools")
+elif os.path.exists(_here_qoralis_engine):
+    GLM = _here_qoralis_engine
+    TOOLS = os.path.join(HERE, "tools")
 elif os.path.exists(_here_colibri):
     GLM = _here_colibri
     TOOLS = os.path.join(HERE, "tools")
@@ -107,7 +111,10 @@ elif os.path.exists(_here_glm):
     GLM = _here_glm
     TOOLS = os.path.join(HERE, "tools")
 else:
-    GLM = os.path.join(_LIBEXEC, "colibri" + _EXE)
+    _libexec_qoralis_engine = os.path.join(_LIBEXEC, "qoralis_engine" + _EXE)
+    _libexec_colibri = os.path.join(_LIBEXEC, "colibri" + _EXE)
+    GLM = (_libexec_qoralis_engine if os.path.exists(_libexec_qoralis_engine)
+           else _libexec_colibri)
     TOOLS = os.path.join(_LIBEXEC, "tools")
     sys.path.insert(0, _LIBEXEC)   # so `import resource_plan`, `doctor`, `openai_server` still resolve
 
@@ -1770,7 +1777,7 @@ def cmd_run(a):
     if not family.has_cli_adapter:
         if family.has_gateway_adapter:
             return run_via_gateway(a, family, engine, prompt)
-        sys.exit(f"{C.yel}coli run is not wired for {family.display_name};{C.r} "
+        sys.exit(f"{C.yel}qoralis run is not wired for {family.display_name};{C.r} "
                  f"use coli chat or coli serve")
     if arch=="deepseek_v4":
         prompt_path=None
@@ -3812,7 +3819,7 @@ def cmd_bench(a):
     # on it, which died on "this engine requires n_group=1" (#898's shape).
     family=resolve_model(a.model).descriptor
     if family.id!="glm":
-        sys.exit(f"{C.yel}coli bench is not wired for {family.display_name};{C.r} "
+        sys.exit(f"{C.yel}qoralis bench is not wired for {family.display_name};{C.r} "
                  f"its harness scores the GLM-5.2/5.3 engine only")
     # python con `tokenizers`: l'ambiente del progetto se c'e', altrimenti quello corrente
     py = project_python()

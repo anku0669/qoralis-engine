@@ -682,7 +682,7 @@ class RunConfiguration(HomeTestCase):
         self.assertEqual(env["COLI_VK_SHADERS"], os.path.join(engine_dir, "shaders"))
         self.assertEqual(env["VK_ICD_FILENAMES"], "/home/u/dzn_icd.json")
         self.assertNotIn("COLI_NO_OMP_TUNE", env)
-        glm = setup_flow.run_environment("vulkan", os.path.join(engine_dir, "Qoralis"),
+        glm = setup_flow.run_environment("vulkan", os.path.join(engine_dir, "qoralis_engine"),
                                          family_by_id("glm"), hw)
         self.assertEqual(glm["COLI_NO_OMP_TUNE"], "1")
         self.assertEqual(glm["OMP_NUM_THREADS"], "6")     # physical cores, not 12 threads

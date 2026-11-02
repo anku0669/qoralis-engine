@@ -885,11 +885,18 @@ endif
 # and marking it phony also forces the real binary to rebuild on every invocation.
 # Only create the alias when the platform executable suffix makes it distinct.
 ifneq ($(EXE),)
-.PHONY: colibri
+.PHONY: colibri qoralis_engine
 colibri: colibri$(EXE)
+qoralis_engine: qoralis_engine$(EXE)
 endif
-.PHONY: glm
+.PHONY: glm Qoralis
 glm: colibri$(EXE)
+Qoralis: qoralis_engine$(EXE) colibri$(EXE)
+
+# Product-facing GLM engine artifact. c/qoralis stays the friendly CLI wrapper;
+# this differently named binary avoids case-insensitive filesystem collisions.
+qoralis_engine$(EXE): qoralis_engine.c $(CUDA_OBJ) $(METAL_OBJ) $(VK_OBJ) $(XDNA_OBJ) .build-config
+	$(CC) $(CFLAGS) qoralis_engine.c $(CUDA_OBJ) $(METAL_OBJ) $(VK_OBJ) $(XDNA_OBJ) -o qoralis_engine$(EXE) $(LDFLAGS)
 
 # Config stamp: make only tracks file timestamps, not flag changes. Without this,
 # `make colibri.exe CUDA_DLL=1` after a prior CPU-only build reports "up to date"
@@ -3342,13 +3349,14 @@ check:
 	$(MAKE) portable
 	$(MAKE) test
 
-install: colibri$(EXE) glm53$(EXE) inkling$(EXE) kimi_k3$(EXE) olmoe$(EXE) qwen36$(EXE) qwen38$(EXE) deepseek_v41$(EXE) mimo$(EXE) qwenimage$(EXE) laya$(EXE) gliner_decide$(EXE) \
+install: colibri$(EXE) qoralis_engine$(EXE) glm53$(EXE) inkling$(EXE) kimi_k3$(EXE) olmoe$(EXE) qwen36$(EXE) qwen38$(EXE) deepseek_v41$(EXE) mimo$(EXE) qwenimage$(EXE) laya$(EXE) gliner_decide$(EXE) \
 	$(if $(filter 1,$(COLI_V4_SUPPORTED)),deepseek-v4,)
 	$(INSTALL) -d $(DESTDIR)$(BINDIR)
 	$(INSTALL) -d $(DESTDIR)$(LIBEXECDIR)
 	$(INSTALL) -d $(DESTDIR)$(LIBEXECDIR)/tools
 	$(INSTALL) -m 755 coli $(DESTDIR)$(BINDIR)/coli
 	$(INSTALL) -m 755 colibri$(EXE) $(DESTDIR)$(LIBEXECDIR)/colibri$(EXE)
+	$(INSTALL) -m 755 qoralis_engine$(EXE) $(DESTDIR)$(LIBEXECDIR)/qoralis_engine$(EXE)
 	$(INSTALL) -m 755 glm53$(EXE) $(DESTDIR)$(LIBEXECDIR)/glm53$(EXE)
 	$(INSTALL) -m 755 inkling$(EXE) $(DESTDIR)$(LIBEXECDIR)/inkling$(EXE)
 	$(INSTALL) -m 755 kimi_k3$(EXE) $(DESTDIR)$(LIBEXECDIR)/kimi_k3$(EXE)

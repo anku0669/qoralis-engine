@@ -127,8 +127,8 @@ jobs:
                 shaders/attention_absorb.spv shaders/rmsnorm.spv
           # Nothing links the loader (vk_load.h): a VK=1 binary starts without one, as
           # the release archives' must. The Vulkan build is the string it opens.
-          if ldd Qoralis | grep -q libvulkan; then echo "FAIL: Qoralis links libvulkan"; ldd Qoralis; exit 1; fi
-          grep -q libvulkan.so.1 Qoralis || { echo "FAIL: built without the Vulkan backend"; exit 1; }
+          if ldd qoralis_engine | grep -q libvulkan; then echo "FAIL: Qoralis links libvulkan"; ldd qoralis_engine; exit 1; fi
+          grep -q libvulkan.so.1 qoralis_engine || { echo "FAIL: built without the Vulkan backend"; exit 1; }
       - name: Initialise the backend against Lavapipe
         run: |
           cd c
@@ -509,7 +509,7 @@ jobs:
           # The fix skips malloc_trim on musl; on glibc it must still be called.
           # Here we only assert the build has no reference to it, which is the
           # half this leg can see.
-          if nm Qoralis | grep -q malloc_trim; then
+          if nm qoralis_engine | grep -q malloc_trim; then
             echo "FAIL: malloc_trim linked in a musl build"; exit 1
           fi
           echo "ok: no glibc-only symbol in the musl binary"
@@ -570,7 +570,7 @@ jobs:
         run: |
           cd c
           rc=0
-          ENGINES="Qoralis glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide"
+          ENGINES="qoralis_engine glm53 inkling kimi_k3 olmoe qwen36 qwen38 deepseek_v41 mimo qwenimage laya gliner_decide"
           if [ "${{ matrix.v4 }}" = "1" ]; then ENGINES="$ENGINES deepseek-v4"; fi
           for t in $ENGINES; do
             echo "::group::$t"
@@ -2149,7 +2149,7 @@ jobs:
       # rieseguiva un binario non strumentato. Uno di quei test era rosso da
       # settimane senza che nessuno potesse vederlo.
       - name: Build the engines those tests exercise
-        run: make -C c kimi_k3 inkling Qoralis olmoe qwen38 qwen36 deepseek_v41 qwenimage
+        run: make -C c kimi_k3 inkling qoralis_engine olmoe qwen38 qwen36 deepseek_v41 qwenimage
       - name: Python test suite
         run: cd c && python3 -m unittest discover -s tests -p 'test_*.py'
 

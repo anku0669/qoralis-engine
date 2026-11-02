@@ -22,7 +22,7 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
-BINARY = next((path for path in (HERE / "colibri.exe", HERE / "Qoralis") if path.exists()), None)
+BINARY = next((path for path in (HERE / "qoralis_engine.exe", HERE / "qoralis_engine", HERE / "colibri.exe", HERE / "colibri") if path.exists()), None)
 FIXTURE = Path(os.environ.get("COLI_ORACLE_FIXTURE", ""))
 CTX = 64
 NGEN = 4

@@ -16,7 +16,7 @@ import tempfile
 import unittest
 
 C_DIR = Path(__file__).resolve().parents[1]
-ENGINE = C_DIR / ("colibri.exe" if os.name == "nt" else "Qoralis")
+ENGINE = C_DIR / ("qoralis_engine.exe" if os.name == "nt" else "qoralis_engine")
 SNAP = C_DIR / "glm_tiny"
 REFERENCE = C_DIR / "ref_glm.json"
 

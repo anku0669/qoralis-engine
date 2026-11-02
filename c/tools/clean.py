@@ -10,7 +10,7 @@ import shutil
 
 # Files (relative to c/) to remove if present.
 FILES = [
-    "Qoralis", "colibri.exe",
+    "qoralis_engine", "qoralis_engine.exe", "colibri", "colibri.exe",
     "inkling", "inkling.exe",
     "kimi_k3", "kimi_k3.exe",
     "olmoe", "olmoe.exe",

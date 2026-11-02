@@ -31,8 +31,8 @@ C_DIR = HERE.parent
 # longer exists on Windows either. _engine_present() was therefore always
 # False, so every test in this file has been skipping on every platform
 # instead of running. Resolve the real name, both extensions.
-ENGINE = next((p for p in (C_DIR / "Qoralis", C_DIR / "colibri.exe") if p.exists()),
-              C_DIR / "Qoralis")
+ENGINE = next((p for p in (C_DIR / "qoralis_engine", C_DIR / "qoralis_engine.exe", C_DIR / "colibri.exe", C_DIR / "colibri") if p.exists()),
+              C_DIR / "qoralis_engine")
 TINY = C_DIR / "glm_tiny"
 
 

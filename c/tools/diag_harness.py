@@ -685,7 +685,7 @@ class DiagnosticHarness:
 def main():
     ap = argparse.ArgumentParser(description="Comprehensive model diagnostic harness for Qoralis GLM-5.2")
     ap.add_argument("--snap", required=True, help="model snapshot directory")
-    ap.add_argument("--glm", default=None, help="engine binary path (default: auto-detect colibri/colibri.exe)")
+    ap.add_argument("--glm", default=None, help="engine binary path (default: auto-detect qoralis_engine or colibri compatibility binary)")
     ap.add_argument("--phase", default="all",
                     choices=["all","system","smoke","diagnostic","quality","throughput"],
                     help="which test phase to run")
@@ -701,8 +701,8 @@ def main():
     # Auto-detect engine binary
     if a.glm is None:
         directories = (Path.cwd(), Path.cwd().parent, Path(__file__).resolve().parent.parent)
-        names = (("colibri.exe", "Qoralis", "glm.exe", "glm") if sys.platform == "win32"
-                 else ("Qoralis", "colibri.exe", "glm", "glm.exe"))
+        names = (("qoralis_engine.exe", "colibri.exe", "glm.exe", "glm") if sys.platform == "win32"
+                 else ("qoralis_engine", "colibri", "glm", "glm.exe"))
         for name in names:
             for directory in directories:
                 candidate = directory / name

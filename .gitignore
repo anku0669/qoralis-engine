@@ -206,3 +206,7 @@ c/qwen36_tiny_mtp*/
 
 # Netlify local project state
 .netlify
+
+# Generated GLM engine artifacts
+/c/qoralis_engine
+/c/qoralis_engine.exe

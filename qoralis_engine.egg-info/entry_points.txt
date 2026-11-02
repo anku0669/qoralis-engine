@@ -1,3 +1,0 @@
-[console_scripts]
-coli = colibri.cli:main
-qoralis = colibri.cli:main

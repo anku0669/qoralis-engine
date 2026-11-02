@@ -27,7 +27,7 @@ def run(*args, **env):
 @unittest.skipUnless(ENGINE.exists(), "kimi_k3 is not built")
 class KimiUsageTest(unittest.TestCase):
     def assertUsage(self, out, ctx):
-        for fragment in ("<model_dir>", "--ngen", "--ids", "coli chat --model"):
+        for fragment in ("<model_dir>", "--ngen", "--ids", "qoralis chat --model"):
             self.assertIn(fragment, out, f"{ctx}: usage is missing {fragment!r}")
 
     def test_help_flags_print_usage_and_succeed(self):
@@ -58,16 +58,16 @@ class KimiUsageTest(unittest.TestCase):
         out = r.stdout + r.stderr
         self.assertIn("without a model", out,
                       "no args: does not say what is missing")
-        self.assertIn("coli chat", out,
+        self.assertIn("qoralis chat", out,
                       "no args: does not name the launcher, which is what the "
                       "person almost certainly wanted")
         self.assertNotEqual(r.returncode, 0, "a missing model dir is a failure")
 
     def test_usage_names_the_launcher(self):
-        """Most people reaching for the raw engine want `coli chat`. It runs this
+        """Most people reaching for the raw engine want `qoralis chat`. It runs this
         engine for them and does not need the GLM binary built — which is what
         the #783 reporter had assumed was required."""
-        self.assertIn("coli chat --model", run("--help").stdout + run("--help").stderr)
+        self.assertIn("qoralis chat --model", run("--help").stdout + run("--help").stderr)
 
     def test_usage_documents_autopin_and_the_gpu_path(self):
         """Both are things a user cannot guess and will otherwise never find:

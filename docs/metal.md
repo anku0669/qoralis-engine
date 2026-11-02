@@ -32,7 +32,7 @@ make Qoralis METAL=1          # macOS only; no Xcode needed (shader compiles at 
                               # any macOS SDK builds; the COLI_METAL_RESSET residency-set
                               # path needs the macOS 15 SDK and is compiled out below it
 make metal-test           # standalone kernel/attention correctness vs CPU reference
-COLI_METAL=1 COLI_MODEL=/path/glm52_i4 ./coli chat --ram 96
+COLI_METAL=1 COLI_MODEL=/path/glm52_i4 ./qoralis chat --ram 96
 ```
 
 The release's `macos-arm64.tar.gz` has `Qoralis`, `inkling` and `kimi_k3` built

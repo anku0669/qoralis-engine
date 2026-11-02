@@ -1,8 +1,8 @@
-"""#979: `coli chat` must SHOW the model's thinking, and be able to hide it.
+"""#979: `qoralis chat` must SHOW the model's thinking, and be able to hide it.
 
 The server streams thinking as `reasoning_content` deltas; chat_attached's
 loop used to drop every non-content delta (its comment listed `reasoning`
-among the discards), so `coli run` showed reasoning while `coli chat`
+among the discards), so `qoralis run` showed reasoning while `qoralis chat`
 silently hid it. These tests drive the real chat_attached under a pty
 against a stdlib SSE server:
 
@@ -181,7 +181,7 @@ class ChatThinkingTest(unittest.TestCase):
 
     def test_mimo_starts_with_thinking_off(self):
         """MiMo's template thinks by default; at ~1 tok/s that is minutes of
-        reasoning before the answer, so coli chat asks for it off unless --think."""
+        reasoning before the answer, so qoralis chat asks for it off unless --think."""
         SERVER_ARCH["value"] = "mimo"
         out = run_chat(self.base, {"COLI_SHOW_THINK": "1"})
         self.assertIn("thinking is off here", out)
@@ -211,7 +211,7 @@ class ChatThinkingTest(unittest.TestCase):
         self.assertIn("ANSWER-GAMMA", out, "the answer must still stream")
 
     def test_a_compacted_conversation_is_said_once(self):
-        """coli chat asks for compaction, and says when the server summarized the
+        """qoralis chat asks for compaction, and says when the server summarized the
         chat's first messages; a later turn on the same summary says nothing more."""
         SERVER_COMPACTION["value"] = {"summarized_messages": 6, "summary": "S"}
         out = run_chat(self.base, {"COLI_SHOW_THINK": "1"})

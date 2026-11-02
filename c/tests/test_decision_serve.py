@@ -456,8 +456,8 @@ class DecisionRegistryAndLauncher(unittest.TestCase):
 
     def test_coli_describes_it_and_refuses_to_chat(self):
         import subprocess
-        # each fixture with its weights generated and its engine built: coli plan reads the
-        # weights' header, and coli chat says the engine is not built before anything else
+        # each fixture with its weights generated and its engine built: qoralis plan reads the
+        # weights' header, and qoralis chat says the engine is not built before anything else
         fixtures = [path for path, binary in ((FIXTURE, BINARY), (GLINER_FIXTURE, GLINER_BINARY))
                     if (path / "model.safetensors").exists() and binary.exists()]
         if not fixtures:

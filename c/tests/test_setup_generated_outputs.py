@@ -129,7 +129,7 @@ class GeneratedOutputReadinessTests(unittest.TestCase):
         (self.model / "tokenizer.json").unlink()
         with mock.patch.object(setup_flow, "refresh_configured", side_effect=AssertionError("build probe")), \
              mock.patch.object(setup_flow, "start_server", side_effect=AssertionError("server launch")):
-            with self.assertRaisesRegex(setup_flow.SetupError, "run `coli setup`"):
+            with self.assertRaisesRegex(setup_flow.SetupError, "run `qoralis setup`"):
                 setup_flow.cmd_start(argparse.Namespace(background=True, no_browser=True, json=False))
 
     def test_public_setup_parser_enters_resume_without_false_ready(self):

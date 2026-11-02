@@ -1,4 +1,4 @@
-"""coli chat's documents (#2431): `/file PATH` in the chat and `coli chat --file PATH`.
+"""qoralis chat's documents (#2431): `/file PATH` in the chat and `qoralis chat --file PATH`.
 
 The security contract, first:
 - a path is never picked out of a message's text: only /file and --file read a file

@@ -36,7 +36,7 @@ _positioned_write_lock = threading.Lock()
 
 
 # ---------- guardia di famiglia (#1304) ----------
-# Questo convertitore serve UNA famiglia: GLM-5.2. Ma `coli convert` accetta
+# Questo convertitore serve UNA famiglia: GLM-5.2. Ma `qoralis convert` accetta
 # qualunque --repo, e in una settimana due utenti gli hanno dato Qwen3.8:
 # i tensori BF16 che non riconosce come esperti GLM passano upcastati a f32,
 # ogni shard raddoppia, e #1304 si e' fermato a 424 GB scritti su 360 di
@@ -142,12 +142,12 @@ OTHER_FAMILY_PATHS = {
     "qwen3_5":         "Qwen3.8-27B (dense): use tools/convert_qwen36.py, see docs/qwen36.md",
     "qwen3_5_text":    "Qwen3.8-27B (dense): use tools/convert_qwen36.py, see docs/qwen36.md",
     "qwen3_moe":       "Qwen3-Coder-30B-A3B: use tools/convert_qwen36.py, see docs/qwen36.md",
-    "flint":           "Flint: use tools/convert_qwen36.py, or run one of its GGUFs (coli import), see docs/gguf.md",
-    "lfm3":            "LFM3-VL: use tools/convert_qwen36.py, or run one of its GGUFs (coli import), see docs/qwen36.md",
-    "lfm3_vl":         "LFM3-VL: use tools/convert_qwen36.py, or run one of its GGUFs (coli import), see docs/qwen36.md",
-    "muse_spark":      "Muse Spark Open is NOT converted by this tool: run one of its GGUFs (coli import), see docs/gguf.md",
+    "flint":           "Flint: use tools/convert_qwen36.py, or run one of its GGUFs (qoralis import), see docs/gguf.md",
+    "lfm3":            "LFM3-VL: use tools/convert_qwen36.py, or run one of its GGUFs (qoralis import), see docs/qwen36.md",
+    "lfm3_vl":         "LFM3-VL: use tools/convert_qwen36.py, or run one of its GGUFs (qoralis import), see docs/qwen36.md",
+    "muse_spark":      "Muse Spark Open is NOT converted by this tool: run one of its GGUFs (qoralis import), see docs/gguf.md",
     "qwen3":           "Qwen3 (dense) is NOT converted by this tool: the qwen36 engine runs its "
-                       "GGUF as the file has it (coli import), see docs/gguf.md",
+                       "GGUF as the file has it (qoralis import), see docs/gguf.md",
     "inkling_mm_model":"Inkling: use tools/convert_inkling_int4.py",
     "inkling":         "Inkling: use tools/convert_inkling_int4.py",
     "olmoe":           "OLMoE: use tools/convert_olmoe.py",

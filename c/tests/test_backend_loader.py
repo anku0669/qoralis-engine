@@ -1250,7 +1250,7 @@ class LoaderRuntimeDirContractTest(unittest.TestCase):
             cls.fixture = None
 
     def setUp(self):
-        self.cases = tempfile.TemporaryDirectory(prefix="coli runtime dir ")
+        self.cases = tempfile.TemporaryDirectory(prefix="qoralis runtime dir ")
         self.addCleanup(self.cases.cleanup)
         self.cfg = Path(self.cases.name) / "cfg"
         self.cfg.mkdir()

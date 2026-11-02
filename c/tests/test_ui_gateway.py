@@ -210,7 +210,7 @@ class ModelsServiceTest(unittest.TestCase):
         self.assertTrue(t["gpu"]["fits"])
         self.assertIsNone(t["gpu"]["est"])          # another integrated GPU: no ratio borrowed
         t = self.m.tiers_for(g, 0, have=True, family="olmoe")
-        self.assertFalse(t["gpu"]["fits"])          # an engine coli setup keeps on the CPU there
+        self.assertFalse(t["gpu"]["fits"])          # an engine qoralis setup keeps on the CPU there
         self.assertIn("resta sulla CPU", t["gpu"]["why"])
 
     def test_a_cpu_only_engine_has_no_gpu_way(self):

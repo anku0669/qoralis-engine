@@ -83,10 +83,10 @@ class Dsv41ImageServeTest(unittest.TestCase):
                 break
             except Exception:
                 if cls.proc.poll() is not None:
-                    raise RuntimeError("coli serve exited: " + cls.proc.stdout.read()[-2000:])
+                    raise RuntimeError("qoralis serve exited: " + cls.proc.stdout.read()[-2000:])
                 time.sleep(1)
         else:
-            raise RuntimeError("coli serve did not come up in 180 s")
+            raise RuntimeError("qoralis serve did not come up in 180 s")
 
     @classmethod
     def tearDownClass(cls):

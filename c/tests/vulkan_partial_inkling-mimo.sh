@@ -104,7 +104,7 @@ ptl_imk_head_fault() {
 # The reserve the capped runs keep for a chunk's scratch and the frames' staging (the tier
 # takes the rest of the device): 0.04 GiB.
 PTL_RESERVE=0.04
-# ptl_imk_plan <engine> <tag> <fixture> <log> <env...>: coli plan's prediction (resource_plan.py,
+# ptl_imk_plan <engine> <tag> <fixture> <log> <env...>: qoralis plan's prediction (resource_plan.py,
 # vk_chain_fit) for the same device and settings, from the checkpoint's header and config
 # alone: the engine's free bytes, per-layer bytes, fixed bytes and N. The tiny inkling's
 # config says model_type inkling_text, which the family registry does not take: the plan
@@ -115,9 +115,9 @@ ptl_imk_plan() {
   local eng=$1 tag=$2 fx=$3 log=$4; shift 4
   case "${VK_ICD_FILENAMES:-}" in
     *lvp_icd*) ;;
-    *) echo "   coli plan: not compared on this driver (its buffers' alignment is not the plan's 256 bytes)"; return 0 ;;
+    *) echo "   qoralis plan: not compared on this driver (its buffers' alignment is not the plan's 256 bytes)"; return 0 ;;
   esac
-  $PY - "$eng" "$fx" "$log" "$@" <<'PY' || fail "$tag: coli plan predicts otherwise"
+  $PY - "$eng" "$fx" "$log" "$@" <<'PY' || fail "$tag: qoralis plan predicts otherwise"
 import json, os, re, shutil, sys, tempfile
 sys.path.insert(0, ".")
 import resource_plan as rp
@@ -142,8 +142,8 @@ with tempfile.TemporaryDirectory() as tmp:
     fit = rp.vk_chain_fit(rp.analyze_model(model), eng, env, {"type": "cpu"})
 ok = fit is not None and (fit["layers"], fit["fixed"], fit["free"], fit["n"]) == (layers, num("fixed"), num("free"), n)
 if fit is None:
-    sys.exit(f"   coli plan: no fit for {eng}")
-print(f"   coli plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
+    sys.exit(f"   qoralis plan: no fit for {eng}")
+print(f"   qoralis plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
       f"layers {'= the engine' if fit['layers'] == layers else fit['layers']}, fixed {fit['fixed']} B, free {fit['free']} B")
 sys.exit(0 if ok else 1)
 PY
@@ -178,7 +178,7 @@ ptl_inkling() {
   for k in 1 4 7; do
     ptl_imk_cap inkling "partial inkling cap for N=$k" ptl-probe.log $k ink_cap_run
     ptl_imk_plan inkling "partial inkling cap for N=$k" tiny_inkling vk.log COLI_VK_DEVICE_CAP_MB=$PTL_CAP_LAST COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE
-    echo "OK partial inkling cap for N=$k: tokens = CPU, coli plan's N the engine's"
+    echo "OK partial inkling cap for N=$k: tokens = CPU, qoralis plan's N the engine's"
   done
   # the dense-int4g64 container's forms, and D = 6144, in the plan
   rm -f chain.usage
@@ -190,7 +190,7 @@ ptl_inkling() {
   env COLI_VK_DEVICE_CAP_MB=256 COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE COLI_USAGE=chain.usage COLI_VULKAN=1 COLI_VK_CHAIN=1 \
     SNAP=tiny_inkling_wide ./inkling 8 0 $W > vk.log 2>&1 || true
   ptl_imk_plan inkling "partial inkling plan, D=6144" tiny_inkling_wide vk.log COLI_VK_DEVICE_CAP_MB=256 COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE
-  echo "OK partial inkling plan: coli plan's numbers the engine's (the container, D = 6144)"
+  echo "OK partial inkling plan: qoralis plan's numbers the engine's (the container, D = 6144)"
 
   # ---- an upload failing inside layer k's setup (COLI_VK_STAGED_FAULT, aimed from a probe's
   # counts): the layers before it on the device, nothing of layer k; the full chain's setup
@@ -341,7 +341,7 @@ ptl_mimo_all() {
   for k in 1 3 5; do
     ptl_imk_cap mimo "partial mimo cap for N=$k" ptl-probe.log $k mimo_cap_run
     ptl_imk_plan mimo "partial mimo cap for N=$k" mimo_tiny vk.log COLI_VK_DEVICE_CAP_MB=$PTL_CAP_LAST COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE MIMO_DENSE_BITS=32
-    echo "OK partial mimo cap for N=$k: tokens = CPU, coli plan's N the engine's"
+    echo "OK partial mimo cap for N=$k: tokens = CPU, qoralis plan's N the engine's"
   done
   for bits in 0 8; do   # the release's FP8/BF16 and int8 rows, a block of 3, in the plan
     env COLI_VK_DEVICE_CAP_MB=256 COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE COLI_VK_CHAIN_LAYERS=0 MIMO_CHUNK=3 COLI_TEMP=0 COLI_VULKAN=1 \
@@ -349,7 +349,7 @@ ptl_mimo_all() {
     ptl_imk_plan mimo "partial mimo plan bits=$bits" mimo_tiny vk.log COLI_VK_DEVICE_CAP_MB=256 COLI_VK_TIER_RESERVE_GB=$PTL_RESERVE \
       COLI_VK_CHAIN_LAYERS=0 MIMO_CHUNK=3 MIMO_DENSE_BITS=$bits
   done
-  echo "OK partial mimo plan: coli plan's numbers the engine's (MIMO_DENSE_BITS 0 and 8, blocks of 3)"
+  echo "OK partial mimo plan: qoralis plan's numbers the engine's (MIMO_DENSE_BITS 0 and 8, blocks of 3)"
 
   # ---- an upload failing inside layer k (the full chain's setup, after the tier; the
   # device-only one, before it), the warm start filling no device (as inkling's above)

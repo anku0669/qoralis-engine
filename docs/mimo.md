@@ -26,7 +26,7 @@ The checkpoint is read as it is released, **no conversion**:
 ```sh
 hf download XiaomiMiMo/MiMo-V2.6-Flash-MOPD --local-dir ~/Models/MiMo-V2.6-Flash
 make -C c mimo
-coli chat --model ~/Models/MiMo-V2.6-Flash
+qoralis chat --model ~/Models/MiMo-V2.6-Flash
 ```
 
 Pro is the same engine and the same commands. Three files of the release are never
@@ -36,10 +36,10 @@ so the download can skip them, 563.6 GB instead of 573.5:
 ```sh
 hf download XiaomiMiMo/MiMo-V2.6-Pro-MOPD --local-dir ~/Models/MiMo-V2.6-Pro \
   --exclude "dflash/*" --exclude "audio_tokenizer/*" --exclude "model_mtp.safetensors"
-coli chat --model ~/Models/MiMo-V2.6-Pro --ram 54
+qoralis chat --model ~/Models/MiMo-V2.6-Pro --ram 54
 ```
 
-`coli chat`, `coli serve` and `coli web` size the expert cache from the resource plan
+`qoralis chat`, `qoralis serve` and `qoralis web` size the expert cache from the resource plan
 when `--cap` is omitted; `--ram N` gives it a budget. The standalone engine takes the
 cache (experts per layer) as its first argument, and never goes below one routing
 step (8).
@@ -90,8 +90,8 @@ system turn, calls written inline as
 tool results as a `tool` turn. Through the API, thinking is on unless the request
 turns it off (`enable_thinking: false`, or `reasoning_effort: "none"`), as in the
 template; with thinking on the cue ends in `<think>`, the token the model writes
-first. `coli chat` starts with thinking off, because at about 1 tok/s the template's
-default reasoning is minutes of tokens before the answer; `coli chat --think` turns it
+first. `qoralis chat` starts with thinking off, because at about 1 tok/s the template's
+default reasoning is minutes of tokens before the answer; `qoralis chat --think` turns it
 on (the web has its own reasoning toggle).
 
 ## System One mode and prompt reuse
@@ -211,9 +211,9 @@ chat prompt (thinking off) and 128 generated tokens:
 Through the gateway: a tool call comes back as `get_weather({"city": "Roma", "days": 3})`
 with the integer typed as declared, and asked what is written in a picture made by
 Qoralis's Qwen-Image the model answers with its text, word for word. The same in
-`coli web` and `coli chat`:
+`qoralis web` and `qoralis chat`:
 
-![MiMo-V2.6 Flash in coli web, reading a picture made by Qwen-Image](media/mimo-web.png)
+![MiMo-V2.6 Flash in qoralis web, reading a picture made by Qwen-Image](media/mimo-web.png)
 
 ### Pro
 
@@ -245,12 +245,12 @@ The same machine, prompt and 128 tokens as the Flash table above:
   the dense weights; int8 shortens both, with fewer dense bytes and more RAM left
   for the cache.
 
-Through the gateway (`coli serve --ram 54`, which plans 11 experts per layer), on the
+Through the gateway (`qoralis serve --ram 54`, which plans 11 experts per layer), on the
 real Pro: thinking off and on, the same tool call with the integer typed as declared,
-streaming, and the Qwen-Image picture read back word for word; `coli chat` with the
-picture's path at the start of the line, and `coli web` with the upload button:
+streaming, and the Qwen-Image picture read back word for word; `qoralis chat` with the
+picture's path at the start of the line, and `qoralis web` with the upload button:
 
-![MiMo-V2.6 Pro in coli web, reading a picture made by Qwen-Image](media/mimo-pro-web.png)
+![MiMo-V2.6 Pro in qoralis web, reading a picture made by Qwen-Image](media/mimo-pro-web.png)
 
 ## On a GPU (Vulkan)
 

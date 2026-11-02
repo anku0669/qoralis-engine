@@ -46,7 +46,7 @@ class StopScopeTests(unittest.TestCase):
         self.assertFalse(coli._serve_cmdline_matches_port(raw, 9000))
 
     def test_web_is_a_server(self):
-        # `coli web` is `coli serve` plus a browser, and what `coli start` runs.
+        # `qoralis web` is `qoralis serve` plus a browser, and what `qoralis start` runs.
         raw = self.cmdline("python3", "/opt/colibri/coli", "web", "--model", "/models/a",
                            "--host", "127.0.0.1", "--port", "9000", "--no-browser")
         self.assertTrue(coli._serve_cmdline_matches_port(raw, 9000))
@@ -63,8 +63,8 @@ class StopScopeTests(unittest.TestCase):
              mock.patch.object(coli, "serve_pidfile", return_value="/not/a/pidfile"), \
              mock.patch.object(coli, "_stop_proc_table", return_value=table), \
              contextlib.redirect_stdout(out):
-            coli.cmd_stop(args)
-        self.assertIn("would stop 4242: coli serve (cmdline, port 9123)", out.getvalue())
+            qoralis.cmd_stop(args)
+        self.assertIn("would stop 4242: qoralis serve (cmdline, port 9123)", out.getvalue())
 
     def test_engine_tag_is_port_specific(self):
         raw = b"SNAP=/models/a\0SERVE=1\0COLI_SERVE_PORT=9000\0"
@@ -82,11 +82,11 @@ class StopScopeTests(unittest.TestCase):
         with mock.patch.object(coli, "banner"), \
              mock.patch.object(coli, "serve_pidfile", return_value="/not/a/pidfile"), \
              mock.patch.object(coli.os, "listdir", side_effect=OSError):
-            coli.cmd_stop(args)
+            qoralis.cmd_stop(args)
 
     def test_serve_that_cannot_bind_keeps_the_running_serves_pidfile(self):
-        # A second `coli serve` on a busy port fails to bind; the pidfile must
-        # still name the serve that holds the port, for coli stop and coli status.
+        # A second `qoralis serve` on a busy port fails to bind; the pidfile must
+        # still name the serve that holds the port, for qoralis stop and qoralis status.
         running = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
         try:
             with tempfile.TemporaryDirectory() as tmp:
@@ -111,7 +111,7 @@ class StopScopeTests(unittest.TestCase):
                      mock.patch("openai_server.serve",
                                 side_effect=OSError(48, "Address already in use")):
                     with self.assertRaises(OSError):
-                        coli.cmd_serve(args)
+                        qoralis.cmd_serve(args)
                 self.assertEqual(pidfile.read_text(), f"{running.pid} /models/a\n")
         finally:
             running.terminate()
@@ -143,7 +143,7 @@ class StopScopeTests(unittest.TestCase):
                                        return_value=os.path.join(tmp, "coli-serve-9123.stop")), \
                      mock.patch.object(coli.time, "sleep"), \
                      contextlib.redirect_stdout(io.StringIO()):
-                    coli.cmd_stop(args)
+                    qoralis.cmd_stop(args)
                 own.wait(timeout=5)
                 self.assertIsNone(other.poll(), "stop killed a server on another port")
             finally:

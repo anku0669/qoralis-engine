@@ -61,11 +61,11 @@ hf download deepseek-ai/DeepSeek-V4-Flash-0731 \
 ```bash
 cd c
 make deepseek-v4
-python ./coli run --model /path/to/DeepSeek-V4-Flash --ram 32 \
+python ./qoralis run --model /path/to/DeepSeek-V4-Flash --ram 32 \
   "What is the capital of France?"
-python ./coli chat --model /path/to/DeepSeek-V4-Flash --ram 32
-python ./coli serve --model /path/to/DeepSeek-V4-Flash --ram 32
-python ./coli web --model /path/to/DeepSeek-V4-Flash --ram 32
+python ./qoralis chat --model /path/to/DeepSeek-V4-Flash --ram 32
+python ./qoralis serve --model /path/to/DeepSeek-V4-Flash --ram 32
+python ./qoralis web --model /path/to/DeepSeek-V4-Flash --ram 32
 ```
 
 V4 chat 使用模型原生标记。原生服务当前支持 greedy 和一个活动 KV slot。

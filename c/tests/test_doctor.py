@@ -343,7 +343,7 @@ class DoctorTest(unittest.TestCase):
     def test_ssd_probe_check_never_emits_json_infinity(self):
         # float("inf") used to sail through the old reader; json.dumps renders
         # it as the bare literal Infinity, which is not JSON -- machine
-        # consumers of `coli doctor --json` would then fail to parse the whole
+        # consumers of `qoralis doctor --json` would then fail to parse the whole
         # report. The strict v2 grammar bans inf/nan outright (#386 fix round).
         (self.model / ".coli_ssd").write_bytes(b"inf\n")
         report = self.report()
@@ -576,7 +576,7 @@ class DoctorTest(unittest.TestCase):
 
 
 class CoreTensorRoleTest(unittest.TestCase):
-    """#1365: `coli doctor` reported "2 required core tensor(s) are missing"
+    """#1365: `qoralis doctor` reported "2 required core tensor(s) are missing"
     for every GLM-5.3-Flash checkpoint, converted locally or downloaded
     pre-converted. Nothing was missing. The check held three literal tensor
     names taken from GLM-5.2, and Flash nests its language model under the

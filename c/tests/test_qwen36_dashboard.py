@@ -1,7 +1,7 @@
 """The dashboard's Brain and Profile tabs read four lines from the engine's
 stdout: EMAP, HITS, PROF, TIERS. On Qwen3.6 they were empty, not because
 anything needed activating but because qwen36.c emitted none of them. This
-test drives the engine the way the dashboard does -- through `coli serve`
+test drives the engine the way the dashboard does -- through `qoralis serve`
 and the /experts and /profile endpoints -- and asserts the data arrives in
 the shape the server parses, so a family that stops emitting a line fails
 here rather than as a blank tab on a user's screen.
@@ -10,7 +10,7 @@ It needs a Qwen3.6 container with a tokenizer.json and a built `qwen36`.
 Set COLI_QWEN36_FIXTURE to the container directory; without it the test is
 skipped, with the reason on the record. The CI job builds the tiny fixture it
 already uses for the token-exact oracle and adds the byte tokenizer from
-tools/make_edge_tiny_tokenizer.py, which is all `coli serve` needs.
+tools/make_edge_tiny_tokenizer.py, which is all `qoralis serve` needs.
 """
 import json
 import os
@@ -69,10 +69,10 @@ class Qwen36DashboardTest(unittest.TestCase):
                 break
             except Exception:
                 if cls.proc.poll() is not None:
-                    raise RuntimeError("coli serve exited: " + cls.proc.stdout.read()[-2000:])
+                    raise RuntimeError("qoralis serve exited: " + cls.proc.stdout.read()[-2000:])
                 time.sleep(1)
         else:
-            raise RuntimeError("coli serve did not come up in 180 s")
+            raise RuntimeError("qoralis serve did not come up in 180 s")
         model = get_json(f"http://127.0.0.1:{cls.port}/v1/models")["data"][0]["id"]
         body = json.dumps({"model": model, "prompt": "abcabcabc", "max_tokens": 3}).encode()
         req = urllib.request.Request(f"http://127.0.0.1:{cls.port}/v1/completions", data=body,

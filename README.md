@@ -65,7 +65,7 @@ their own names)
 ```bash
 sudo apt install git python3 build-essential
 git clone https://github.com/anku0669/qoralis-engine
-cd Qoralis
+cd qoralis-engine
 ./start-here.sh
 ```
 
@@ -75,7 +75,7 @@ cd Qoralis
 xcode-select --install
 brew install libomp git python
 git clone https://github.com/anku0669/qoralis-engine
-cd Qoralis
+cd qoralis-engine
 ./start-here.sh
 ```
 
@@ -109,9 +109,11 @@ Starting Qoralis
 ```
 
 **Next time**, run `START-HERE.bat` or `./start-here.sh` again: Qoralis starts
-straight away, with no download and no build. `c/coli status` shows what is
-installed and whether it runs, `c/coli stop` stops it (`c\coli.cmd status` and
-`c\coli.cmd stop` on Windows).
+straight away, with no download and no build. `c/qoralis status` shows what is
+installed and whether it runs, `c/qoralis stop` stops it (`c\qoralis.cmd status` and
+`c\qoralis.cmd stop` on Windows).
+
+Existing installations with ~/colibri-models keep using that directory automatically; fresh installations use ~/qoralis-models. The same compatibility rule preserves an existing macOS Application Support/colibri setup directory.
 
 Options go after `./start-here.sh` or `START-HERE.bat`:
 
@@ -120,7 +122,7 @@ Options go after `./start-here.sh` or `START-HERE.bat`:
 | `--list` | every model against this machine, and why one does not fit |
 | `--model ID` | install that model (the ids are in [the tables below](#which-model-for-my-machine)) |
 | `--yes` | no questions: take the recommendation |
-| `--dir DIR` | put the models on another disk (default `~/colibri-models`) |
+| `--dir DIR` | put the models on another disk (default `~/qoralis-models`) |
 | `--backend vulkan`, `cuda` or `cpu` | choose the engine build yourself; `--no-gpu` is `--backend cpu` |
 | `--model-dir DIR` | use a model you already downloaded |
 | `--reconfigure` | choose another model |
@@ -135,27 +137,27 @@ What each step does, in detail: [docs/quickstart.md](docs/quickstart.md#the-one-
 | `to use the GPU through ..., first run: <command>` | run that command, then the setup again: it rebuilds for the GPU and does not download again |
 | `the ... build failed`, for example `Unsupported gpu architecture` when the installed CUDA toolkit no longer supports the card | the setup checks the toolkit against the card first and picks Vulkan by itself, saying why; if a build still fails it offers the next one (Vulkan, then the CPU). `./start-here.sh --backend vulkan` forces Vulkan; `--no-gpu` stays on the CPU |
 | `needs N GB free for the download` | `--dir` with a folder on a bigger disk |
-| on WSL, the model folder is under `/mnt/c` | keep it on the Linux disk (the default, `~/colibri-models`): `/mnt/c` is many times slower |
+| on WSL, the model folder is under `/mnt/c` | keep it on the Linux disk (the default, `~/qoralis-models`): `/mnt/c` is many times slower |
 | you updated the checkout (`git pull`) | run `./start-here.sh` again: it rebuilds the engine when the sources changed, then starts it |
-| anything else | `c/coli logs -n 50` shows the log of a server started in the background (one started in the foreground prints to its own terminal) and `c/coli logs --install` the setup's; open an [issue](https://github.com/JustVugg/colibri/issues) with the last lines the setup printed |
+| anything else | `c/qoralis logs -n 50` shows the log of a server started in the background (one started in the foreground prints to its own terminal) and `c/qoralis logs --install` the setup's; open an [issue](https://github.com/JustVugg/colibri/issues) with the last lines the setup printed |
 
 ### Let your AI assistant set it up
 
 If you use an AI coding assistant, it can do all of this for you. Ask it:
 
-> Set up Qoralis on this machine following docs/AI_SETUP.md from https://github.com/JustVugg/colibri
+> Set up Qoralis on this machine following docs/AI_SETUP.md from https://github.com/anku0669/qoralis-engine
 
 [docs/AI_SETUP.md](docs/AI_SETUP.md) gives the assistant every step as a
 command with a machine-readable result, and tells it to ask you before it
 downloads a model or installs a system package. Assistants that speak the Model
-Context Protocol can use Qoralis's MCP server instead: `coli mcp` offers tools
+Context Protocol can use Qoralis's MCP server instead: `qoralis mcp` offers tools
 to detect the hardware, recommend a model, install, start, stop and check it
 ([docs/MCP_SERVER.md](docs/MCP_SERVER.md)).
 
 ### Or by hand
 
 To choose each step yourself (a prebuilt release or a source build, any model
-from the tables below, then `coli chat`, `coli web` or `coli serve`), see
+from the tables below, then `qoralis chat`, `qoralis web` or `qoralis serve`), see
 [Install by hand](#install-by-hand), or the
 [Quick Start guide](docs/quickstart.md) for every platform step by step.
 
@@ -239,7 +241,7 @@ a fast NVMe drive helps most)
 
 **From a GGUF: the published files, read as they are**
 
-`./coli import` takes the first file of a GGUF (its other parts next to it) and writes a model
+`./c/qoralis import` takes the first file of a GGUF (its other parts next to it) and writes a model
 directory beside it; `--model` that directory, as any other ([gguf.md](docs/gguf.md)). Nothing is
 converted or quantized again: the blocks run as the file holds them, from IQ1_S to Q8_0, F16, BF16
 and MXFP4. The engines of every chat model above read GGUFs too
@@ -323,10 +325,10 @@ Qwen3.8-Flash-Next, and why each engine decides for itself whether to run the
 dense chain there (Qwen3.6 yes, Qwen3.8 no). `--backend vulkan` asks for Vulkan
 anyway.
 
-**Turning the GPU on or off.** `coli setup --backend vulkan` uses the GPU for any
-model, and `coli setup --backend cpu` (or `--no-gpu`) keeps everything on the
+**Turning the GPU on or off.** `qoralis setup --backend vulkan` uses the GPU for any
+model, and `qoralis setup --backend cpu` (or `--no-gpu`) keeps everything on the
 CPU. An engine built with Vulkan uses the GPU only with `COLI_VULKAN=1` in the
-environment of `coli chat`, `serve` or `web` (the setup sets it when it chose
+environment of `qoralis chat`, `serve` or `web` (the setup sets it when it chose
 Vulkan); without it, the engine runs on the CPU. With the GPU on, `COLI_VK_CHAIN=0`
 keeps the expert tier and runs the dense layers on the CPU. On an integrated GPU,
 try both: on a laptop with an Intel Iris Xe (Core i7-1355U), Qwen3.6 decoded
@@ -451,21 +453,21 @@ Who answers:
 API, so a Jev client switches to Qoralis by changing its base URL and nothing
 else: `TYPESAFE_BASE_URL=http://127.0.0.1:8000` (the key it already sends is
 accepted by a server started without `COLI_API_KEY`). The two official SDKs,
-unmodified, are tested against `coli serve`.
+unmodified, are tested against `qoralis serve`.
 
 The same mode is in the terminal (`/decide merge | request changes | close` in
-`coli chat`) and on the dashboard's System One page. The request and reply in
+`qoralis chat`) and on the dashboard's System One page. The request and reply in
 full, the scoring rules and where it does not help:
 [docs/systemone.md](docs/systemone.md).
 
 ## The dashboard
 
-`coli web` opens it, and so does the one-step setup: the chat, the System One
+`qoralis web` opens it, and so does the one-step setup: the chat, the System One
 page, the Brain and the Profiling page, in a light or a dark theme.
 
 ### The chat UI
 
-`coli ui` opens the new chat next to a running `coli serve`: reasoning in its own block,
+`qoralis ui` opens the new chat next to a running `qoralis serve`: reasoning in its own block,
 pictures for models with a vision tower, web search, the expert map, a live monitor, and
 coding agents opened already pointed at colibri. Seven languages. See [ui/README.md](ui/README.md).
 
@@ -496,7 +498,7 @@ with the last 30 turns as a trend.
 
 ## Use it from other apps
 
-`coli serve` (which the setup starts for you) is one server with several APIs:
+`qoralis serve` (which the setup starts for you) is one server with several APIs:
 
 - **OpenAI-compatible**: `/v1/chat/completions`, `/v1/completions` and
   `/v1/models`, with streaming, JSON replies, stop sequences and logprobs;
@@ -506,24 +508,24 @@ with the last 30 turns as a trend.
   model's native format ([the per-engine table](docs/api.md#tool-calling-support));
 - **images in** on GLM-5.3-Flash, DeepSeek V4.1 Flash, MiMo-V2.6,
   Qwen3.8-Flash-Next, Qwen3.8-27B, LFM3-VL and Mistral-Large-4 (from a GGUF, with
-  the `mmproj` file next to it): a path in a `coli chat` message, an
-  attachment in `coli web` or `coli ui`, or an `image_url` part;
-- **documents in** on every chat engine: `/file PATH` in `coli chat` (or
-  `coli chat --file PATH`) sends a text file's or a PDF's text with the next
+  the `mmproj` file next to it): a path in a `qoralis chat` message, an
+  attachment in `qoralis web` or `qoralis ui`, or an `image_url` part;
+- **documents in** on every chat engine: `/file PATH` in `qoralis chat` (or
+  `qoralis chat --file PATH`) sends a text file's or a PDF's text with the next
   message. Only a file named that way is read, never a path inside a message;
   it must be a regular file with a text suffix or `.pdf`, within 64 MiB and
   2 million characters. A PDF is parsed in a separate process with a time and
   memory limit, by `pdftotext` (poppler) or `pypdf`;
 - **pictures out** with Qwen-Image-2.1 on `POST /v1/images/generations`,
-  and drawn inside the terminal by `coli chat`
+  and drawn inside the terminal by `qoralis chat`
   ([qwen-image.md](docs/qwen-image.md));
 - **decisions** on `POST /v1/systemone` ([above](#system-one-a-decision-with-a-probability));
-- **several conversations at once** on every text engine: `coli serve
+- **several conversations at once** on every text engine: `qoralis serve
   --kv-slots N` keeps up to 16, each with its own cache, and decodes their next
   tokens together ([api.md](docs/api.md#isolated-kv-contexts)).
 
 Coding CLIs and editors connect as to any OpenAI-compatible provider: base URL
-`http://127.0.0.1:8000/v1`, the model id `coli status` prints, any non-empty key
+`http://127.0.0.1:8000/v1`, the model id `qoralis status` prints, any non-empty key
 ([docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)).
 
 ## How it works
@@ -606,7 +608,7 @@ the experts live. GLM-5.2 decode, from [the full tables](docs/benchmarks.md):
 ### Three backends on one machine
 
 An i5-13500 with 62 GB of RAM and an RTX PRO 4000 Blackwell SFF (24 GB, 70 W),
-each model served by `coli serve`: a fresh 450-token prompt, then a 128-token
+each model served by `qoralis serve`: a fresh 450-token prompt, then a 128-token
 streamed answer, the request's HTTP included; the better of two runs, tok/s.
 
 | GGUF | CUDA prompt | CUDA decode | Vulkan prompt | Vulkan decode | CPU prompt | CPU decode |
@@ -619,7 +621,7 @@ streamed answer, the request's HTTP included; the better of two runs, tok/s.
 
 ### Large models on the same machine
 
-Machine D again, each model from its published GGUF through `coli serve`: what
+Machine D again, each model from its published GGUF through `qoralis serve`: what
 neither the card nor the RAM holds comes from the two NVMe drives. Tokens per
 second, from each model's page:
 
@@ -660,9 +662,9 @@ the numbers.
 <a id="1-get-colibri"></a>
 
 **1. The program.** Take the archive for your platform from
-[Releases](https://github.com/JustVugg/colibri/releases) (Linux x86_64, macOS,
+[Releases](https://github.com/anku0669/qoralis-engine/releases) (Linux x86_64, macOS,
 Windows; no compiler needed, only [Python 3](https://www.python.org/downloads/)
-for the launcher and the API) and unpack it, then `python3 coli info`. The Linux
+for the launcher and the API) and unpack it, then `python3 qoralis info`. The Linux
 and Windows engines have Vulkan built in, with their `shaders/` beside them, and
 the macOS ones Metal; for an NVIDIA card on Windows add the CUDA archive. Or build
 from source with `gcc` (or clang) and OpenMP:
@@ -683,11 +685,11 @@ container with the int8 MTP head,
 (429 GB), or [`Justvugg/GLM-5.3-colibri-int4-g64`](https://huggingface.co/Justvugg/GLM-5.3-colibri-int4-g64)
 for GLM-5.3 (419 GB, no MTP head). Not the older per-row int4 mirrors: they
 measure about 9 points worse on quality and caused the looping answers of
-[#455](https://github.com/JustVugg/colibri/issues/455). `./coli convert --model
+[#455](https://github.com/JustVugg/colibri/issues/455). `./c/qoralis convert --model
 /nvme/glm52_i4` builds the same container from the FP8 release, shard by shard,
 without ever needing its 756 GB on disk at once. How to check the MTP head and
 the rest: [quickstart.md](docs/quickstart.md#3-get-the-model). A GGUF you
-already have needs no conversion: `./coli import` its first file
+already have needs no conversion: `./c/qoralis import` its first file
 ([above](#from-a-gguf)).
 
 <a id="3-run-it"></a>
@@ -697,18 +699,18 @@ The launcher reads the model's `config.json` and picks the engine and its chat
 template, so the commands are the same for every model:
 
 ```bash
-./c/qoralis chat  --model /nvme/qwen36          # chat in the terminal
-./coli web   --model /nvme/qwen36          # API + dashboard, opens a browser
-./coli serve --model /nvme/qwen36          # API + dashboard, no browser
-./coli plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
-./coli doctor --model /nvme/qwen36         # read-only check: is everything ready?
-./coli tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
-./coli import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
-./coli ui                                  # the chat UI, next to a running coli serve
+./qoralis chat  --model /nvme/qwen36          # chat in the terminal
+./qoralis web   --model /nvme/qwen36          # API + dashboard, opens a browser
+./qoralis serve --model /nvme/qwen36          # API + dashboard, no browser
+./qoralis plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
+./qoralis doctor --model /nvme/qwen36         # read-only check: is everything ready?
+./qoralis tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
+./qoralis import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
+./qoralis ui                                  # the chat UI, next to a running qoralis serve
 ```
 
-On Windows a release archive ships `coli.cmd` (`coli.cmd chat --model
-D:\qwen36`); from a source checkout use `py -3 c\coli`. The `.exe` files are
+On Windows a release archive ships `qoralis.cmd` (`qoralis.cmd chat --model
+D:\qwen36`); from a source checkout use `py -3 c\qoralis`. The `.exe` files are
 the engines, not the launcher. Every option and variable:
 [SETTINGS.md](docs/SETTINGS.md), [ENVIRONMENT.md](docs/ENVIRONMENT.md).
 
@@ -749,7 +751,7 @@ well-controlled failure is worth more here than an unexplained fast number.
 | System One and the decision models | [systemone.md](docs/systemone.md), [laya.md](docs/laya.md), [gliner_decide.md](docs/gliner_decide.md), [clef.md](docs/clef.md) |
 | GGUF files: the architectures, the two modes, what each engine does with the blocks | [gguf.md](docs/gguf.md) |
 | The models on the Qwen3.6 engine (Flint, Muse Spark Open, LFM3-VL) and Mistral-Large-4 | [qwen36.md](docs/qwen36.md), [mistral-large4.md](docs/mistral-large4.md) |
-| The chat UI (`coli ui`) | [ui/README.md](ui/README.md) |
+| The chat UI (`qoralis ui`) | [ui/README.md](ui/README.md) |
 | Vulkan: the expert tier, the dense chain, cards without Resizable BAR | [vulkan.md](docs/vulkan.md) |
 | CUDA, and Qwen3.6's CUDA tier | [cuda.md](docs/cuda.md), [qwen36-cuda-tier.md](docs/qwen36-cuda-tier.md) |
 | Apple Silicon, Windows | [metal.md](docs/metal.md), [windows.md](docs/windows.md) |
@@ -792,14 +794,14 @@ c/
 ├── backend_metal.*       optional Metal tier  (METAL=1)
 ├── backend_vulkan.*, vk_tier.c, vk_chain.c   optional Vulkan tier and dense chain (VK=1)
 │
-├── coli                  user-facing CLI
+├── qoralis               user-facing CLI (coli compatibility alias)
 ├── setup_*.py            the one-step setup: hardware, catalog, downloads, flow
-├── mcp_server.py         the MCP server (coli mcp)
+├── mcp_server.py         the MCP server (qoralis mcp)
 ├── openai_server.py      OpenAI- and Anthropic-compatible HTTP gateway
-├── resource_plan.py      RAM/VRAM planner behind coli plan and coli doctor
+├── resource_plan.py      RAM/VRAM planner behind qoralis plan and qoralis doctor
 ├── tools/                conversion, fixtures and benchmarks
 └── tests/                dependency-free C and Python tests
-ui/                       the chat UI (coli ui)
+ui/                       the chat UI (qoralis ui)
 web/                      the dashboard (a pure API client)
 desktop/                  Tauri desktop shell around the dashboard
 docker/                   container images

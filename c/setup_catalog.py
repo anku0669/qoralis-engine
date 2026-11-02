@@ -24,7 +24,7 @@ from the measurements quoted in README.md and the per-model docs:
 - ram_good_gb: where it runs as the docs measured it: the whole expert set in
   RAM for the small models, a comfortable cache for the large ones.
 
-After the download, `coli setup` runs the real planner (resource_plan.py) on the
+After the download, `qoralis setup` runs the real planner (resource_plan.py) on the
 files, which is the authority; these numbers only decide what to offer.
 """
 import json

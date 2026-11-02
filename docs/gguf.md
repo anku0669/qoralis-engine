@@ -8,11 +8,11 @@ description: "Run a GGUF you already have, read in place: no conversion, no seco
 Qoralis runs the GGUF files people already have on disk. The ggml blocks are computed as the file holds them, from IQ1_S to Q8_0 and MXFP4: nothing is converted or quantized a second time.
 
 ```bash
-./coli import ~/models/GLM-5.3-UD-IQ1_S-00001-of-00006.gguf   # first part of a split model
-./coli chat --model ~/models/GLM-5.3-UD-IQ1_S.colibri         # or coli serve / coli web
+./qoralis import ~/models/GLM-5.3-UD-IQ1_S-00001-of-00006.gguf   # first part of a split model
+./qoralis chat --model ~/models/GLM-5.3-UD-IQ1_S.colibri         # or qoralis serve / qoralis web
 ```
 
-`coli import` writes a model directory next to the GGUF, named after it, or wherever `--out` says. The directory holds `config.json`, the tokenizer, the chat template and `gguf.json`, which points at the file. From there `coli chat`, `coli serve`, `coli web`, `coli plan` and `coli doctor` treat it like any other model.
+`qoralis import` writes a model directory next to the GGUF, named after it, or wherever `--out` says. The directory holds `config.json`, the tokenizer, the chat template and `gguf.json`, which points at the file. From there `qoralis chat`, `qoralis serve`, `qoralis web`, `qoralis plan` and `qoralis doctor` treat it like any other model.
 
 ## Supported architectures
 
@@ -36,7 +36,7 @@ Qoralis runs the GGUF files people already have on disk. The ggml blocks are com
 | `olmoe` | OLMoE | olmoe |
 | `kimi-k3` | Kimi K3 | kimi_k3 |
 
-A GGUF of another architecture is refused by `coli import` with the list above.
+A GGUF of another architecture is refused by `qoralis import` with the list above.
 
 ## Two modes
 
@@ -71,7 +71,7 @@ Both are lossless: the same blocks, the same tokens.
   - `ssm_a` holds -exp(A_log): the engine's decay rate A = exp(A_log) is its negative.
   - MLA's `attn_k_b` (transposed) and `attn_v_b` are put back into `kv_b_proj`.
   - The routed experts sit in the latent (`ffn_routed_down` and `ffn_routed_up` are the latent projections) and keep the file's blocks on the CPU and in the Vulkan tier. A GGUF's `lm_head` stays on the host.
-  - unsloth's UD-IQ1_S (594 GB: F32, Q6_K, Q8_0, IQ2_XXS and IQ1_S) runs. On an RTX PRO 4000 (24 GB) with 62 GB of RAM, a 181-token prompt and 128 tokens: the CPU 0.4-0.5 tok/s of prompt and 0.18-0.22 of decode, Vulkan 1.0 and 0.28. The chain holds 45 of the 93 layers (21.3 GiB) and the tier 106 experts on the card and 2839 in the host pool; most experts still come from the disk. UD-TQ1_0 and UD-Q1_0 use ggml types 65 and 66, which Qoralis does not know: `coli import` refuses them ("unsupported ggml type 65").
+  - unsloth's UD-IQ1_S (594 GB: F32, Q6_K, Q8_0, IQ2_XXS and IQ1_S) runs. On an RTX PRO 4000 (24 GB) with 62 GB of RAM, a 181-token prompt and 128 tokens: the CPU 0.4-0.5 tok/s of prompt and 0.18-0.22 of decode, Vulkan 1.0 and 0.28. The chain holds 45 of the 93 layers (21.3 GiB) and the tier 106 experts on the card and 2839 in the host pool; most experts still come from the disk. UD-TQ1_0 and UD-Q1_0 use ggml types 65 and 66, which Qoralis does not know: `qoralis import` refuses them ("unsupported ggml type 65").
   - The experts' shards are read without the kernel's readahead (`POSIX_FADV_RANDOM`), three slices an expert. With it, on a two-NVMe md array whose readahead is 2 MiB, decode read 17.3 GB a token for 6.7 GB of experts. Without it the read is 5.8 GB, and a 96-token answer on Vulkan decodes at 0.349 tok/s against 0.269, its 31-token prompt in 46.5 s against 54-57 s.
 - **A GGUF's experts read without the kernel's readahead.** A layer's experts sit in three tensors, so an expert is three slices read apart through the page cache, and the readahead read past each one. The files that hold them take `POSIX_FADV_RANDOM` on every drive, the mirrors too (`st_no_readahead` in `c/st.h`): Qoralis (GLM-5.2), glm53, mimo and kimi_k3. The engines that read their experts with `O_DIRECT` (deepseek_v4, deepseek_v41) never had it. GLM-5.2 UD-IQ1_S (202 GB) on Vulkan, an RTX PRO 4000 with 62 GB of RAM and a two-NVMe md array whose readahead is 2 MiB, a 96-token answer, two runs without readahead and three with it, alternated: 2.3-3.6 GB read a decoded token against 4.7-6.6 with the same number of experts loaded, 0.633-0.658 tok/s against 0.567-0.602, and 41 GB read for the prompt against 64-67.
 - **GLM's MLA**: `k_b` / `v_b` (llama.cpp splits `kv_b_proj`) stay the file's blocks on the CPU; the Vulkan chain (glm53 and Qoralis) takes them as floats, since its MLA core reads them a head at a time.
@@ -91,15 +91,15 @@ Both are lossless: the same blocks, the same tokens.
 - **qwen38's CUDA chain runs a GGUF too**: the trunk and the experts on the CUDA tier as the file has them (warm from the history), the experts the card leaves in a host pool of page-locked RAM the card reads over the bus (`COLI_CUDA_CHAIN_POOL`: a decode step's staged on the card first, a prompt chunk's layer copied over DMA while the layers before it run), routed and computed in the chain's frame with no host step. Qwen3.8-Flash-Next IQ2_XS (68 GB) on an RTX PRO 4000 (24 GB): prompt 209-213 tok/s, decode 49.6-50.8 (before: 19-21 and 11.6; the Vulkan chain 194-197 and 44-51). The greedy text is the CPU's and the Vulkan chain's. A CUDA run of such a GGUF stays on CUDA in a build with both backends.
 - **Qoralis (GLM-5.2, Mistral-Large-4) runs a GGUF on CUDA too**: the routed experts on the shared tier over the CUDA backend as the file has them, the resident dense matrices on the card as far as half its free memory goes (`COLI_CUDA_DENSE_GB` sets it), the attention on the CPU. Mistral-Large-4 UD-IQ1_S on an RTX PRO 4000: 888 experts on the card where the Vulkan tier beside the dense chain holds 156, a 240-token prompt in 66-82 s and then 1.34-1.36 tok/s of decode, against the Vulkan chain's 36.5-36.9 s and 1.16-1.17 (alternated, the same build): faster decode, a slower prompt, whose dense part (17 GiB, past half of the card) the CPU reads. A build without Vulkan (`make CUDA=1`) takes the same path.
 - **The other engines' dense matrices stay on the CPU** on CUDA, and their CUDA tiers take no ggml block types yet.
-- **A GGUF those engines' CUDA path does not take runs on Vulkan on an NVIDIA card** (qwen38 for a file whose expert types the CUDA chain's frame lacks, Qoralis for GLM-5.2 and Mistral-Large-4, whose Vulkan chain takes the attention and so reads a prompt faster than its CUDA path (`COLI_VULKAN=0` runs it there, see above), deepseek_v4, whose CUDA tier mirrors native FP4 experts only, and qwen36 for a file whose expert types the CUDA chain's frame lacks). A CUDA run of such a GGUF computed every routed expert on the CPU (Qwen3.8 IQ2_S/Q2_0 on an RTX PRO 4000: 28 tok/s of prompt, 9 of decode). A build with both backends switches such a run to Vulkan on the same card when CUDA was asked for and `COLI_VULKAN` was not set (114-118 and 46-49 tok/s); `COLI_VULKAN=0` keeps CUDA. `coli setup` builds these engines' CUDA engine with Vulkan too where the Vulkan toolchain is there (on Linux; the Windows CUDA package has both).
+- **A GGUF those engines' CUDA path does not take runs on Vulkan on an NVIDIA card** (qwen38 for a file whose expert types the CUDA chain's frame lacks, Qoralis for GLM-5.2 and Mistral-Large-4, whose Vulkan chain takes the attention and so reads a prompt faster than its CUDA path (`COLI_VULKAN=0` runs it there, see above), deepseek_v4, whose CUDA tier mirrors native FP4 experts only, and qwen36 for a file whose expert types the CUDA chain's frame lacks). A CUDA run of such a GGUF computed every routed expert on the CPU (Qwen3.8 IQ2_S/Q2_0 on an RTX PRO 4000: 28 tok/s of prompt, 9 of decode). A build with both backends switches such a run to Vulkan on the same card when CUDA was asked for and `COLI_VULKAN` was not set (114-118 and 46-49 tok/s); `COLI_VULKAN=0` keeps CUDA. `qoralis setup` builds these engines' CUDA engine with Vulkan too where the Vulkan toolchain is there (on Linux; the Windows CUDA package has both).
 
 ## Ollama's files
 
-The blobs Ollama pulls for Qwen3.5 / Qwen3.6 (`qwen3.6:35b`: 23.9 GB, Q4_K_M, under `/usr/share/ollama/.ollama/models/blobs/sha256-...` on Linux) come from Ollama's own converter, not llama.cpp's, and differ in three places `coli import` and the qwen36 engine know: `attention.head_count_kv` is an array per layer (0 on the DeltaNet layers), whose maximum is the config's; the DeltaNet's dt bias is `blk.N.ssm_dt` (llama.cpp's `ssm_dt.bias`, the same values); and the MTP head (`mtp.*`) and the vision tower (`v.*`, `mm.*`) sit in the model's file, which the engine leaves unread. `ssm.v_head_reordered` and `rope.mrope_interleaved` carry no change of layout. A symlink with a `.gguf` suffix on the blob serves as the import's file:
+The blobs Ollama pulls for Qwen3.5 / Qwen3.6 (`qwen3.6:35b`: 23.9 GB, Q4_K_M, under `/usr/share/ollama/.ollama/models/blobs/sha256-...` on Linux) come from Ollama's own converter, not llama.cpp's, and differ in three places `qoralis import` and the qwen36 engine know: `attention.head_count_kv` is an array per layer (0 on the DeltaNet layers), whose maximum is the config's; the DeltaNet's dt bias is `blk.N.ssm_dt` (llama.cpp's `ssm_dt.bias`, the same values); and the MTP head (`mtp.*`) and the vision tower (`v.*`, `mm.*`) sit in the model's file, which the engine leaves unread. `ssm.v_head_reordered` and `rope.mrope_interleaved` carry no change of layout. A symlink with a `.gguf` suffix on the blob serves as the import's file:
 
 ```bash
 ln -s /usr/share/ollama/.ollama/models/blobs/sha256-<digest> ~/models/qwen3.6-35b-ollama.gguf
-./coli import --out ~/models/qwen3.6-35b-ollama ~/models/qwen3.6-35b-ollama.gguf
+./qoralis import --out ~/models/qwen3.6-35b-ollama ~/models/qwen3.6-35b-ollama.gguf
 ```
 
 Qwen3.6-35B-A3B from that blob on an RTX 3070 (8 GB) with the CUDA chain, 2619 experts on the card: 73-78 tok/s of decode where Ollama 0.40.3 decodes the same file at 38 on the same card.

@@ -295,7 +295,7 @@ class Ml4ImageGeometryTest(unittest.TestCase):
 
 
 class Ml4MmprojImportTest(unittest.TestCase):
-    """coli import links Mistral's mmproj (projector pixtral, under clip.projector_type, where
+    """qoralis import links Mistral's mmproj (projector pixtral, under clip.projector_type, where
     LFM3's file says clip.vision.projector_type) and writes its geometry for the gateway."""
 
     def mmproj(self, folder, projector, key="clip.projector_type"):

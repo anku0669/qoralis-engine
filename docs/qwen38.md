@@ -25,10 +25,10 @@ hf download Qwen/Qwen3.8-Flash-Next-FP8 \
   --local-dir ~/Models/Qwen3.8-Flash-Next-FP8
 
 make -C c qwen38
-COLI_MODEL=~/Models/Qwen3.8-Flash-Next-FP8 ./c/coli chat
+COLI_MODEL=~/Models/Qwen3.8-Flash-Next-FP8 ./c/qoralis chat
 ```
 
-`coli serve` and `coli web` use the same gateway path. Qwen3.8 thinks
+`qoralis serve` and `qoralis web` use the same gateway path. Qwen3.8 thinks
 by default; `reasoning_effort` accepts `low`, `medium`, `high`, and `xhigh`, and
 `enable_thinking: false` emits the model's official empty thinking prefix.
 Audio and grammar constraints are rejected explicitly. Images are supported;
@@ -101,7 +101,7 @@ blocks are pooled and scored, the best 512 blocks are retained, and a causal
 tail of up to three tokens is appended. The main 24-head attention then operates
 only on those original tokens. The native model limit is 262,144 tokens;
 `Q38_MAXT` defaults to 8,192 and may raise the server limit up to that native
-ceiling when the required RAM is available. `coli serve --ctx N` (and `coli
+ceiling when the required RAM is available. `qoralis serve --ctx N` (and `coli
 chat --ctx N`) reach the engine as `Q38_MAXT=N`, not as `CTX`: that is the
 variable to look for in the engine process's environment. `max_tokens` is a
 ceiling: a budget the prompt leaves no room for is clamped to the room left
@@ -127,7 +127,7 @@ prompt:
 | PLE n-gram table (51B parameters) | 0; sixteen 160-byte row reads per token |
 | routed experts on disk | 120.8 GB, streamed |
 
-`coli plan --model <dir> --ram <GB> --ctx 8192 --gpu none` prints this
+`qoralis plan --model <dir> --ram <GB> --ctx 8192 --gpu none` prints this
 accounting for a budget and chooses the expert cap from it.
 
 Measured on the official checkpoint on an Intel Core i9-14900K (24 physical
@@ -170,7 +170,7 @@ at the full context. What a long context costs is what it takes from the experts
 - **The RAM plan prices one prompt segment, not the context**: serve reads a prompt in segments
   (8,192 rows with a dense chain, 2,048 without; `COLI_PROMPT_SEGMENT`), so a forward's row buffers
   hold one segment. The plan used to price the whole context as one forward: 38 GB at 262,144
-  positions, and no expert cache in RAM (`coli serve` started at 10 slots a layer).
+  positions, and no expert cache in RAM (`qoralis serve` started at 10 slots a layer).
 
 Qwen3.8-Flash-Next IQ2_XS on an RTX PRO 4000 (24 GB) with 62 GB of RAM, served on the CUDA chain, a
 452-token prompt and 128 tokens:
@@ -301,10 +301,10 @@ load, the parallel batch reads (`Q38_EXPERT_PARALLEL_READS`), the prefetch, the
 prefill batch and `COLI_MAP_EXPERTS=1`. The startup line names the expert
 representation, the bytes of one expert, what the cache costs full at the
 given cap, and how many experts per layer the RAM available at that moment
-would hold. `coli plan` and `--auto-tier` size the cache cap with the
+would hold. `qoralis plan` and `--auto-tier` size the cache cap with the
 sidecar's records and plan no VRAM for them: the CUDA expert tier streams FP8
 experts only, and with int4 experts it stays off, trunk included. A build with
-Vulkan too (`VK=1 CUDA=1`, what `coli setup` builds on an NVIDIA card) hands the
+Vulkan too (`VK=1 CUDA=1`, what `qoralis setup` builds on an NVIDIA card) hands the
 sidecar's experts (int4-g64 and the low-bit ones) to the Vulkan tier and its dense
 chain, on the same card, when `COLI_CUDA=1` and `COLI_VULKAN` is unset;
 `COLI_VULKAN=0` keeps them on the CPU. On an RTX PRO 4000 (24 GB) with 62 GB of
@@ -432,7 +432,7 @@ alternating.
 In a `VK=1` build, `COLI_VULKAN=1` puts the trunk on the Vulkan device (as before)
 and the routed experts of the model's layers on the shared Vulkan expert tier
 (`c/vk_tier.c`, [vulkan.md](vulkan.md#the-routed-expert-tier-vk_tierc)): a cache of
-experts in device memory, filled at startup from `.coli_usage` (`coli setup` ships a
+experts in device memory, filled at startup from `.coli_usage` (`qoralis setup` ships a
 starting one) and adapted while
 you chat, whose experts the device computes while the CPU computes the rest of the
 step. It takes every expert form this engine reads: the int4-g64 sidecar's planar
@@ -485,7 +485,7 @@ OMP_NUM_THREADS=<physical cores - 1> OMP_WAIT_POLICY=ACTIVE OMP_PROC_BIND=close 
 SNAP=<checkpoint> N_NEW=200 ./c/qwen38 128 8 prompt.txt
 ```
 
-`coli chat --gpu <n>` does the same through the planner (`supports_accelerator`
+`qoralis chat --gpu <n>` does the same through the planner (`supports_accelerator`
 in the `qwen38` descriptor). The tier reports next to the cache hit rate:
 resident experts, uploads, VRAM hits and misses, LFRU swaps. Requirements:
 native FP8 routed experts (`Q38_NATIVE_FP8=1`, the default) with every layer's
@@ -495,7 +495,7 @@ scale loader stays on the CPU and says so.
 **The card's allowance.** `CUDA_EXPERT_GB` is what each card gives the tier,
 the dense trunk and, with the CUDA chain, the chain's own buffers, in GB. Unset,
 `0` or `auto`, it is the card's free memory less 1 GB; the start prints both,
-`[qtier] dev 0: <free> GB free, allowance <GB> GB`. `coli chat --vram <GB>`
+`[qtier] dev 0: <free> GB free, allowance <GB> GB`. `qoralis chat --vram <GB>`
 passes its number as `CUDA_EXPERT_GB`; `--gpu` alone leaves it to the engine.
 `COLI_VK_TIER_GB` is the Vulkan tier's and does not size this one.
 
@@ -564,7 +564,7 @@ there, one round trip per matmul (`x` up, `y` down; activations stay on the
 CPU). Prefill rows (S > 1) and any backend failure take the CPU path, which
 holds the same int8 rows (see [the trunk on the CPU](#the-trunk-on-the-cpu-int8-rows)). The placer takes the trunk before the experts (it is
 read on every token), so on an 8 GB card about 2 GB remain for hot experts;
-`coli plan` prices it the same way (`4.0 GB int8 trunk + ... hot tier`).
+`qoralis plan` prices it the same way (`4.0 GB int8 trunk + ... hot tier`).
 
 | variable | effect |
 |---|---|
@@ -921,7 +921,7 @@ arithmetic rather than a defect, and the threshold sits between it and the
 
 Images work end to end. Send an OpenAI `image_url` part with a base64 data URI
 (a local path is accepted only under `COLI_IMAGE_ROOT`, see
-`docs/ENVIRONMENT.md`; `coli chat` reads a pasted path itself and sends the
+`docs/ENVIRONMENT.md`; `qoralis chat` reads a pasted path itself and sends the
 data URI); the gateway preprocesses it, replaces the part with
 `<|vision_start|>` + N x `<|image_pad|>` + `<|vision_end|>`, and hands the patches
 to the engine in an `IMAGE` frame ahead of the `SUBMIT` they belong to. The engine

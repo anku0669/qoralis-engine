@@ -8,8 +8,8 @@ stalls byte-counted reads (#195).
 
 | protocol | entry | selected by | used by |
 |---|---|---|---|
-| **mux** (continuous batching, up to 16 KV slots) | `run_serve_mux` | `SERVE_BATCH=1` | `openai_server.py`, `coli web` |
-| **legacy** (single slot, interactive) | `run_serve` | `SERVE=1` (without `SERVE_BATCH`) | `coli chat` |
+| **mux** (continuous batching, up to 16 KV slots) | `run_serve_mux` | `SERVE_BATCH=1` | `openai_server.py`, `qoralis web` |
+| **legacy** (single slot, interactive) | `run_serve` | `SERVE=1` (without `SERVE_BATCH`) | `qoralis chat` |
 
 This document is the reference for the **mux** protocol; the legacy protocol is
 summarized at the end. Line formats below are quoted from the emitting `printf`s in
@@ -192,7 +192,7 @@ All telemetry is advisory: servers render what they know and skip the rest.
 - `GET /*` — static hosting of `web/dist` (SPA fallback, path-traversal-safe), plus
   `experts.json` if published there (the measured expert atlas, #175/#218).
 
-## Legacy protocol (`run_serve`, `coli chat`)
+## Legacy protocol (`run_serve`, `qoralis chat`)
 
 Interactive lines are prompts; control frames: `\x02RESET` (clear history),
 `\x02MORE` (continue an NGEN-truncated answer), and
@@ -205,7 +205,7 @@ emits an empty answer, a `STAT` line with a seventh `CONTEXT_EXCEEDED` token,
 and a stderr line naming the cause (prompt too long for the context, a
 conversation history that no longer fits, or text clipped by the 64 KB render
 buffer). The cause rides the `STAT` line as an eighth token (`PROMPT_TOO_LONG`,
-`HISTORY_FULL`, or `RENDER_CLIPPED`) so `coli chat` can print it with the
+`HISTORY_FULL`, or `RENDER_CLIPPED`) so `qoralis chat` can print it with the
 right hint instead of an empty answer: `:reset` clears a full history, a
 shorter prompt (or a larger `CTX`) fits an over-long turn. Raise `CTX` or
 shorten the prompt; in chat, `\x02RESET` clears a full history.

@@ -1,4 +1,4 @@
-"""TypeSafe's own SDKs against `coli serve`: switching from Jev is a base-URL change.
+"""TypeSafe's own SDKs against `qoralis serve`: switching from Jev is a base-URL change.
 
 The official clients, unmodified, pointed at Qoralis with nothing but
 `base_url` and an API key changed:
@@ -11,7 +11,7 @@ The official clients, unmodified, pointed at Qoralis with nothing but
   @typesafe-ai/sdk      TypeScript, new TypeSafeClient({apiKey, baseURL})
                         .systemOne(...) and .models.list(), run under node
 
-Each one is driven against four servers, each a real `coli serve` process:
+Each one is driven against four servers, each a real `qoralis serve` process:
 a language model (the tiny MiMo fixture, which scores options through the
 logprob channel), two decision engines (the tiny Laya and GLiNER2.5-Decide
 fixtures, DECIDE) and a chat model with a decision head (the tiny Clef on
@@ -83,7 +83,7 @@ def free_port():
 
 
 class ColiServe:
-    """`coli serve` in its own process, on a free port, until stop()."""
+    """`qoralis serve` in its own process, on a free port, until stop()."""
 
     def __init__(self, model, env=None):
         self.port = free_port()
@@ -103,7 +103,7 @@ class ColiServe:
             except OSError:
                 if self.process.poll() is not None or time.monotonic() > deadline:
                     self.stop()
-                    raise AssertionError(f"coli serve did not start:\n{self.output()}")
+                    raise AssertionError(f"qoralis serve did not start:\n{self.output()}")
                 time.sleep(0.2)
 
     def output(self):

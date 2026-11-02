@@ -29,7 +29,7 @@ that decides whether a decision can be automated.
 ## It needs a running server
 
 There are three ways to use System One mode and they are all clients of the same
-server: the **HTTP endpoint**, the **terminal** (`coli chat --attach`) and the
+server: the **HTTP endpoint**, the **terminal** (`qoralis chat --attach`) and the
 **System One page** in the web interface. What does not exist is a one-shot form:
 no `coli decide <model> ...` that loads, answers and exits.
 
@@ -42,7 +42,7 @@ So start the server once and keep it:
 
 ```bash
 cd c
-COLI_MODEL=/nvme/qwen36 ./coli serve --host 127.0.0.1 --port 8000 --model-id qwen36
+COLI_MODEL=/nvme/qwen36 ./qoralis serve --host 127.0.0.1 --port 8000 --model-id qwen36
 ```
 
 and then reach it however you prefer:
@@ -50,7 +50,7 @@ and then reach it however you prefer:
 | from | how |
 |---|---|
 | your own code | `POST /v1/systemone`, below |
-| the terminal | `coli chat --attach http://127.0.0.1:8000`, then `/decide` |
+| the terminal | `qoralis chat --attach http://127.0.0.1:8000`, then `/decide` |
 | the browser | open the server's address, System One in the navigation dock |
 
 All three end up in the same place, so a snapshot warmed by one of them is
@@ -169,7 +169,7 @@ const { answers } = await r.json();
 Qoralis answers `POST /v1/systemone` with the request and the reply of
 TypeSafe's Jev API. Code written against Jev keeps working: point it at
 Qoralis and change nothing else. The two official SDKs, unmodified, are
-tested against `coli serve` on a language model, on the decision engines
+tested against `qoralis serve` on a language model, on the decision engines
 (Laya, GLiNER2.5-Decide) and on a chat model with a decision head (Clef)
 (`tests/test_jev_sdk.py`, `make -C c jev-sdk-check`).
 
@@ -288,7 +288,7 @@ The conversation so far becomes the context, so you can chat, then switch to
 scoring without restating anything.
 
 ```
-coli chat --attach http://127.0.0.1:8000
+qoralis chat --attach http://127.0.0.1:8000
 
 › /decide merge | request changes | close
   ✦ System One · 3 options · the model no longer generates, it assigns probabilities
@@ -553,9 +553,9 @@ plus `encoder/config.json`, keyed `laya_<encoder model_type>`;
 GLiNER2.5-Decide: a `config.json` whose `model_type` is `extractor` plus
 `encoder_config/config.json`, keyed
 `gliner2_<architecture>_<encoder model_type>`). `checkpoint_files` names the
-files `coli doctor` checks. `coli serve`
-and `coli web` then serve it, `coli info` and `coli plan` describe it, and
-`coli chat` / `coli run` refuse it with a pointer to the endpoint. A decision
+files `qoralis doctor` checks. `qoralis serve`
+and `qoralis web` then serve it, `qoralis info` and `qoralis plan` describe it, and
+`qoralis chat` / `qoralis run` refuse it with a pointer to the endpoint. A decision
 head over a chat family is a `DecisionHead` instead (Clef: a qwen36 checkpoint
 with `joint_head_config.json` and `joint_head.safetensors`): the family stays
 the chat one, `resolve_model` sets `decision_head`, and nothing is refused.

@@ -8,8 +8,9 @@ RUN apt-get update && \
 
 # Let's clone the repository
 WORKDIR /app
-RUN git clone https://github.com/JustVugg/colibri.git .
+ARG QORALIS_REPOSITORY=https://github.com/anku0669/qoralis-engine.git
+RUN git clone "${QORALIS_REPOSITORY}" .
 WORKDIR /app/c
 # It's time to compile
-RUN ./setup.sh && ./coli build
+RUN ./setup.sh && ./qoralis build
 

@@ -132,7 +132,7 @@ $MODEL_PATH="C:\LLM\models\glm-5.2"
 docker run --rm -it --name colibri-c `
   -v "$MODEL_PATH`:/app/glm-5.2" `
   -e COLI_MODEL=/app/glm-5.2 `
-  colibri-i ./coli chat
+  colibri-i ./qoralis chat
 ```
 
 **Mac/Linux** (Terminal/Bash):
@@ -141,7 +141,7 @@ MODEL_PATH="/path/to/glm-5.2"
 docker run --rm -it --name colibri-c \
   -v "$MODEL_PATH:/app/glm-5.2" \
   -e COLI_MODEL=/app/glm-5.2 \
-  colibri-i ./coli chat
+  colibri-i ./qoralis chat
 ```
 
 **Esempio per Linux:**
@@ -150,7 +150,7 @@ MODEL_PATH="/home/user/LLM/glm-5.2"
 docker run --rm -it --name colibri-c \
   -v "$MODEL_PATH:/app/glm-5.2" \
   -e COLI_MODEL=/app/glm-5.2 \
-  colibri-i ./coli chat
+  colibri-i ./qoralis chat
 ```
 
 ---
@@ -165,7 +165,7 @@ docker run --rm -it --name colibri-c \
 | `-v "PERCORSO:/app/glm-5.2"` | Collega il tuo modello dentro il container |
 | `-e COLI_MODEL=/app/glm-5.2` | Dice a Qoralis Engine dove trovare il modello |
 | `colibri-i` | Nome dell'immagine Docker |
-| `./coli chat` | Avvia Qoralis Engine in modalità chat |
+| `./qoralis chat` | Avvia Qoralis Engine in modalità chat |
 
 ---
 
@@ -413,7 +413,7 @@ Buon divertimento! 🐦
 Nel primo caso ho fatto una domanda in italiano, nel secondo in giapponese, e nel terzo ho rifatto la domanda in giapponese ma ho richiesto una risposta in italiano. 
 
 ```
-PS C:\quack\llm\Qoralis\docker> docker run --rm -it --name colibri-c -v "C:\quack\llm\models\glm-5.2:/app/glm-5.2" -e COLI_MODEL=/app/glm-5.2 colibri-i ./coli chat
+PS C:\quack\llm\Qoralis\docker> docker run --rm -it --name colibri-c -v "C:\quack\llm\models\glm-5.2:/app/glm-5.2" -e COLI_MODEL=/app/glm-5.2 colibri-i ./qoralis chat
 
      ▄▀▀▀▄  ▄        Qoralis Engine v1.0
   ▄▄▄▄▀▀▀▀▄▀▀        tiny engine, immense model

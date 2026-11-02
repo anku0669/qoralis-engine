@@ -154,13 +154,13 @@ class ProjectPythonTest(unittest.TestCase):
 
 
 class BenchDispatchTest(unittest.TestCase):
-    """`coli bench` scores the GLM-5.2/5.3 engine and nothing else.
+    """`qoralis bench` scores the GLM-5.2/5.3 engine and nothing else.
 
     tools/eval_glm.py drives the `Qoralis` binary through the log-likelihood
     scoring protocol only that engine speaks. cmd_bench handed it every model,
-    so `coli bench` on an OLMoE container printed the OLMoE banner, started the
+    so `qoralis bench` on an OLMoE container printed the OLMoE banner, started the
     GLM engine on it and died on "this engine requires n_group=1 (GLM-5.2)":
-    the shape #898 fixed for `coli tune`.
+    the shape #898 fixed for `qoralis tune`.
     """
 
     @classmethod
@@ -188,7 +188,7 @@ class BenchDispatchTest(unittest.TestCase):
              mock.patch.object(self.cli.subprocess, "call", return_value=0) as call:
             with self.assertRaises(SystemExit) as exited:
                 self.cli.cmd_bench(bench)
-        self.assertIn("coli bench is not wired for OLMoE", str(exited.exception.code))
+        self.assertIn("qoralis bench is not wired for OLMoE", str(exited.exception.code))
         call.assert_not_called()
 
 

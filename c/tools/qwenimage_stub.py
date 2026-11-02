@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A stand-in for the qwenimage engine: same command line, same serve protocol.
 
-The front ends (coli chat/run/serve, the web UI) were written before the C
+The front ends (qoralis chat/run/serve, the web UI) were written before the C
 engine could draw anything, and they are tested without it. This script speaks
 the protocol byte for byte and draws a synthetic picture that depends on the
 prompt, the seed and the size, so a rendered image is recognisable and two

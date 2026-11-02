@@ -23,7 +23,7 @@ server's `/profile` endpoint — a rolling window of per-turn `PROF` snapshots
 emitted by the engine.
 
 When `/v1/models` marks the selected model with `"capabilities":
-["image_generation"]` (Qwen-Image-2.1 under `coli serve`), the chat view
+["image_generation"]` (Qwen-Image-2.1 under `qoralis serve`), the chat view
 generates pictures instead of text. The composer then offers size presets
 (every side a multiple of 32, from 256 to 2048) or a custom size, the number of
 denoising steps and a seed; an empty seed draws a new random one for every

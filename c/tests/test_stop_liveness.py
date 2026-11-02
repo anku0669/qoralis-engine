@@ -1,9 +1,9 @@
-"""#1049: `coli stop` must actually find a live serve, on every platform.
+"""#1049: `qoralis stop` must actually find a live serve, on every platform.
 
 The bug these cover: `os.kill(pid, 0)` is the POSIX liveness idiom, but on
 Windows os.kill() has no signal semantics and raises OSError [WinError 87] for
 a pid the caller did not spawn. cmd_stop swallowed that as "not running", so
-`coli stop` reported "nothing running" while the port was still LISTENING and
+`qoralis stop` reported "nothing running" while the port was still LISTENING and
 ~5 GB of engines were resident.
 """
 import importlib.machinery, importlib.util, os, subprocess, sys, unittest

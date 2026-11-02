@@ -14,9 +14,9 @@ make glm53
 Or through the launcher, which is where images and chat templates live:
 
 ```
-coli chat  --model <dir> --no-think
-coli serve --model <dir>
-coli web   --model <dir>
+qoralis chat  --model <dir> --no-think
+qoralis serve --model <dir>
+qoralis web   --model <dir>
 ```
 
 ## Getting the model
@@ -118,8 +118,8 @@ correctness only: no GPU has run the real weights on it yet.
 
 ## Vision
 
-Reachable from every surface: a path pasted in `coli chat` (read by the client,
-sent as a data URI), a file attached or dropped in `coli web`, or an OpenAI
+Reachable from every surface: a path pasted in `qoralis chat` (read by the client,
+sent as a data URI), a file attached or dropped in `qoralis web`, or an OpenAI
 `image_url` part with a base64 data URI. A local path in the request is read
 only under `COLI_IMAGE_ROOT` (see `docs/ENVIRONMENT.md`): a file read by the
 server happens with its own rights, and an inference client is not the

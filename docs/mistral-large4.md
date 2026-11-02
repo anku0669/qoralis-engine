@@ -6,8 +6,8 @@ the first layer dense, vocabulary 204800. Its text model is GLM-5.2's DSA attent
 changes, so it runs on the GLM-5.2 engine (`colibri.c`, the `glm` family in `coli`).
 
 ```
-./coli import ~/models/Mistral-Large-4-1T-A52B-UD-IQ1_S-00001-of-00006.gguf   # first part of a split model
-./coli chat --model ~/models/Mistral-Large-4-1T-A52B-UD-IQ1_S.colibri
+./qoralis import ~/models/Mistral-Large-4-1T-A52B-UD-IQ1_S-00001-of-00006.gguf   # first part of a split model
+./qoralis chat --model ~/models/Mistral-Large-4-1T-A52B-UD-IQ1_S.colibri
 ```
 
 ## What differs from GLM-5.2
@@ -41,7 +41,7 @@ its calls as `[TOOL_CALLS]name[ARGS]{json}`, which it gives as `tool_calls`.
 
 ## From a GGUF
 
-`coli import` (`tools/gguf_import.py`) takes any of unsloth's eleven files
+`qoralis import` (`tools/gguf_import.py`) takes any of unsloth's eleven files
 (`unsloth/Mistral-Large-4-1T-A52B-GGUF`), read in place. Their types, from their headers:
 
 | file | attention q, output, indexer q, head | routed experts | the rest |
@@ -116,12 +116,12 @@ The vision tower is the GGUF repository's `mmproj-BF16.gguf` (or `mmproj-F16.ggu
 layers of width 2048, 16 heads, patches of 14 with an axial RoPE, a SiLU-gated MLP; the projector
 puts each 2 x 2 block of patches side by side (8192 to 2048), then 2048 to 6144, GELU, 6144 to
 6144 (`mistral_vision.h`, transcribed from transformers' `modeling_pixtral.py` and
-`modeling_mistral3.py`). `coli import` links one it finds next to the model (`--mmproj` names one,
+`modeling_mistral3.py`). `qoralis import` links one it finds next to the model (`--mmproj` names one,
 `--no-mmproj` leaves it out) and writes its geometry to `preprocessor_config.json`.
 
 ```
-coli import Mistral-Large-4-1T-A52B-UD-IQ1_S-00001-of-00006.gguf --mmproj mmproj-BF16.gguf
-coli serve --model Mistral-Large-4-1T-A52B-UD-IQ1_S.colibri
+qoralis import Mistral-Large-4-1T-A52B-UD-IQ1_S-00001-of-00006.gguf --mmproj mmproj-BF16.gguf
+qoralis serve --model Mistral-Large-4-1T-A52B-UD-IQ1_S.colibri
 ```
 
 The gateway cuts a picture as the release's processor does (`tools/mistral_image.py`: scaled down

@@ -6,7 +6,7 @@ turns it on, and this drives both paths.
 
 DSpark proposes tokens and the main model verifies them in one forward. The whole
 design rests on one property: what comes out has to be what would have come out
-without it. This drives `coli serve` twice over the same prompt, once with drafts on
+without it. This drives `qoralis serve` twice over the same prompt, once with drafts on
 and once with V41_DSPARK=0, and compares the text.
 
 The tiny fixture's draft head is random, so almost nothing it proposes is accepted --
@@ -55,7 +55,7 @@ def completion(drafts):
     """One turn through the gateway, with drafting on or off. Returns (text, log)."""
     port = free_port()
     # V41_STATS: the per-turn "N of M drafts accepted" line is what this test reads,
-    # and it is off by default so that `coli chat` does not print accounting between
+    # and it is off by default so that `qoralis chat` does not print accounting between
     # the question and the answer. A test that measures asks to be told.
     environment = {**os.environ, "V41_DSPARK": "1" if drafts else "0", "V41_STATS": "1"}
     process = subprocess.Popen(
@@ -66,14 +66,14 @@ def completion(drafts):
         deadline = time.time() + 180
         while True:
             if time.time() > deadline:
-                raise RuntimeError("coli serve did not come up in 180 s")
+                raise RuntimeError("qoralis serve did not come up in 180 s")
             try:
                 with urllib.request.urlopen(f"http://127.0.0.1:{port}/v1/models", timeout=2) as r:
                     model = json.load(r)["data"][0]["id"]
                 break
             except Exception:
                 if process.poll() is not None:
-                    raise RuntimeError("coli serve exited early")
+                    raise RuntimeError("qoralis serve exited early")
                 time.sleep(1)
         body = json.dumps({"model": model, "prompt": PROMPT,
                            "max_tokens": TOKENS, "temperature": 0.0}).encode()

@@ -257,7 +257,7 @@ def check_cli_uses_engine_context(binary: Path, model: Path, temporary: Path) ->
         ],
         env=dict(os.environ, CTX="768"),
     )
-    # `coli tune` compares candidates from tokens-and-elapsed, and before #898
+    # `qoralis tune` compares candidates from tokens-and-elapsed, and before #898
     # only the GLM engine emitted a parseable line -- so the tuner ran GLM at
     # every checkpoint. Assert the line here rather than trusting a one-off
     # manual check: the first placement of it compiled fine and sat in a branch

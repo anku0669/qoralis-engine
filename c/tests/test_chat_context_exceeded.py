@@ -1,8 +1,8 @@
-"""`coli chat` surfaces the engine's CONTEXT_EXCEEDED refusal instead of an empty answer.
+"""`qoralis chat` surfaces the engine's CONTEXT_EXCEEDED refusal instead of an empty answer.
 
 The legacy run_serve protocol has no ERROR frame: on an over-context turn the
 engine emits an empty answer plus `STAT ... CONTEXT_EXCEEDED <cause>` (#2097).
-The reason used to go only to the engine's stderr, which `coli chat` drains
+The reason used to go only to the engine's stderr, which `qoralis chat` drains
 into a temporary log and never shows, so the user saw empty answers until they
 typed `:reset`, without being told to. The chat loop now reads the token on
 the STAT line and prints the reason with the hint that actually fixes it.
@@ -86,7 +86,7 @@ DRIVER = textwrap.dedent("""\
          mock.patch("builtins.input", fake_input), \\
          mock.patch.object(sys, "stdout", out):
         try:
-            coli.cmd_chat(args)
+            qoralis.cmd_chat(args)
         except SystemExit:
             pass
     print(json.dumps({"output": out.getvalue(), "turns": len(sent)}, ensure_ascii=True))
@@ -103,7 +103,7 @@ def chat(cause):
             result = subprocess.run([sys.executable, str(driver), str(CLI), str(engine), cause],
                                     capture_output=True, timeout=90)
         except subprocess.TimeoutExpired:
-            raise AssertionError("`coli chat` hung talking to the refusing engine")
+            raise AssertionError("`qoralis chat` hung talking to the refusing engine")
     if result.returncode:
         raise AssertionError(result.stderr.decode("utf-8", "replace")[-3000:])
     report = json.loads(result.stdout.decode("utf-8").strip().splitlines()[-1])

@@ -12,7 +12,7 @@ natively on every engine, on the CPU, on Vulkan and on CUDA. CUDA gets device
 chains of its own and a routed-expert tier for every engine. New models:
 Mistral-Large-4 (text and pictures), LFM3-VL, Flint and Muse Spark Open, the
 published GGUFs of DeepSeek V4.1 Flash and Kimi K3. Qwen3.8 Flash Next runs a
-256k context at the speed of 64k. A new chat UI (`coli ui`). An agent's short
+256k context at the speed of 64k. A new chat UI (`qoralis ui`). An agent's short
 requests between two turns no longer make the conversation read again, on every
 engine.
 
@@ -129,11 +129,11 @@ engine.
 
 ### Interface
 
-- **#2505**: a new chat UI (`coli ui`): reasoning, pictures, web search, the
+- **#2505**: a new chat UI (`qoralis ui`): reasoning, pictures, web search, the
   expert map, a live monitor, models, coding agents.
 - **#2087**, **#2094**, **#2004**, **#2005**, **#2457**: the web chat sends a past
   turn's reasoning back and follows a streaming answer; Brazilian Portuguese;
-  `coli chat` reads documents (`/file`, `--file`).
+  `qoralis chat` reads documents (`/file`, `--file`).
 - **#2144**: `residency_sim.py --engine olmoe` replays OLMoE traces with OLMoE's
   own cache traversal.
 
@@ -143,7 +143,7 @@ engine.
   stop on an MSYS or Cygwin gcc.
 - **#2026**, **#2095**, **#2099**, **#2100**, **#2197**: setup applies the plan
   off CUDA and takes `--ctx`, CUDA on Windows, models split across drives,
-  `coli stop`, GGUF import on Windows.
+  `qoralis stop`, GGUF import on Windows.
 - **#2315**, **#2325**, **#2037**, **#2509**: Windows heap and memory fixes, a
   shard's readers overlapping.
 - **#2396**, **#2397**: a container's cgroup limit bounds the RAM.
@@ -181,7 +181,7 @@ decision API (System One).
 
 ### Several conversations at once
 
-- **#1955**: every text engine serves several conversations at once (`coli serve
+- **#1955**: every text engine serves several conversations at once (`qoralis serve
   --kv-slots N`, up to 16), as GLM-5.2 and GLM-5.3 Flash did: qwen36 (Qwen3.6,
   Qwen3-Coder, Qwen3.8-27B), qwen38, OLMoE, Inkling, Kimi K3, MiMo-V2.6,
   DeepSeek V4 and V4.1. Each slot keeps its own conversation's state, and every
@@ -217,7 +217,7 @@ decision API (System One).
   layers that fit go to the device, the CPU runs the rest, and nothing is
   uploaded that the chain will not use, so an 8 GB card with a larger trunk keeps
   the chain and its expert tier instead of losing both. `COLI_VK_CHAIN_LAYERS`
-  forces N, `coli plan` predicts it. DeepSeek V4, qwen36 and olmoe, qwen38,
+  forces N, `qoralis plan` predicts it. DeepSeek V4, qwen36 and olmoe, qwen38,
   GLM-5.2 and GLM-5.3 Flash.
 - **#1920**: a second GPU for the expert tier (`COLI_VK_DEV2=auto|<index>`) on
   every MoE engine: the experts after the primary device's, each step one batch
@@ -269,7 +269,7 @@ decision API (System One).
 - **#1813**, **#1819**, **#1820**, **#1827**, **#1835**: MiMo-V2.6 (Flash and
   Pro): the engine, the vision tower, tool calling and Brio mode with logprobs,
   read as released; Pro verified against Xiaomi's reference on the real
-  checkpoint, and `coli serve` names the loaded variant.
+  checkpoint, and `qoralis serve` names the loaded variant.
 - **#1828**, **#1829**: Qwen3-Coder-30B-A3B (`qwen3_moe`) on the qwen36 engine.
 - **#1777**, **#1779**: dense checkpoints of the Qwen3.6 family on the qwen36
   engine (Qwen3.8-27B), text and images.
@@ -288,7 +288,7 @@ decision API (System One).
 - **#1832**, **#1917**: speculative decoding with the checkpoint's MTP head,
   lossless, +12-14% on the release; with #1917 it is on by default with prompt
   lookup on every engine that has it (`Q38_MTP=0`, `COLI_LOOKUP=0` turn them
-  off), and `coli plan` counts the MTP head's memory.
+  off), and `qoralis plan` counts the MTP head's memory.
 - **#1814**: Inkling reads the embedding norm under the name transformers 5.18
   writes.
 
@@ -311,22 +311,22 @@ decision API (System One).
   Metal, and a Windows CUDA package (`coli_cuda.dll` for compute 8.0 and newer,
   with Qoralis, qwen36 and kimi_k3 built to load it). The Vulkan loader is
   opened at run time, so these engines still start on a machine without one,
-  on the CPU. `coli setup` uses them without a Vulkan toolchain.
+  on the CPU. `qoralis setup` uses them without a Vulkan toolchain.
 
-- **#1842**: one-step install and start (`start-here`, `coli setup`), the
+- **#1842**: one-step install and start (`start-here`, `qoralis setup`), the
   `AI_SETUP.md` guide and an MCP server.
 - **#1850**, **#1896**: setup picks the backend that works on the machine: on an
   integrated GPU, Vulkan only where it was measured faster; CUDA only when the
   toolkit builds for the card, Vulkan otherwise, and a failed build falls back.
 - **#1903**: an engine already built is brought up to date with `make` before it
-  is used (a `git pull` used to keep running the old binary), and `coli logs`
+  is used (a `git pull` used to keep running the old binary), and `qoralis logs`
   says where a foreground server prints (#1852).
 - **#1919**: a fresh install of Qwen3.6-35B-A3B or Qwen3.8 Flash Next gets a
   starting expert history, so its first run fills the GPU tier from the start:
   on a Radeon 780M Qwen3.6's first run went from about 6 to 11 tok/s.
-- **#1817**: in `coli chat`, a line that starts with a picture's path is a
+- **#1817**: in `qoralis chat`, a line that starts with a picture's path is a
   message, not a command.
-- **#1959** (@rudycelekli): `coli setup` counts a server on its port as a running
+- **#1959** (@rudycelekli): `qoralis setup` counts a server on its port as a running
   Qoralis only when `/health` answers as Qoralis does; another program's HTTP 200
   no longer passes for one, and the setup starts its own on the next free port.
 - **#1315** (@Avicennasis): resumable, hash-verified qpack installers for
@@ -334,11 +334,11 @@ decision API (System One).
 - **#1316** (@Avicennasis): the planner honours cgroup memory limits.
 - **#1949**: on Windows every engine has its bare `make <engine>` target (six
   fell to make's built-in rule and linked without CUDA or Vulkan, #1945,
-  #1900); `coli setup` prefers an MSYS2 that can build Vulkan over a PATH
+  #1900); `qoralis setup` prefers an MSYS2 that can build Vulkan over a PATH
   compiler that cannot, and installs libgomp; `COLI_VK_DENSE=0` keeps the dense
   chain off too (on an 8 GB laptop it had taken the expert tier's budget,
   #1900); DeepSeek V4 uses the physical cores on an SMT machine (+10% decode on
-  a Threadripper, #1906); `coli plan` leaves a card below an engine's CUDA
+  a Threadripper, #1906); `qoralis plan` leaves a card below an engine's CUDA
   floor out; the server says why its engine stopped (#1941); clearer messages
   for a missing model and a CUDA DLL that does not load.
 
@@ -439,7 +439,7 @@ decision API (System One).
 ## [1.12.1] — 2026-09-24
 
 96 pull requests since v1.12.0, 80 of them from contributors. Two tokenizers
-brought back to the reference, brio on the ninth engine, `coli chat` working
+brought back to the reference, brio on the ninth engine, `qoralis chat` working
 again at the default context on two families, and a placement decision that
 is now measured on the card in front of it instead of predicted.
 
@@ -480,7 +480,7 @@ is now measured on the card in front of it instead of predicted.
 - **#1659**: qwen36 and qwen38 refused a request when `prompt + max_tokens`
   exceeded the context, and the gateway's default budget for these two
   families is 8192, the whole default context: every request without
-  `max_tokens` and every `coli chat` message answered 400 on a two-token
+  `max_tokens` and every `qoralis chat` message answered 400 on a two-token
   prompt (#1641). `max_tokens` is now a ceiling, clamped to the room the
   prompt leaves, as GLM and DeepSeek V4 already did; only a prompt that does
   not fit is refused. `docs/api.md` states the rule, `docs/qwen38.md` names
@@ -596,14 +596,14 @@ is now measured on the card in front of it instead of predicted.
   rows (`kv_prefix.h`) and refuses a stale pin or prefix restore; image rows
   are tainted. Wire regressions run on the BF16 and FP8 fixtures.
 - **#1626**: `SNAP` is the model directory for every non-GLM engine, so
-  `coli run` stops handing them a leftover environment (#1600).
+  `qoralis run` stops handing them a leftover environment (#1600).
 - **#1604**: glm53 honours `Mat.resident` in the Vulkan gate and frees the
   Vulkan handle in `mat_release`.
 - **#1321**: glm53 sizes its expert cache around the model rather than
   around `MemAvailable`, which the page cache had been inflating.
 - **#1588**: qwen36 refuses loudly on a failed encode-buffer realloc instead
   of writing through NULL.
-- **#1546**: `coli convert` routes OLMoE to `convert_olmoe_merged.py`.
+- **#1546**: `qoralis convert` routes OLMoE to `convert_olmoe_merged.py`.
 - **#1630**: olmoe emits the `ROUTE_TRACE` records it announced; the stream
   used to be a zero-byte file.
 - **#1610**: `v41_dsml.py` is staged during installation (and the nix flake
@@ -614,8 +614,8 @@ is now measured on the card in front of it instead of predicted.
   tolerance.
 - **#1670**: DeepSeek V4.1 read only its argv cache cap, so `RAM_GB=120`
   on a 128 GB box left the engine at eight expert slots per layer and
-  23.8 GB of RSS (#1666). With `--cap` omitted, `coli chat`, `coli serve`
-  and `coli web` now size the cache from the resource plan, with `RAM_GB`
+  23.8 GB of RSS (#1666). With `--cap` omitted, `qoralis chat`, `qoralis serve`
+  and `qoralis web` now size the cache from the resource plan, with `RAM_GB`
   or `--ram` as the budget; an explicit `--cap`, a measured profile and an
   auto-tier plan keep precedence.
 - **#1671**: DeepSeek V4.1 treats `max_tokens` as a ceiling like the other
@@ -661,7 +661,7 @@ is now measured on the card in front of it instead of predicted.
   gateway and the whole answer came back as `reasoning_content`. The
   non-special added tokens are decoded now; special ones such as
   `<|im_start|>` still decode to nothing.
-- **#1734** (tarazum): stopping `coli serve` closes the engine's stdin and
+- **#1734** (tarazum): stopping `qoralis serve` closes the engine's stdin and
   waits for it to exit on its own before the hard-stop ladder, so the
   engine's teardown runs; qwen36 never saved its `HEAT_FILE` under `coli
   serve` (#1733). On Windows the gateway handles SIGBREAK and the engine
@@ -676,10 +676,10 @@ is now measured on the card in front of it instead of predicted.
 - **#1728** (crichalchemist): `make test-c VK=1` built 43 test binaries
   without the Vulkan object; they link it now.
 - **#1712** (kevin9327): Kimi K3, Inkling and OLMoE now treat `max_tokens`
-  as a ceiling like the other engines; `coli chat`'s default of 16384
+  as a ceiling like the other engines; `qoralis chat`'s default of 16384
   answered 400 on every Kimi and Inkling message against their 8192-token
   window.
-- **#1713** (kevin9327): `coli plan`, `doctor` and `--auto-tier` export the
+- **#1713** (kevin9327): `qoralis plan`, `doctor` and `--auto-tier` export the
   variable that actually sizes the expert cache on Kimi K3
   (`K3_EXPERT_GB`) and GLM-5.3 (`GLM53_EXPERT_GB`); only `RAM_GB` was
   exported, which neither engine reads as the cache size.
@@ -731,7 +731,7 @@ is now measured on the card in front of it instead of predicted.
   rule and built a CPU-only binary; a bare `qwen36` alias, a `.build-config`
   prerequisite so a CUDA_DLL change rebuilds, a loader-against-header parity
   test, and the Windows CUDA tier documented.
-- **#1556**: `coli plan` on macOS said "no supported GPU detected" on every
+- **#1556**: `qoralis plan` on macOS said "no supported GPU detected" on every
   Mac; it now lists the Metal device by name, as identity only, without
   pretending unified memory is a VRAM budget.
 - **#1691**: the installed launcher invoked as `/bin/coli` or `/sbin/coli`
@@ -812,7 +812,7 @@ is now measured on the card in front of it instead of predicted.
   version, which the banner test now checks in every language.
 - **#1634**: the multi-disk guide states measured gains and limits instead
   of "twice the bandwidth", with Bash and PowerShell examples.
-- **#1617**: connecting the pi coding agent to `coli serve`.
+- **#1617**: connecting the pi coding agent to `qoralis serve`.
 - **#1619**: `expected_bytes` identity versus physical extent for
   int4-rans256-g0 (#1273).
 - **#1618** (bherald): `docs/qwen38.md` no longer calls the engine text-only;
@@ -854,7 +854,7 @@ that used to answer 500 or die on a locale.
   match a cold recomputation to 0.00e+00 on all nine tiny fixtures, and on
   the two real checkpoints available (qwen36 at 22 GB and DeepSeek V4.1
   Flash at 476 GB).
-- Three clients: `POST /v1/brio` on the gateway, `/brio` in `coli chat`,
+- Three clients: `POST /v1/brio` on the gateway, `/brio` in `qoralis chat`,
   and a page in the dashboard. `docs/brio.md` has the request, the reply,
   the normalisation choice and the cases where the mode does not help.
 - The endpoint takes three forms. `options` is one closed question.
@@ -914,24 +914,24 @@ that used to answer 500 or die on a locale.
   synchronisation and glm53 reached it from an OpenMP region.
 - **#1557**: a truncated multibyte tail made the qwen36 tokenizer read past
   the prompt. **#1530**: an integer overflow check in `kimi_k3.c`.
-- **#1631**: `coli serve` reaches the expert-history save when it is stopped
+- **#1631**: `qoralis serve` reaches the expert-history save when it is stopped
   with SIGTERM, not only on Ctrl-C. **#1628**: the expert grid is resent
   after every turn, so the dashboard stops showing the cold snapshot
   forever.
-- **#1608**: `coli doctor` matches core tensor roles by component instead of
+- **#1608**: `qoralis doctor` matches core tensor roles by component instead of
   by one family's spelling.
 - **#1526**, **#1584**, **#1585**, **#1536**: the planner, the auto-tuner
   and the registry agree about which engine is running, and stop advising
   GLM-only knobs on every family.
-- **#1489**: `coli bench` ran the GLM engine on any model. **#1503**: every
+- **#1489**: `qoralis bench` ran the GLM engine on any model. **#1503**: every
   engine is handed its model directory through `SNAP`. **#1486** and
   **#1488**: a directory without `config.json` names no engine, and
-  `coli convert` refuses an output directory that already holds one.
+  `qoralis convert` refuses an output directory that already holds one.
 
 ### Windows, macOS and locales
 
 - **#1515**, **#1560**, **#1561**, **#1562**, **#1516**: the chat, `coli
-  run`, `coli tune` and the datapoint harness no longer die when an engine
+  run`, `qoralis tune` and the datapoint harness no longer die when an engine
   line, a prompt or a dash does not fit the console code page.
 - **#1537**, **#1579**, **#1535**: the qwen36 CUDA_DLL build on Windows gets
   its tier, is recognised, and the device probe loads the backend before
@@ -946,7 +946,7 @@ that used to answer 500 or die on a locale.
 - **#1494**, **#1506**, **#1512**: `PROF` reports block time, head time,
   matmul, attention and lm_head, at microsecond resolution, on deepseek_v4,
   olmoe and qwen36. **#1555**: `CONSIST=1` checks prefill against decode.
-- **#1482**: configurable generation statistics in `coli chat`, with exact
+- **#1482**: configurable generation statistics in `qoralis chat`, with exact
   token throughput when the server reports it.
 - **#1468**, **#1487**, **#1480**: a failure in the MoE step, a missing core
   tensor and duplicate tensor names are diagnosed by name instead of by a
@@ -997,7 +997,7 @@ building them in CI.
 - Two ways of hiding the expert reads behind the matmuls were built,
   measured worse, and removed; both are written up in `docs/deepseek-v41.md`
   with the numbers, so the next attempt starts from them.
-- `coli chat`, `coli serve` and `coli web` work; `coli run` is deliberately
+- `qoralis chat`, `qoralis serve` and `qoralis web` work; `qoralis run` is deliberately
   unwired for this family, as for qwen36 and qwen38. Per-turn accounting is
   behind `V41_STATS`, off by default, so the chat stays clean.
 
@@ -1017,7 +1017,7 @@ building them in CI.
   the CPU path for any format that needs scales and got none.
 - **#1389** (@bherald): GLM-5.3 teardown leaked the lazily allocated dashboard
   HITS table.
-- **#1461**: `coli cluster worker` could never start without an explicit
+- **#1461**: `qoralis cluster worker` could never start without an explicit
   `--cap`: the default is `None`, and `str(None)` reached the engine's
   argument check as the literal `"None"` (#1452). The worker now resolves the
   cap the way every other launcher does.
@@ -1032,7 +1032,7 @@ building them in CI.
   with no flags (#1442).
 - **#1377**: available RAM is measured on every platform (glm53 read
   `/proc/meminfo` unconditionally, so on Windows and macOS it read 0 and the
-  expert budget collapsed to 1 GB, which is how `coli tune` went OOM in
+  expert budget collapsed to 1 GB, which is how `qoralis tune` went OOM in
   #1375), and the Windows commit limit is respected.
 - **#1381**: the context ceiling is announced, a request that cannot be
   honoured is refused up front, and the number reported is the right one
@@ -1054,13 +1054,13 @@ building them in CI.
   the container's widest (#1351). **#1410**, **#1411**: on a single GPU the
   VRAM prefix is sized from the VRAM budget and the measured headroom, not
   from the RAM pin plan capped by the LRU reserve (#1409, #1405).
-- **#1447** (@trigger2k20): `coli mirror verify` accepts a complete mirror
+- **#1447** (@trigger2k20): `qoralis mirror verify` accepts a complete mirror
   copied by other means, with no receipt, and fails closed on a short or
   corrupt shard.
 - **#1456** (@trigger2k20): the planner reports `memory.unified` from the
   host, not from whether the selected engine has a placement-capable GPU, so
   a CPU-only engine on Apple Silicon no longer reads as non-unified; and
-  `coli tune` stops suggesting `DRAFT`/`PIPE`/`PIN`/`NUMA` to glm53, which
+  `qoralis tune` stops suggesting `DRAFT`/`PIPE`/`PIN`/`NUMA` to glm53, which
   ignores them.
 - **#1396** (@dmoraesrs): the web reasoning selector drops "Medium" for
   GLM 5.3, which the engine renders identically to "High".
@@ -1078,7 +1078,7 @@ building them in CI.
   and the route-weighted scatter on the GPU, CPU path unchanged when Metal
   is off. Validated against the CPU implementation to 2.8e-09 and measured
   on an M4 Max: 0.469 to 0.621 tok/s at 32 tokens, up to 2.15 tok/s with
-  the expert cache tuned. Also fixes `coli run --cap N` being silently
+  the expert cache tuned. Also fixes `qoralis run --cap N` being silently
   ignored on the glm53 one-shot path.
 - **#1457** (@trigger2k20): GLM-5.3-Flash feeds the shared routing telemetry
   and writes `.coli_usage`, so usage-driven placement and partial-mirror
@@ -1120,13 +1120,13 @@ days after it shipped.
 
 ### Fixed
 
-- `coli convert` picks the converter from the checkpoint's `config.json`. It ran
+- `qoralis convert` picks the converter from the checkpoint's `config.json`. It ran
   GLM-5.2's converter on everything; on GLM-5.3-Flash that quantized the nested
-  embedding and the engine refused the result hours later inside `coli web`.
+  embedding and the engine refused the result hours later inside `qoralis web`.
   An option the target converter does not take is refused, not dropped (#1368,
   #1369). The converter also refuses a checkpoint it cannot serve, with a
   per-family pointer (#1305).
-- `coli doctor` no longer reports two missing core tensors on a healthy
+- `qoralis doctor` no longer reports two missing core tensors on a healthy
   GLM-5.3-Flash: it matches roles, prefix-agnostically, instead of GLM-5.2's
   literal names (#1365, #1366).
 - The release archive ships every file `coli` reaches: `iq3_pack.py`, its grid
@@ -1139,7 +1139,7 @@ days after it shipped.
 - Metal: bit-exact fp8-e4m3 decode (#1346). Qwen3.6: tokenizer merges in both
   spellings (#1319). macOS: Homebrew prefixes found when `brew` is off the PATH
   (#1320). DeepSeek V4 on macOS: real CPU and memory in HWINFO (#1308).
-- `coli doctor` omits the GPU plan for a CPU-only engine (#1322); a missing core
+- `qoralis doctor` omits the GPU plan for a CPU-only engine (#1322); a missing core
   tensor explains itself on every fatal path (#1318); GLM-5.3-Flash `--no-think`
   is the template's lowest effort level, not a shape of ours (#1327).
 - GLM-5.3-Flash `serve` can use the 16 KV slots the engine has; the registry
@@ -1166,7 +1166,7 @@ days after it shipped.
 
 ### Docs
 
-- Windows DeepSeek V4 users are led to the release launcher (`coli.cmd`)
+- Windows DeepSeek V4 users are led to the release launcher (`qoralis.cmd`)
   instead of a source build (#1291).
 
 ### Build and CI
@@ -1291,10 +1291,10 @@ we shipped twice.
 
 ### Interfaces
 - **#829** (@aaristov) — GPU-vs-fallback counters and chat status made visible in
-  `coli serve`: the tier's behaviour is now observable instead of inferred.
+  `qoralis serve`: the tier's behaviour is now observable instead of inferred.
 - **#1095** (@benmaster82) — OLMoE planner geometry adapter, and **#1103**
   (@SebaWag) — Kimi K3, Inkling and DeepSeek V4 adapters with 23 tests: every
-  family now has real planner geometry, so `coli plan` stops guessing (#1066).
+  family now has real planner geometry, so `qoralis plan` stops guessing (#1066).
 - **#1096** (@terrizoaguimor) — DeepSeek V4 serve framing on the shared codec,
   completing the codec migration across OLMoE, Kimi K3 and V4.
 - **#1063 / #1068** (@terrizoaguimor) — model families are registry-owned:
@@ -1307,8 +1307,8 @@ we shipped twice.
   Windows binary mode silently disappeared from sibling engines (#748).
 - **#1036** (@lineape) — distributed expert workers (LAN, opt-in via
   `CLUSTER_WORKERS`).
-- Planner: DeepSeek V4 expert naming now recognized, so `coli plan` and
-  `coli doctor` stop counting every routed expert as dense (fixes #1110).
+- Planner: DeepSeek V4 expert naming now recognized, so `qoralis plan` and
+  `qoralis doctor` stop counting every routed expert as dense (fixes #1110).
 
 ## [1.6.2] — 2026-08-14
 Security release: **six privately-reported memory-safety issues fixed**, all reachable
@@ -1383,7 +1383,7 @@ Defender flags the v1.1.0 Windows binary, and the cause was ours.
 - **`python3 openai_server.py` was broken on a clean checkout** (#526) — the gateway
   still looked for an engine named `glm` after the #391 rename. It resolves
   `Qoralis`/`colibri.exe` first now, falling back to `glm` for older trees.
-  `coli serve` was unaffected. Spotted by @RDouglasSharp while debugging #488.
+  `qoralis serve` was unaffected. Spotted by @RDouglasSharp while debugging #488.
 
 ### Added
 
@@ -1503,12 +1503,12 @@ First tagged release. The engine has been running in production since late June
   on unified memory GPU
 - **MTP speculation**: native GLM-5.2 draft heads, grammar-forced drafts, kernel-
   pinned verification (`SPEC_PIN=1`)
-- **OpenAI-compatible API**: `coli serve` with SSE streaming, KV slots, bounded
-  queue, web dashboard (`coli web`)
+- **OpenAI-compatible API**: `qoralis serve` with SSE streaming, KV slots, bounded
+  queue, web dashboard (`qoralis web`)
 - **Web UI**: chat with live metrics, expert cortex brain page, profiling breakdown,
   expert atlas 3-D galaxy
 - **Cross-platform**: Linux, macOS, Windows 11 (native MinGW), PowerPC; CI on all three
-- **Auto-tune**: `coli plan --auto-tier` classifies the bottleneck and derives
+- **Auto-tune**: `qoralis plan --auto-tier` classifies the bottleneck and derives
   MTP/PIPE/NUMA/PIN settings with explanations
 
 ### Engine
@@ -1525,10 +1525,10 @@ First tagged release. The engine has been running in production since late June
 
 ### Tools
 
-- `coli convert` — FP8→int4 one-shard-at-a-time converter
-- `coli doctor` — read-only setup diagnostics
-- `coli plan` — resource planner with auto-tune prescription
-- `coli bench` — MMLU / HellaSwag / ARC quality benchmarks
+- `qoralis convert` — FP8→int4 one-shard-at-a-time converter
+- `qoralis doctor` — read-only setup diagnostics
+- `qoralis plan` — resource planner with auto-tune prescription
+- `qoralis bench` — MMLU / HellaSwag / ARC quality benchmarks
 - Expert atlas (`tools/analyze.py --web`) — measured topic affinity for 19,456 experts
 
 ### Community

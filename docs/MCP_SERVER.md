@@ -3,7 +3,7 @@
 Qoralis ships a [Model Context Protocol](https://modelcontextprotocol.io) server,
 so an AI coding assistant can detect the hardware, recommend a model, install
 it, and start, check and stop the server through tool calls instead of shell
-commands. It is the same code `coli setup` runs (`c/setup_flow.py`), written
+commands. It is the same code `qoralis setup` runs (`c/setup_flow.py`), written
 with the Python standard library only: nothing to install beyond Python 3.10.
 
 The shell path for assistants without MCP is [AI_SETUP.md](AI_SETUP.md).
@@ -14,11 +14,11 @@ The transport is stdio: the client starts the process and exchanges JSON-RPC
 2.0 messages with it, one per line. Either form works:
 
 ```bash
-python3 /path/to/colibri/c/coli mcp
+python3 /path/to/colibri/c/qoralis mcp
 python3 /path/to/colibri/c/mcp_server.py
 ```
 
-After `make install` the launcher is on the PATH and `coli mcp` is enough.
+After `make install` the launcher is on the PATH and `qoralis mcp` is enough.
 
 ## Client configuration
 
@@ -33,7 +33,7 @@ Linux, macOS, WSL:
   "mcpServers": {
     "Qoralis": {
       "command": "python3",
-      "args": ["/home/me/colibri/c/coli", "mcp"]
+      "args": ["/home/me/qoralis-engine/c/qoralis", "mcp"]
     }
   }
 }
@@ -46,7 +46,7 @@ Windows:
   "mcpServers": {
     "Qoralis": {
       "command": "py",
-      "args": ["-3", "C:\\Users\\me\\Qoralis\\c\\coli", "mcp"]
+      "args": ["-3", "C:\\Users\\me\\Qoralis\\c\\qoralis", "mcp"]
     }
   }
 }
@@ -56,19 +56,19 @@ Optional environment, in an `"env"` object next to `"args"`:
 
 | Variable | Use |
 |---|---|
-| `COLI_SETUP_HOME` | where the run configuration, state and logs live (default: `~/.local/share/colibri`, `~/Library/Application Support/colibri`, `%LOCALAPPDATA%\Qoralis`) |
+| `COLI_SETUP_HOME` | where the run configuration, state and logs live (default: `~/.local/share/Qoralis`, `~/Library/Application Support/Qoralis`, `%LOCALAPPDATA%\Qoralis`) |
 | `HF_TOKEN` | token for gated model repositories |
 | `HF_ENDPOINT` | a mirror of the model hub |
 
-A client that only takes a command line: `python3 /home/me/colibri/c/coli mcp`.
+A client that only takes a command line: `python3 /home/me/colibri/c/qoralis mcp`.
 
 ## Tools
 
 | Tool | Arguments | Returns |
 |---|---|---|
-| `detect_hardware` | `target_dir` (optional) | RAM total and free, free disk in `target_dir` (default `~/colibri-models`) with the WSL `/mnt/<drive>` warning, CPU name and features, the Vulkan device the engine would use (type, memory budget), NVIDIA cards, and a `summary` text |
+| `detect_hardware` | `target_dir` (optional) | RAM total and free, free disk in `target_dir` (default `~/qoralis-models`) with the WSL `/mnt/<drive>` warning, CPU name and features, the Vulkan device the engine would use (type, memory budget), NVIDIA cards, and a `summary` text |
 | `recommend_models` | `target_dir`, `include_unfit` | the models that fit, each with `download_gb`, `ram_min_gb`, `ram_good_gb`, `dense_gb`, `status`, `reason`, and the `recommended` id; `fits_means` explains what fitting means |
-| `install` | `model`, `target_dir`, `model_dir`, `backend` (`auto`, `cpu`, `vulkan`, `cuda`), `port`, `start` (default true), `wait_seconds` (default 0) | starts a background `coli setup --yes` job and returns its pid and log; with `wait_seconds` it waits that long and reports progress |
+| `install` | `model`, `target_dir`, `model_dir`, `backend` (`auto`, `cpu`, `vulkan`, `cuda`), `port`, `start` (default true), `wait_seconds` (default 0) | starts a background `qoralis setup --yes` job and returns its pid and log; with `wait_seconds` it waits that long and reports progress |
 | `start` | `open_browser` (default false), `wait_seconds` | starts the configured server in the background; returns its state and URLs |
 | `stop` | none | stops the configured server and its engine |
 | `status` | none | the configuration (model, engine, backend, environment), install progress, server state (`stopped`, `loading`, `ready`), the browser, OpenAI and Anthropic URLs, the API `model_id`, tok/s of the last answer |
@@ -132,5 +132,5 @@ stdin and stdout. By hand:
 printf '%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
   '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"status","arguments":{}}}' \
-  | python3 c/coli mcp
+  | python3 c/qoralis mcp
 ```

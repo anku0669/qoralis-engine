@@ -1,14 +1,14 @@
 # OpenAI-compatible API, KV contexts & web UI
 
-## `coli serve`
+## `qoralis serve`
 
-`coli serve` keeps one model process loaded and exposes a text-only
+`qoralis serve` keeps one model process loaded and exposes a text-only
 OpenAI-compatible HTTP API. The gateway uses only the Python standard library;
 inference still runs in the same dependency-free C engine.
 
 ```bash
 cd c
-COLI_MODEL=/nvme/glm52_i4 COLI_API_KEY=local-secret ./coli serve \
+COLI_MODEL=/nvme/glm52_i4 COLI_API_KEY=local-secret ./qoralis serve \
   --host 127.0.0.1 --port 8000 --model-id glm-5.2-colibri
 
 curl http://127.0.0.1:8000/v1/chat/completions \
@@ -36,7 +36,7 @@ budget to what the context holds and the reply ends with `finish_reason:
 "length"`; only a prompt that does not fit is refused, with
 `context_length_exceeded` (#260, #1641). A request without a budget gets the server's
 ceiling (`--max-tokens`, reported by `GET /health` as `max_tokens`); a chat server started by
-`coli serve`, `coli web` or `coli chat` without `--ngen` sets none, so a response may run to
+`qoralis serve`, `qoralis web` or `qoralis chat` without `--ngen` sets none, so a response may run to
 the end of the context: a reasoning model's turn is its reasoning plus its answer (#382).
 Stop sequences are removed from the response and end generation early in both JSON and
 streaming modes.
@@ -299,8 +299,8 @@ trust that exact hostname with repeatable `--allowed-host` options. The
 comma-separated `COLI_ALLOWED_HOSTS` environment variable is equivalent:
 
 ```bash
-COLI_ALLOWED_HOSTS=llm.example.com ./coli serve --model /nvme/glm52_i4
-# or: ./coli serve --model /nvme/glm52_i4 --allowed-host llm.example.com
+COLI_ALLOWED_HOSTS=llm.example.com ./qoralis serve --model /nvme/glm52_i4
+# or: ./qoralis serve --model /nvme/glm52_i4 --allowed-host llm.example.com
 ```
 
 Only configure hostnames or IP addresses you control; there is no wildcard.
@@ -331,7 +331,7 @@ bounds waiting requests, independently of active capacity.
 
 ### When the engine stops
 
-`coli serve` starts the engine again when it dies (a crash, the out-of-memory
+`qoralis serve` starts the engine again when it dies (a crash, the out-of-memory
 killer, a kill). While the new engine loads, `GET /health` answers 503 with
 `{"status": "restarting"}` and `Retry-After: 5`, and nothing is admitted: a
 request waits in the queue for the new engine, within `--queue-timeout`, rather
@@ -345,7 +345,7 @@ restarts in `engine_restarts`, and the log names the cause:
 [gateway] the engine is running again (restart 1)
 ```
 
-`coli chat` waits for a restarting server instead of starting a second one.
+`qoralis chat` waits for a restarting server instead of starting a second one.
 
 ## Prometheus metrics
 
@@ -557,10 +557,10 @@ pi's tool calls fail the same way any OpenAI `tools` request does.
 
 The same provider entry serves the other engines — swap the model `id` and
 `name` (`qwen3.6-colibri` for Qwen3.6, `deepseek-v4-flash-colibri` for DeepSeek
-V4 Flash; `coli status` prints the id of the running model). Serve with a
+V4 Flash; `qoralis status` prints the id of the running model). Serve with a
 context that fits pi's preamble plus the working set: pi sends its system
 prompt, tool catalog and project instructions — about 5,000 tokens — before the
-first user word, so start the server with e.g. `coli serve --ctx 32768` and set
+first user word, so start the server with e.g. `qoralis serve --ctx 32768` and set
 `contextWindow` to the same value. Measured with pi 1.4.0 against
 Qwen3.6-35B-A3B resident in RAM (Vulkan, Ryzen 9 9950X): the ~4,900-token
 preamble prefills in about 30 s, and follow-up turns reuse the cached prefix.
@@ -596,7 +596,7 @@ schemas). A server whose context nobody set gives a chat model 65536 tokens
 whenever that fits in a quarter of the memory (more where a tenth allows it, see
 [below](#conversations-longer-than-the-context)), and `GET /v1/models` reports
 it as `context_length` and `max_model_len`. Hermes Agent reads it from there; for
-the others, put the same number in their configuration (`coli serve` prints it:
+the others, put the same number in their configuration (`qoralis serve` prints it:
 `[gateway] 65536 tokens of context ...`). An agent that believes in a larger
 window than the server holds compacts too late and ends in
 `context_length_exceeded`.
@@ -619,7 +619,7 @@ reuse the prefix and prefill only what is new.
 
 ```yaml
 model:
-  default: qwen3.6            # the --model-id of coli serve
+  default: qwen3.6            # the --model-id of qoralis serve
   provider: custom
   base_url: http://localhost:8000/v1
   api_key: local
@@ -657,7 +657,7 @@ server's `context_length`.
 A chat request may opt into context compaction with the extension field
 `"context_compaction": "auto"` (`"off"` is the default, the standard behavior;
 `COLI_COMPACT=1` on the server makes `auto` the default for every client). The
-dashboard and `coli chat` send it, so a conversation there never ends in
+dashboard and `qoralis chat` send it, so a conversation there never ends in
 `context_length_exceeded`:
 
 1. When the conversation does not fit the context, or leaves the answer less
@@ -696,7 +696,7 @@ state allowed, which left the cache nothing. The startup log says which
 
 ## Isolated KV contexts
 
-`coli serve --kv-slots N` allocates up to 16 independent sequence contexts.
+`qoralis serve --kv-slots N` allocates up to 16 independent sequence contexts.
 Requests select one with the optional integer `cache_slot` field; ordinary
 OpenAI clients omit it and keep the original slot 0 behavior.
 
@@ -716,7 +716,7 @@ keep their cache across requests. On GLM-5.2 each slot also has its MTP window a
 a crash-safe persistence file (`.coli_kv`, `.coli_kv.1`, ...), so the cache
 survives an engine restart too. Use `COLI_KV_SLOTS=N` as the environment
 equivalent. Start small: at the default 4096-token context, every slot costs
-hundreds of MB, and `coli plan` counts them.
+hundreds of MB, and `qoralis plan` counts them.
 
 Every text engine serves the slots at the same time. Requests on different slots
 are decoded together: each step takes the next token of every active
@@ -737,12 +737,12 @@ same port, then opens your browser when the engine is ready:
 
 ```bash
 cd web && npm install && npm run build   # once
-./coli web --model <model-dir>
+./qoralis web --model <model-dir>
 ```
 
-`coli web` differs from `coli serve` only in opening a browser — both serve the
+`qoralis web` differs from `qoralis serve` only in opening a browser — both serve the
 dashboard on the same port. On a headless host (no display, often no GPU at all)
-use `coli serve`, or `coli web --no-browser`, and point a browser at it from
+use `qoralis serve`, or `qoralis web --no-browser`, and point a browser at it from
 another machine. Nothing in the dashboard needs a desktop session on the host.
 
 What you get is one workspace with a dock to switch page:
@@ -767,7 +767,7 @@ What you get is one workspace with a dock to switch page:
 The dashboard talks to the engine over a small line protocol and plain JSON
 endpoints — nothing heavier than the engine itself. `web/` is a pure OpenAI-API
 client (React + TypeScript) and also works against any other compatible
-endpoint; the terminal `coli chat` remains the first-class interface.
+endpoint; the terminal `qoralis chat` remains the first-class interface.
 
 The layout is responsive down to phone widths; the per-turn time breakdown and
 the tok/s trend live on the Profiling page:

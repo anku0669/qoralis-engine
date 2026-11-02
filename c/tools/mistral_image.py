@@ -44,7 +44,7 @@ MAX_TOKENS = 1024   # merged tokens; ML4_MAX_IMAGE_TOKENS changes it in the gate
 
 
 def load_config(model_dir):
-    """The tower's geometry from the model directory (written by coli import beside a linked
+    """The tower's geometry from the model directory (written by qoralis import beside a linked
     mmproj), else the release's numbers."""
     if model_dir:
         path = Path(model_dir) / "preprocessor_config.json"

@@ -4,8 +4,8 @@ the experts streamed from the SSD), the speed to expect, the models on this disk
 catalog and the GGUFs on Hugging Face that Qoralis reads, downloads with progress, and
 switching the model the gateway serves.
 
-It runs inside `coli ui` when the gateway is on this machine (the default), or on its own
-on the engine's machine, for `coli ui --models-backend`:
+It runs inside `qoralis ui` when the gateway is on this machine (the default), or on its own
+on the engine's machine, for `qoralis ui --models-backend`:
 
     python3 ui/models.py [--backend http://127.0.0.1:8000] [--models-dir DIR] [--port 8791]
 
@@ -15,7 +15,7 @@ here. Speeds are labelled: "measured" is the median of the gateway's own finishe
 that model, on the CPU or with the GPU; "estimate" is the bytes a token reads over the
 bandwidth measured here, never shown as measured.
 
-Switching restarts the running `coli serve` with its own command, folder and environment,
+Switching restarts the running `qoralis serve` with its own command, folder and environment,
 only --model changed (on Linux, where /proc names the process that holds the port); when the
 new model does not start, the previous one is started again. Standard library only (numpy,
 when it is there, measures the RAM bandwidth)."""
@@ -60,7 +60,7 @@ DENSE_I8_AT_LOAD = {"qwen36"}
 # Decode on a Radeon 780M against the CPU of the same Ryzen 7 PRO 8700GE (docs/vulkan.md, "The
 # chain on a Radeon 780M"). An integrated GPU reads the same RAM, so what changes is the compute;
 # the ratio is applied only to that GPU. Which engines use an integrated GPU at all is
-# setup_flow.VULKAN_IGPU_MEASURED, the rule `coli setup` follows.
+# setup_flow.VULKAN_IGPU_MEASURED, the rule `qoralis setup` follows.
 IGPU_NAME = "780M"
 IGPU_RATIO = {"qwen36": {"model": "Qwen3.6", "gpu": 9.94, "cpu": 6.01},
               "qwen38": {"model": "Qwen3.8", "gpu": 3.81, "cpu": 3.49}}
@@ -116,7 +116,7 @@ def spath(name):
 
 
 def roots():
-    """Where models are: --models-dir, else the folder `coli setup` used (~/colibri-models by
+    """Where models are: --models-dir, else the folder `qoralis setup` used (~/qoralis-models by
     default), and the folder of the model the gateway serves when it is elsewhere. Downloads
     go to the first."""
     if CFG.dirs:
@@ -152,13 +152,13 @@ def jsave(path, data):
 
 
 def http_json(url, timeout=30, headers=None):
-    req = urllib.request.Request(url, headers={"User-Agent": "colibri-models/1", **(headers or {})})
+    req = urllib.request.Request(url, headers={"User-Agent": "qoralis-models/1", **(headers or {})})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8"))
 
 
 def http_range(url, start, end, timeout=60):
-    req = urllib.request.Request(url, headers={"User-Agent": "colibri-models/1", "Range": "bytes=%d-%d" % (start, end)})
+    req = urllib.request.Request(url, headers={"User-Agent": "qoralis-models/1", "Range": "bytes=%d-%d" % (start, end)})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read()
 
@@ -790,7 +790,7 @@ def installed_rows():
         r = dict(r, id="local:" + os.path.basename(r["path"]), kind="text", installed=r["path"], in_use=cur == r["path"])
         try:
             fam, accel, kind = family_of(r["path"])
-        except Exception as e:   # noqa: BLE001 - coli serve would refuse it too
+        except Exception as e:   # noqa: BLE001 - qoralis serve would refuse it too
             r.update(tiers=None, error="Qoralis non sa servire questa cartella: %s" % str(e)[:200], status="incomplete", rank=0)
             rows.append(r)
             continue
@@ -1130,7 +1130,7 @@ def start_gguf_download(repo, stem):
         r = subprocess.run([sys.executable, os.path.join(COLI_DIR, "coli"), "import", os.path.join(dest, v["files"][0]["path"]),
                             "--out", out, "--mode", "link"], capture_output=True, text=True, cwd=COLI_DIR)
         if r.returncode:
-            raise RuntimeError("coli import: %s" % (r.stderr or r.stdout)[-400:])
+            raise RuntimeError("qoralis import: %s" % (r.stderr or r.stdout)[-400:])
         j["msg"] = "importato in %s" % out
     threading.Thread(target=run_download, args=(job, repo, "main", files, dest, after), daemon=True).start()
     return job
@@ -1171,7 +1171,7 @@ def launch(argv, cwd, env, log):
     out = open(log, "wb")
     kw = {"start_new_session": True} if os.name == "posix" else \
         {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS}
-    # its own session: it outlives this service, as a `coli serve` started by hand would
+    # its own session: it outlives this service, as a `qoralis serve` started by hand would
     return subprocess.Popen(argv, cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT, **kw)
 
 
@@ -1216,8 +1216,8 @@ def switch_model(path, force=False, tier=None):
     if answering and old and not old["coli"]:
         raise RuntimeError("la porta %d è di un altro processo (%d): non lo tocco" % (CFG.port, old["pid"]))
     if answering and not old:
-        raise RuntimeError("non trovo il processo di coli serve sulla porta %d su questa macchina: fermalo e "
-                           "riavvialo con coli serve --model %s" % (CFG.port, path))
+        raise RuntimeError("non trovo il processo di qoralis serve sulla porta %d su questa macchina: fermalo e "
+                           "riavvialo con qoralis serve --model %s" % (CFG.port, path))
     if answering and not force and not gw_idle():
         raise RuntimeError("il motore sta rispondendo a una richiesta: riprova quando ha finito")
     if not _switching.acquire(blocking=False):
@@ -1393,9 +1393,9 @@ def start(backend, models_dirs=(), state=None):
 
 
 class Handler(BaseHTTPRequestHandler):
-    """alone on the engine's machine, for `coli ui --models-backend`: 127.0.0.1 only, a loopback
+    """alone on the engine's machine, for `qoralis ui --models-backend`: 127.0.0.1 only, a loopback
     Host, and on a POST the page's own header (no other site, no DNS rebinding)"""
-    server_version = "colibri-models/1"
+    server_version = "qoralis-models/1"
 
     def log_message(self, *a):
         pass
@@ -1426,7 +1426,7 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser(description="the Models page's service, alone on the engine's machine")
     ap.add_argument("--backend", default=os.environ.get("QORALIS_BACKEND", "http://127.0.0.1:8000"),
-                    help="the qoralis gateway (coli serve) on this machine")
+                    help="the qoralis gateway (qoralis serve) on this machine")
     ap.add_argument("--models-dir", action="append", default=[], help="where models are (default: Qoralis's own folder)")
     ap.add_argument("--port", type=int, default=8791)
     a = ap.parse_args()

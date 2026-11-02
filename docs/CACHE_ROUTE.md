@@ -42,13 +42,13 @@ reports `swap 0.0%`; lower `ROUTE_J` to trade agreement for hits.
 
 ```bash
 # Stock full-K (leaderboard-comparable routing)
-CACHE_ROUTE=0 ./coli chat
+CACHE_ROUTE=0 ./qoralis chat
 
 # Experimental CACHE_ROUTE
-CACHE_ROUTE=1 ROUTE_J=2 ROUTE_M=12 ./coli chat
+CACHE_ROUTE=1 ROUTE_J=2 ROUTE_M=12 ./qoralis chat
 
 # Wider prefer window (more hit, more possible swap)
-CACHE_ROUTE=1 ROUTE_J=2 ROUTE_M=16 ./coli chat
+CACHE_ROUTE=1 ROUTE_J=2 ROUTE_M=16 ./qoralis chat
 ```
 
 ## Stats
@@ -85,5 +85,5 @@ softmax row, the group mask and a residency callback, pinned by
 `tests/test_qwen36_cache_route.c` without a model. With the lever unset the
 router runs the original top-K loop and emits byte-identical token ids.
 
-Treat as experimental until quality gates (e.g. `./coli bench`) pass; do not
+Treat as experimental until quality gates (e.g. `./qoralis bench`) pass; do not
 default `CACHE_ROUTE=1`.

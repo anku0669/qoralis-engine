@@ -1,6 +1,6 @@
 """Legacy run_serve refuses over-context prompts in both arms, never silently truncating.
 
-The legacy protocol (what `coli chat` speaks, and the pre-mux `\\x02PROMPT` API
+The legacy protocol (what `qoralis chat` speaks, and the pre-mux `\\x02PROMPT` API
 mode) has no ERROR frame: on an over-context turn the engine emits an empty
 answer plus `STAT ... CONTEXT_EXCEEDED <cause>` (#2097). This drives the real
 `Qoralis` binary with SERVE=1 against the tiny GLM oracle model

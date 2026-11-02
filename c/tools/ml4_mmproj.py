@@ -245,7 +245,7 @@ def finish(outdir, source="RELEASE"):
     preprocessor(outdir, config, processor)
     tensors.clear()
     shutil.rmtree(parts, ignore_errors=True)
-    print(f"[ML4] vision tower: mmproj.gguf, {n} tensors, {size / 1e9:.2f} GB (pictures through coli serve)")
+    print(f"[ML4] vision tower: mmproj.gguf, {n} tensors, {size / 1e9:.2f} GB (pictures through qoralis serve)")
     return True
 
 

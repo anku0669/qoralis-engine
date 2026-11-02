@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """The server of Qoralis's chat UI: serves index.html and passes the API calls
-through to a qoralis gateway (`coli serve`), so the page and the API share one
+through to a qoralis gateway (`qoralis serve`), so the page and the API share one
 origin (the gateway sends no CORS headers). Standard library only.
 
     python3 ui/server.py [--port 8790] [--backend http://127.0.0.1:8000]
-    coli ui                       (the same, the backend `coli serve`'s default)
+    qoralis ui                       (the same, the backend `qoralis serve`'s default)
 
 Besides the proxy it answers /agents (ui/agents.py: a coding agent opened in a
 new terminal window, pointed at Qoralis) and /v1/responses (ui/responses_shim.py:
@@ -201,7 +201,7 @@ def main():
     ap.add_argument("--port", type=int, default=8790)
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--backend", default=os.environ.get("QORALIS_BACKEND", "http://127.0.0.1:8000"),
-                    help="the qoralis gateway (coli serve)")
+                    help="the qoralis gateway (qoralis serve)")
     ap.add_argument("--models-backend", default=os.environ.get("QORALIS_MODELS_BACKEND", ""),
                     help="the models service on the engine's machine (python3 ui/models.py there), "
                          "when the gateway is elsewhere")

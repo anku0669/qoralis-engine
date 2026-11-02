@@ -33,13 +33,13 @@ Build and chat:
 
 ```sh
 make -C c qwen36
-COLI_MODEL=~/Models/qwen36_i4_gs64 ./c/coli chat
+COLI_MODEL=~/Models/qwen36_i4_gs64 ./c/qoralis chat
 ```
 
 `coli` reads the model's `config.json` and matches its `model_type` against the
 family registry (`qwen3_5_moe` / `qwen3_5_moe_text` — an exact match, so other
-Qwen architectures are not claimed by this engine), picks it, and drives it over the serve protocol — `coli web` and
-`coli serve` (OpenAI-compatible API) work the same way.
+Qwen architectures are not claimed by this engine), picks it, and drives it over the serve protocol — `qoralis web` and
+`qoralis serve` (OpenAI-compatible API) work the same way.
 
 Tool calling is supported through the HTTP gateway using Qwen3.6's native
 `<tool_call>` / `<tool_response>` protocol. The gateway translates between
@@ -185,7 +185,7 @@ size). It stays off with the Vulkan chain and with `Q36_MTP_DUMP`, and
 its probability is conditional on the list: with two or more drafts that is
 what `Q36_MTP_PMIN` and `Q36_MTP_PSTEP` read. A qwen36 engine stopped by a
 signal does not write the counts, nor one whose head turned off during the run
-(`[mtp] ... it stays off`); `coli serve` closes its input first, so it does.
+(`[mtp] ... it stays off`); `qoralis serve` closes its input first, so it does.
 
 With the Vulkan chain the head runs on the device: its layer, its routing and its
 routed experts through the chain's device MoE, one frame a draft. `Q36_MTP_GPU=0`
@@ -205,7 +205,7 @@ of the list, sent whole after a rebuild and by its new ids after an append. A
 backend without `matmul_rows` scores the whole vocabulary.
 
 Measured on an RTX PRO 4000 before the `Q36_MTP_VOCAB` list, the head scoring the
-whole vocabulary (Qwen3.6-35B-A3B int4-g64, `coli serve`, answers of 128 tokens, two
+whole vocabulary (Qwen3.6-35B-A3B int4-g64, `qoralis serve`, answers of 128 tokens, two
 alternated rounds of three):
 
 | `Q36_MTP_DRAFTS` | Vulkan chain | CUDA chain | drafts accepted |
@@ -452,7 +452,7 @@ id is `qwen3.8-27b-colibri`.
 
 ```bash
 python3 tools/convert_qwen36.py --model <Qwen3.8-27B download> --out q27_c
-./coli chat --model q27_c --gpu none
+./qoralis chat --model q27_c --gpu none
 ```
 
 The container keeps the weights in f16 (51 GB) and the engine quantizes
@@ -466,7 +466,7 @@ memory bandwidth, not by the disk. Measured on a 16-thread CPU server
 | `COLI_DENSE_BITS=4 COLI_DENSE_INT4=shexp,lmhead` | 21.6 GB | 3.15 tok/s | 4.94 (+1.8%) | 11.69 (+4.5%) |
 | `COLI_DENSE_BITS=4` (everything) | 18.8 GB | 3.72 tok/s | 5.02 (+3.5%) | 12.15 (+8.6%) |
 
-Through the gateway (`coli serve`), greedy decode ran at 2.1 tok/s in int8 and
+Through the gateway (`qoralis serve`), greedy decode ran at 2.1 tok/s in int8 and
 3.45 tok/s with everything in int4, after a load of 73 and 114 s; the answers
 to the same English, Italian and Turkish questions were the same but for a word.
 
@@ -493,7 +493,7 @@ engine follows `Qwen3_5Model.get_rope_index` exactly; with plain 1D
 positions the tiny oracle below loses 10 of 16 tokens.
 
 An image reaches it the way it reaches the other vision engines: a path in
-a `coli chat` message, an attachment in `coli web`, or an `image_url` part
+a `qoralis chat` message, an attachment in `qoralis web`, or an `image_url` part
 on `/v1/chat/completions`. One image per request. `Q36_MAX_IMAGE_TOKENS`
 caps the tokens an image costs (the preprocessor's own ceiling is far above
 what a CPU prefill wants); the image is shrunk, not cropped.
@@ -529,8 +529,8 @@ recognises it from the template, renders it byte for byte
 ```bash
 hf download Qwen/Qwen3-Coder-30B-A3B-Instruct --local-dir qwen3-coder     # 61.1 GB, bf16
 python3 tools/convert_qwen36.py --model qwen3-coder --out qwen3-coder-i4 --ebits 4 --gs 64
-coli serve --model qwen3-coder-i4 --cap 128     # every expert in RAM
-coli serve --model qwen3-coder-i4 --cap 32      # 6.5 GB resident
+qoralis serve --model qwen3-coder-i4 --cap 128     # every expert in RAM
+qoralis serve --model qwen3-coder-i4 --cap 32      # 6.5 GB resident
 ```
 
 The int4 gs64 container is 19 GB and converts in under a minute; `--ebits 8`
@@ -558,12 +558,12 @@ cache, 128 tokens, dense trunk int8:
 | int4 gs64 | 32 | 5.1 tok/s | 6.5 GB |
 | int8 | 32 | 3.8 tok/s | 9.6 GB |
 
-Through `coli chat` with `--cap 128` and the cache warm, a 577-token answer
+Through `qoralis chat` with `--cap 128` and the cache warm, a 577-token answer
 streams at 13 tok/s. Prefill is the slow part on the CPU: a request whose tool
 block makes the prompt about 500 tokens takes around two minutes from a cold
 cache.
 
-![Qwen3-Coder-30B-A3B in coli web](media/qwen3-coder-web.png)
+![Qwen3-Coder-30B-A3B in qoralis web](media/qwen3-coder-web.png)
 
 ### Flint
 
@@ -594,7 +594,7 @@ qwen36 oracles)`).
 ```bash
 hf download RecursiveSI/flint --local-dir flint                    # 75 GB, bf16
 python3 tools/convert_qwen36.py --model flint --out flint-i4 --ebits 4 --gs 64
-coli import flint-UD-Q3_K_XL.gguf                                   # or any unsloth/flint-GGUF file
+qoralis import flint-UD-Q3_K_XL.gguf                                   # or any unsloth/flint-GGUF file
 ```
 
 Every file unsloth published and the int4 gs64 container, on an RTX PRO 4000
@@ -674,12 +674,12 @@ strength (low 8, medium 32, high 256, xhigh 512, the template's default); the
 template has no switch to turn reasoning off, so thinking off is low.
 
 ```bash
-coli import Muse-Spark-Open-816B-A42B-UD-IQ1_S-00001-of-00005.gguf    # every part next to it
-coli serve --model Muse-Spark-Open-816B-A42B-UD-IQ1_S.colibri
+qoralis import Muse-Spark-Open-816B-A42B-UD-IQ1_S-00001-of-00005.gguf    # every part next to it
+qoralis serve --model Muse-Spark-Open-816B-A42B-UD-IQ1_S.colibri
 ```
 
 UD-IQ1_S (175.6 GB) on an RTX PRO 4000 (24 GB) with 62 GB of RAM and two NVMe
-drives in an md array, through `coli serve`: a 303-token prompt (the template's
+drives in an md array, through `qoralis serve`: a 303-token prompt (the template's
 system message and a 120-word question) and 63 tokens, three runs each, tok/s:
 
 | path | prompt | decode |
@@ -741,8 +741,8 @@ answer; `enable_thinking: false` writes the closed pair); tool calls are the
 system turn.
 
 ```bash
-coli import LFM3-VL-2B-Q4_K_M.gguf
-coli serve --model LFM3-VL-2B-Q4_K_M.colibri
+qoralis import LFM3-VL-2B-Q4_K_M.gguf
+qoralis serve --model LFM3-VL-2B-Q4_K_M.colibri
 ```
 
 Teacher-forced NLL (nats per token) over 1280 tokens after 256, two texts (the
@@ -795,7 +795,7 @@ mean and std 0.5) and writes `<|vision_start|>`, one `<|image|>` a merged block,
 The gateway's preprocessor needs Pillow and numpy (`pip install pillow numpy`); without them a
 picture is answered with a 400 that says so.
 
-The tower comes from the GGUF's `mmproj-LFM3-VL-2B-BF16.gguf` (`coli import` links one
+The tower comes from the GGUF's `mmproj-LFM3-VL-2B-BF16.gguf` (`qoralis import` links one
 it finds next to the model, `--mmproj` names one, `--no-mmproj` leaves it out;
 `Q36_MMPROJ` over gguf.json's) or from the converted checkpoint (`tools/convert_qwen36.py`
 copies it in bf16, `qwen36_meta.json` gets its shape). It runs on the CPU in float32,

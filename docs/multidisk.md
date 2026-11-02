@@ -14,14 +14,14 @@ Bash, with one primary and two mirrors:
 
 ```bash
 COLI_MODEL_MIRROR='/mnt/nvme2/glm52_i4;/mnt/nvme3/glm52_i4' \
-  python3 ./coli chat --model /mnt/nvme1/glm52_i4
+  python3 ./qoralis chat --model /mnt/nvme1/glm52_i4
 ```
 
 PowerShell, with the same three-drive layout:
 
 ```powershell
 $env:COLI_MODEL_MIRROR = 'E:\models\glm52_i4;F:\models\glm52_i4'
-python ./coli chat --model 'D:\models\glm52_i4'
+python ./qoralis chat --model 'D:\models\glm52_i4'
 ```
 
 For two drives, supply just one mirror directory. Quote the list: an unquoted
@@ -57,7 +57,7 @@ Details worth knowing:
 - routing never changes tokens, because both copies are byte-identical; enable
   `PROF=1` for the `MIRROR:` profile counters showing GB served per drive.
 
-## Partial mirrors: `coli mirror`
+## Partial mirrors: `qoralis mirror`
 
 For a second drive that cannot hold the whole model, Qoralis can rank a partial
 mirror from the expert history it already learns. Run a few representative
@@ -65,11 +65,11 @@ prompts first so `.coli_usage` reflects the workload, then plan, stage, and
 verify the mirror:
 
 ```bash
-./c/coli mirror plan  --model /fast/glm52_i4 --mirror /second/glm52_i4 \
+./c/qoralis mirror plan  --model /fast/glm52_i4 --mirror /second/glm52_i4 \
   --budget-gib 200 --reserve-gib 20
-./c/coli mirror stage --model /fast/glm52_i4 --mirror /second/glm52_i4 \
+./c/qoralis mirror stage --model /fast/glm52_i4 --mirror /second/glm52_i4 \
   --budget-gib 200 --reserve-gib 20
-./c/coli mirror verify --model /fast/glm52_i4 --mirror /second/glm52_i4
+./c/qoralis mirror verify --model /fast/glm52_i4 --mirror /second/glm52_i4
 ```
 
 The planner reads safetensors headers directly, follows split-model directories

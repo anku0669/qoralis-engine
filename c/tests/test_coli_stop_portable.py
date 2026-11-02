@@ -1,4 +1,4 @@
-"""`coli stop` must work on platforms without /proc.
+"""`qoralis stop` must work on platforms without /proc.
 
 `cmd_stop` scanned `/proc` unguarded. On macOS and Windows that directory does not exist, so
 `os.listdir("/proc")` raised FileNotFoundError *after* the pidfile target had been collected but
@@ -7,12 +7,12 @@ even inspect what would be killed.
 
 That mattered more than a crash usually does. The docstring on `cmd_stop` explains that the engine
 re-execs itself for OMP tuning and therefore does NOT carry the name you started it with, which is
-why `pkill -x glm` silently killed nothing and let two ghost engines OOM a box. `coli stop` is the
+why `pkill -x glm` silently killed nothing and let two ghost engines OOM a box. `qoralis stop` is the
 command that exists to prevent exactly that, and on macOS it could not run at all.
 
 So these tests assert both halves:
   1. the command runs and exits cleanly on this platform;
-  2. it still FINDS a `coli serve`-shaped process, i.e. discovery was ported, not merely guarded.
+  2. it still FINDS a `qoralis serve`-shaped process, i.e. discovery was ported, not merely guarded.
 """
 import os
 import subprocess
@@ -83,7 +83,7 @@ class ColiStopPortable(unittest.TestCase):
     def test_does_not_match_the_word_server(self):
         """`" serve" in cmd` also matches "server", so an unrelated process is a kill target.
 
-        This is not hypothetical. Running `coli stop --dry-run` from a shell whose command line
+        This is not hypothetical. Running `qoralis stop --dry-run` from a shell whose command line
         contained the phrase "LIVE server" listed that shell as something to stop -- and the
         non-dry-run path SIGTERMs then SIGKILLs every target. A command whose stated purpose is
         to avoid the collateral damage of `pkill` must not itself kill bystanders.

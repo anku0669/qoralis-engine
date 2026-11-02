@@ -9,13 +9,13 @@ waits for its slowest worker rather than for each of them in turn.
 Start the optional registration service:
 
 ```bash
-./coli cluster coordinator --host 0.0.0.0 --port 8765
+./qoralis cluster coordinator --host 0.0.0.0 --port 8765
 ```
 
 On each worker, with the same converted model available locally:
 
 ```bash
-./coli cluster worker --model /nvme/glm52_i4 --port 9100 \
+./qoralis cluster worker --model /nvme/glm52_i4 --port 9100 \
   --coordinator http://COORDINATOR:8765 --advertise-host WORKER_IP
 ```
 
@@ -23,7 +23,7 @@ Run the coordinator with discovery, or provide `--cluster-workers
 HOST:PORT,...` for a static setup:
 
 ```bash
-./coli serve --model /nvme/glm52_i4 \
+./qoralis serve --model /nvme/glm52_i4 \
   --cluster-coordinator http://127.0.0.1:8765
 ```
 
@@ -120,8 +120,8 @@ family it was built for -- engines are never mixed on one coordinator:
   expert set) stay on the coordinator.
 
 ```bash
-./coli cluster worker --model /nvme/dsv41 --port 9100 --advertise-host WORKER_IP
-./coli serve --model /nvme/dsv41 --cluster-workers WORKER_IP:9100
+./qoralis cluster worker --model /nvme/dsv41 --port 9100 --advertise-host WORKER_IP
+./qoralis serve --model /nvme/dsv41 --cluster-workers WORKER_IP:9100
 ```
 
 `c/tests/test_cluster_sharding.py` and `c/tests/test_dsv41_cluster_sharding.py`

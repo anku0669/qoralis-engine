@@ -13,19 +13,19 @@ gets the engine (built with MSYS2 when it is installed, with Vulkan when your
 GPU can use it; otherwise the prebuilt one from the release, which runs on the
 CPU or with Vulkan), downloads
 the model with resume and opens the dashboard. Running it again starts Qoralis
-directly. The same from a terminal: `py -3 c\coli setup`. See
+directly. The same from a terminal: `py -3 c\qoralis setup`. See
 [quickstart.md](quickstart.md#the-one-step-way).
 
 ## If you downloaded a release archive, start here
 
-The archive contains **`coli.cmd`**: that is the program to run. Double-click it
-for the quick start (it offers `coli.cmd setup`, the one-step path above), or
+The archive contains **`qoralis.cmd`**: that is the program to run. Double-click it
+for the quick start (it offers `qoralis.cmd setup`, the one-step path above), or
 from cmd/PowerShell:
 
 ```
-coli.cmd chat   --model D:\models\glm52_i4
-coli.cmd serve  --model D:\models\glm52_i4
-coli.cmd doctor --model D:\models\glm52_i4
+qoralis.cmd chat   --model D:\models\glm52_i4
+qoralis.cmd serve  --model D:\models\glm52_i4
+qoralis.cmd doctor --model D:\models\glm52_i4
 ```
 
 `colibri.exe`, `kimi_k3.exe` and the other `.exe` files are the **engines**.
@@ -35,7 +35,7 @@ Explorer looks like a window that flashes and disappears (#1241). The launcher
 needs Python 3 from https://www.python.org/downloads/ with "Add python.exe to
 PATH" ticked; the engines themselves need nothing.
 
-The engines are built with Vulkan, their shaders in `shaders\`: `coli.cmd
+The engines are built with Vulkan, their shaders in `shaders\`: `qoralis.cmd
 setup` runs them on a GPU with a Vulkan driver (NVIDIA's, AMD's and Intel's
 drivers all install one) and on the CPU everywhere else, with nothing to build.
 
@@ -45,7 +45,7 @@ and newer: A100, H100 and later too) the release also has
 it replaces `colibri.exe`, `qwen36.exe` and `kimi_k3.exe` with the same engines
 plus CUDA, and adds `coli_cuda.dll` and NVIDIA's CUDA runtime
 (`cudart64_12.dll`), so no CUDA toolkit is needed, only an NVIDIA driver for
-CUDA 12. `coli.cmd setup` then picks CUDA for the models those three engines
+CUDA 12. `qoralis.cmd setup` then picks CUDA for the models those three engines
 run; an older card keeps Vulkan. To build the DLL yourself, for a card the
 package does not cover, see below.
 
@@ -198,14 +198,14 @@ Sanity check: first GPU run should print `[CUDA] device 0: <your GPU>, ... sm_XX
 ```powershell
 cd <repo>\c
 $env:OMP_NUM_THREADS = "<physical cores>"
-python coli run "Explain what a mixture-of-experts model is." --model D:\glm52_i4 --ngen 48
+python qoralis run "Explain what a mixture-of-experts model is." --model D:\glm52_i4 --ngen 48
 ```
 
 The first run is cold — expect the profile to be dominated by `expert-disk` while the cache warms; hit rate climbs run over run. GPU tier on top:
 
 ```powershell
 $env:COLI_CUDA="1"; $env:COLI_GPU="0"; $env:CUDA_DENSE="1"; $env:CUDA_EXPERT_GB="4"
-python coli run "..." --model D:\glm52_i4 --ngen 64
+python qoralis run "..." --model D:\glm52_i4 --ngen 64
 ```
 
 Size `CUDA_EXPERT_GB` so dense (~10 GB) + experts + working set stays under your VRAM. Note MTP speculation is off by default under CUDA (#293, float-accumulation divergence between draft and verify) — `COLI_CUDA_MTP=1` opts back in.
@@ -222,9 +222,9 @@ Size `CUDA_EXPERT_GB` so dense (~10 GB) + experts + working set stays under your
 | `An Application Control policy has blocked this file` | Smart App Control | §2 — turn SAC off + **reboot** |
 | `cannot execute 'collect2.exe': CreateProcess: No such file or directory` | Smart App Control blocked the freshly installed compiler (#1900) | §2: SAC off and a reboot, or wait for SAC's verdict |
 | `storage size of 'r' isn't known` / `implicit declaration of function 'getrusage'`, or `make` stops with "builds for x86_64-pc-msys" (or cygwin) | the gcc that ran is MSYS2's own (the plain `gcc` package, or the "MSYS2 MSYS" shell): it targets the MSYS runtime, not Windows, and does not define `_WIN32` (#1979) | open "MSYS2 UCRT64", `pacman -S --needed mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-libgomp`, check that `gcc -dumpmachine` says `x86_64-w64-mingw32` |
-| `cannot find -lgomp` at the link | MSYS2's gcc 16 no longer pulls libgomp (#1900) | `pacman -S mingw-w64-ucrt-x86_64-libgomp` (`coli setup` lists it) |
+| `cannot find -lgomp` at the link | MSYS2's gcc 16 no longer pulls libgomp (#1900) | `pacman -S mingw-w64-ucrt-x86_64-libgomp` (`qoralis setup` lists it) |
 | `make qwen38` (or glm53, inkling, kimi_k3, olmoe, deepseek_v41) ends in `undefined reference to ...` | older tree: no bare target for that engine, make compiled the `.c` alone (#1945) | update, or name the binary: `make qwen38.exe ...` |
-| `coli setup` does not find MSYS2 installed by scoop, or uses another gcc on the PATH without Vulkan | older tree (#1900) | update, or set `MSYS2_ROOT` to the MSYS2 folder |
+| `qoralis setup` does not find MSYS2 installed by scoop, or uses another gcc on the PATH without Vulkan | older tree (#1900) | update, or set `MSYS2_ROOT` to the MSYS2 folder |
 | `cuda-dll ... Error 1` immediately | old tree: spaced CUDA_HOME / MSVC rejects `-Wextra` | update to current `dev` (#314) |
 | `colibri.exe is up to date` but GPU never engages | old tree: stale CPU-only binary | update to `dev`, or delete the binary and rebuild |
 | `cl.exe (MSVC) not in PATH` | built from plain PowerShell | use the x64 Native Tools prompt |
@@ -250,8 +250,8 @@ SNAP=./glm_tiny TF=1 ./colibri.exe 64 16 16        # expect "~30-32/32 positions
 
 # Run with real model:
 SNAP=D:\glm52_i4 ./colibri.exe 64 4 16            # batch inference
-python coli chat --model D:\glm52_i4            # interactive chat
-python coli serve --model D:\glm52_i4            # OpenAI-compatible API
+python qoralis chat --model D:\glm52_i4            # interactive chat
+python qoralis serve --model D:\glm52_i4            # OpenAI-compatible API
 ```
 
 > Windows Store's `python` alias stub is the single most common native-Windows
@@ -261,7 +261,7 @@ python coli serve --model D:\glm52_i4            # OpenAI-compatible API
 ## Warmup (overnight cache priming)
 
 The engine's expert cache learns from your workload. The included `warmup.ps1`
-script runs `coli run` in a loop with diverse prompts to build the
+script runs `qoralis run` in a loop with diverse prompts to build the
 `.coli_usage` histogram unattended, so the next real session starts with a
 large, accurate hot-expert pin. Each run saves usage atomically on clean
 completion.
@@ -290,7 +290,7 @@ make colibri.exe CUDA_DLL=1 ARCH=native
 
 # Run with the GPU expert tier (8 GB VRAM budget here; scale to your free VRAM):
 $env:COLI_CUDA="1"; $env:COLI_GPU="0"; $env:CUDA_EXPERT_GB="8"
-python coli chat --model D:\glm52_i4 --topp 0.7
+python qoralis chat --model D:\glm52_i4 --topp 0.7
 ```
 
 The DLL exports the full `extern "C"` surface (including the #111 pipeline ABI);
@@ -450,7 +450,7 @@ not been validated on hardware here.
 **CUDA is unaffected.** A `CUDA_DLL=1` host ignores `COLI_HIP_RUNTIME_DIR`
 entirely and keeps its existing `coli_cuda.dll` search behaviour unchanged.
 
-### How `coli plan` and `coli doctor` see an AMD GPU here
+### How `qoralis plan` and `qoralis doctor` see an AMD GPU here
 
 `rocm-smi` is a Linux tool. Neither the Windows HIP SDK installer nor a source
 build ships it, so the ROCm discovery path used everywhere else finds nothing on
@@ -512,7 +512,7 @@ not been measured. Sizing an expert tier from it would be a guess.
 
 Such a device is therefore carried as **identity only**: free memory is
 *unknown for planning*, which is not the same claim as "zero bytes are free".
-`coli plan`
+`qoralis plan`
 shows it, marked `(identity only)`, with a warning naming it, and:
 
 - the VRAM tier stays at 0

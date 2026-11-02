@@ -2,7 +2,7 @@
 
 Same contract as every other family: EMAP after READY and STAT, HITS and PROF after
 DONE, over the rows and columns the grid declares. This drives the engine the way the
-gateway does -- through `coli serve` -- so a family that stops emitting one of the four
+gateway does -- through `qoralis serve` -- so a family that stops emitting one of the four
 lines fails here rather than as a blank tab.
 
 Needs a V4.1-shaped container with a tokenizer and a built `deepseek_v41`. Set
@@ -77,10 +77,10 @@ class Dsv41DashboardTest(unittest.TestCase):
                 break
             except Exception:
                 if cls.proc.poll() is not None:
-                    raise RuntimeError("coli serve exited: " + cls.proc.stdout.read()[-2000:])
+                    raise RuntimeError("qoralis serve exited: " + cls.proc.stdout.read()[-2000:])
                 time.sleep(1)
         else:
-            raise RuntimeError("coli serve did not come up in 180 s")
+            raise RuntimeError("qoralis serve did not come up in 180 s")
         model = get_json(f"http://127.0.0.1:{cls.port}/v1/models")["data"][0]["id"]
         body = json.dumps({"model": model, "prompt": "abcabcabc", "max_tokens": 3}).encode()
         request = urllib.request.Request(f"http://127.0.0.1:{cls.port}/v1/completions",

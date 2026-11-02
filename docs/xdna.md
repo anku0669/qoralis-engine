@@ -6,7 +6,7 @@ It is off by default, it is never selected automatically, and model output may
 differ from the normal path.
 
 ```bash
-coli run --xdna "your prompt"
+qoralis run --xdna "your prompt"
 ```
 
 Without `--xdna` nothing changes: no helper is loaded, no device is opened, and

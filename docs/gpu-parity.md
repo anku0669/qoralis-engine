@@ -59,7 +59,7 @@ release with the int4-g64 sidecar runs there at 100-102 / 23.7-24.9 tok/s, again
 6.3-6.8 with its experts on the CPU and 7.2-7.4 / 3.1-3.2 with its FP8 experts on the CUDA
 tier (176 GB, most of them from the disk). It runs the engines
 whose CUDA path lacks Vulkan's dense chain on Vulkan unless `COLI_VULKAN=0`: a DeepSeek V4
-GGUF, Kimi K3, Inkling, GLM-5.3, DeepSeek V4.1 and MiMo. `coli setup` builds both backends
+GGUF, Kimi K3, Inkling, GLM-5.3, DeepSeek V4.1 and MiMo. `qoralis setup` builds both backends
 for them on an NVIDIA card.
 
 On the numbers above, DeepSeek V4 is the one place where that choice leaves speed behind: on

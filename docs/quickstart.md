@@ -2,7 +2,7 @@
 
 A step-by-step guide for first-time users on **Linux**, **Windows**, and **macOS**.
 No prior experience with C, CUDA, or model conversion is assumed. If you get
-stuck, `./coli doctor` (below) tells you exactly what's missing.
+stuck, `./qoralis doctor` (below) tells you exactly what's missing.
 
 > **What you're setting up:** Qoralis Engine runs a very large Mixture-of-Experts model
 > (e.g. GLM-5.2, 744B parameters) on a normal machine by streaming the model's
@@ -27,7 +27,7 @@ cd Qoralis
 ./start-here.sh
 ```
 
-Both run `coli setup`, which does the rest:
+Both run `qoralis setup`, which does the rest:
 
 1. **Finds your hardware**: RAM, free disk where the model goes, CPU features,
    and GPUs (any Vulkan GPU with its memory, NVIDIA cards through nvidia-smi).
@@ -61,7 +61,7 @@ qoralis setup
 Your machine
   CPU     13th Gen Intel(R) Core(TM) i7-1355U, 6 cores (12 threads), AVX2, AVX_VNNI
   RAM     27.3 GB (24.7 GB free now)
-  Disk    787 GB free in /home/me/colibri-models
+  Disk    787 GB free in /home/me/qoralis-models
   GPU     Intel(R) Iris(R) Xe Graphics via Vulkan 1.3 (integrated, shares RAM)
   System  Ubuntu 24.04 LTS
 
@@ -74,7 +74,7 @@ Models that fit this machine
    3) DeepSeek V4 Flash REAP 150B       85 GB   streams from the SSD
    ...
   (2 more fit too: `--all` lists them, `--model ID` picks one)
-  (4 more need more RAM or disk: `coli setup --list` shows why)
+  (4 more need more RAM or disk: `qoralis setup --list` shows why)
 Choose a model [Enter = 1]:
 
 Engine: qwen36 with VULKAN (Intel(R) Iris(R) Xe Graphics, integrated GPU)
@@ -91,17 +91,17 @@ Starting Qoralis
 
 **Later:** run `START-HERE.bat` or `./start-here.sh` again and Qoralis starts
 straight away, with no second download or build. To stop it, press Ctrl+C in
-its window, or run `c/coli stop` from another terminal (`c\coli.cmd stop` on
-Windows). `c/coli status` shows what is installed, whether it runs, its
+its window, or run `c/qoralis stop` from another terminal (`c\qoralis.cmd stop` on
+Windows). `c/qoralis status` shows what is installed, whether it runs, its
 addresses and the speed of the last answer. To pick another model:
 `./start-here.sh --reconfigure`.
 
-**On WSL** keep the model on the Linux disk (the default, `~/colibri-models`),
+**On WSL** keep the model on the Linux disk (the default, `~/qoralis-models`),
 never under `/mnt/c`. If WSL's own network is much slower than Windows' (it can
 be: 63 KB/s against 3.3 MB/s was measured on one machine), the setup offers to
 download through Windows' `curl.exe` into the same folder.
 
-Useful options (`c/coli setup --help` lists them all): `--yes` takes every
+Useful options (`c/qoralis setup --help` lists them all): `--yes` takes every
 default without asking, `--model ID` picks a model (`--list` shows the ids
 against your machine), `--dir DIR` puts the models elsewhere, `--no-gpu` keeps
 everything on the CPU, `--backend vulkan` (or `cuda`) picks the GPU path
@@ -136,7 +136,7 @@ CPU-only by default.
 >
 > ```bash
 > mkdir Qoralis && tar xzf colibri-v1.1.0-linux-x86_64.tar.gz -C Qoralis && cd Qoralis
-> python3 coli info        # engine ready ✓
+> python3 qoralis info        # engine ready ✓
 > ```
 >
 > Build from source instead if you want the fastest binary for *your* CPU
@@ -163,7 +163,7 @@ source changes or extra flags (verified on AWS Graviton4, Ubuntu 24.04, gcc 13).
 > time. A host that has never had a compiler installed — a minimal cloud image, a
 > fresh container, a restored volume attached to a new instance — may not carry
 > it, and the engine then exits at startup before printing anything. Install the
-> runtime package alone (`sudo apt install -y libgomp1`); `coli doctor` names the
+> runtime package alone (`sudo apt install -y libgomp1`); `qoralis doctor` names the
 > missing library.
 
 ### Windows
@@ -194,12 +194,12 @@ With an NVIDIA RTX 30, 40 or 50 series card, also unpack
 For better understanding, from powershell prompt, a complete invocation line 
 (relying on py launcher, to be launched from the folder where colibri.exe is) is:
 
-PS1> $env:COLI_MODEL="drive:/path/to/1st_copy/model/folder/"; $env:COLI_MODEL_MIRROR="/2nd_copy/model/folder/"; & py ./coli chat
+PS1> $env:COLI_MODEL="drive:/path/to/1st_copy/model/folder/"; $env:COLI_MODEL_MIRROR="/2nd_copy/model/folder/"; & py ./qoralis chat
 
 
 Then continue to [step 3](#3-get-the-model). Prefer to skip the launcher? You can
 run the engine directly — `.\colibri.exe` reads the model path from the `SNAP`
-environment variable (see [docs/windows.md](windows.md)) — but `coli chat` is the
+environment variable (see [docs/windows.md](windows.md)) — but `qoralis chat` is the
 easy path.
 
 **Option B — build from source with MSYS2.**
@@ -282,7 +282,7 @@ One resumable command downloads and converts the model shard by shard, so it
 never needs the full ~756 GB on disk at once:
 
 ```bash
-./coli convert --model /nvme/glm52_i4
+./qoralis convert --model /nvme/glm52_i4
 ```
 
 This produces a group-scaled (gs64) container — the same quality-validated
@@ -297,18 +297,18 @@ Point `COLI_MODEL` at the folder from step 3 and start chatting:
 
 ```bash
 # Linux / macOS
-COLI_MODEL=/nvme/glm52_i4 ./coli chat
+COLI_MODEL=/nvme/glm52_i4 ./qoralis chat
 
 # Windows (UCRT64 shell)
-COLI_MODEL=/d/glm52_i4 ./coli chat
+COLI_MODEL=/d/glm52_i4 ./qoralis chat
 ```
 
 Useful first commands:
 
 ```bash
-COLI_MODEL=/nvme/glm52_i4 ./coli doctor   # read-only check: is everything ready?
-COLI_MODEL=/nvme/glm52_i4 ./coli plan     # shows where the model will live (RAM/disk/GPU)
-COLI_MODEL=/nvme/glm52_i4 ./coli chat --topp 0.85   # faster: reads less from disk, same quality
+COLI_MODEL=/nvme/glm52_i4 ./qoralis doctor   # read-only check: is everything ready?
+COLI_MODEL=/nvme/glm52_i4 ./qoralis plan     # shows where the model will live (RAM/disk/GPU)
+COLI_MODEL=/nvme/glm52_i4 ./qoralis chat --topp 0.85   # faster: reads less from disk, same quality
 ```
 
 > **Tip:** `--topp 0.85` is worth adding on a disk-bound machine — it reads
@@ -327,14 +327,14 @@ COLI_MODEL=/nvme/glm52_i4 ./coli chat --topp 0.85   # faster: reads less from di
 - **It's still the full model.** Placement only changes speed, never the model's
   answers or precision.
 
-If something doesn't work, run `./coli doctor` — it reports exactly what's
+If something doesn't work, run `./qoralis doctor` — it reports exactly what's
 missing (compiler, model files, permissions) and how to fix it.
 
 ---
 
 ## Old processors (no AVX2)
 
-The engines in the release archives, and the ones `coli setup` downloads when
+The engines in the release archives, and the ones `qoralis setup` downloads when
 there is no compiler, are built for x86-64-v3: they use AVX2, FMA and BMI2.
 Intel processors before Haswell (2013) and AMD processors before Excavator
 (2015) do not have them. After 2.0.0 an engine checks this before it starts and
@@ -344,7 +344,7 @@ says so in one line:
 Qoralis: this processor has no avx2 fma bmi2, which this engine build needs; ...
 ```
 
-and `coli setup` names it in the hardware report and does not install the
+and `qoralis setup` names it in the hardware report and does not install the
 prebuilt engine. An older engine stopped at its first such instruction instead:
 the banner, then "Qoralis engine exited unexpectedly" (#1979).
 
@@ -364,8 +364,8 @@ cd colibri/c
 make qwen36.exe ARCH=x86-64-v2
 ```
 
-then run `coli` from that `c` folder (`python coli web --model ...`). With a
-compiler installed, `coli setup` builds the engine for the processor by itself
+then run `coli` from that `c` folder (`python qoralis web --model ...`). With a
+compiler installed, `qoralis setup` builds the engine for the processor by itself
 (`ARCH=native`).
 
 What it costs, measured on Qwen3.6-35B-A3B int4 (the same machine, a Ryzen 7
@@ -374,7 +374,7 @@ generates 8.6 tok/s; x86-64-v2 prefills 6.0 tok/s and generates 3.6 tok/s, about
 2.4 times slower, with the same text and the same perplexity. On an older
 processor both numbers are lower.
 
-`COLI_CPU_CHECK=0` skips the check, in the engines and in `coli setup` (an
+`COLI_CPU_CHECK=0` skips the check, in the engines and in `qoralis setup` (an
 emulator or a hypervisor that reports fewer features than it runs).
 
 ---

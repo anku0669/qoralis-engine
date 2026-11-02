@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hardware detection for the one-step setup (`coli setup`, the MCP server).
+"""Hardware detection for the one-step setup (`qoralis setup`, the MCP server).
 
 What it answers, and nothing more: how much RAM there is, how much disk is free
 where the model would go, which CPU features the engine can use, and which GPUs
@@ -121,7 +121,7 @@ def detect_memory():
         budget = memory_available()
         if budget is not None:
             mem["available"] = budget if mem["available"] is None else min(mem["available"], budget)
-    except Exception:  # a malformed cgroup is reported by `coli plan`, not here
+    except Exception:  # a malformed cgroup is reported by `qoralis plan`, not here
         pass
     return mem
 
@@ -306,7 +306,7 @@ def path_warnings(path, wsl):
         warnings.append(
             f"{absolute} is a Windows drive seen from WSL: reading it is many times "
             "slower than the Linux disk, and the engine streams the model from it. "
-            "Keep the model in the Linux home (for example ~/colibri-models).")
+            "Keep the model in the Linux home (for example ~/qoralis-models).")
     return warnings
 
 

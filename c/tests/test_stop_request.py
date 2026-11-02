@@ -1,7 +1,7 @@
-"""`coli stop` that works without rights on the process, and says so when it fails (#2091).
+"""`qoralis stop` that works without rights on the process, and says so when it fails (#2091).
 
 On Windows a serve started from an administrator console cannot be ended from a normal
-prompt: TerminateProcess and taskkill are both denied. `coli stop` swallowed the error and
+prompt: TerminateProcess and taskkill are both denied. `qoralis stop` swallowed the error and
 printed "stopped -- RAM released" with the engine still resident. Now:
   1. the serve watches for a stop request next to its pidfile and ends itself the way its
      signal handlers do (the engine drained), which needs no rights on it at all;
@@ -9,7 +9,7 @@ printed "stopped -- RAM released" with the engine still resident. Now:
      on Windows with the one right TerminateProcess needs, then taskkill;
   3. whatever still runs at the end is named, with the reason, and the exit code is 1.
 Real processes on every platform the CI runs (Linux, macOS, Windows): the request travels
-through the same coli functions the serve and `coli stop` use.
+through the same coli functions the serve and `qoralis stop` use.
 """
 import contextlib
 import importlib.machinery
@@ -104,7 +104,7 @@ class StopRequest(unittest.TestCase):
             for name, value in patches.items():
                 stack.enter_context(mock.patch.object(coli, name, value))
             try:
-                coli.cmd_stop(types.SimpleNamespace(port=9123, dry_run=False))
+                qoralis.cmd_stop(types.SimpleNamespace(port=9123, dry_run=False))
                 code = 0
             except SystemExit as exit_:
                 code = exit_.code
@@ -150,7 +150,7 @@ class StopRequest(unittest.TestCase):
 
     def test_the_watcher_ends_with_the_serve(self):
         # cmd_serve's watcher, left running in a process that goes on (the test runner
-        # once), ended that process at the next `coli stop` of the same port
+        # once), ended that process at the next `qoralis stop` of the same port
         import threading
         done = threading.Event()
         stopped = []

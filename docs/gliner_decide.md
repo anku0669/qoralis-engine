@@ -7,7 +7,7 @@ ordinal scores. It is a GLiNER2 checkpoint, a DeBERTa-v3-large encoder with
 GLiNER2's heads, and it never generates text.
 
 `c/gliner_decide` runs it from the official checkpoint with no conversion,
-and `coli serve` exposes it on `POST /v1/systemone`, the same request and
+and `qoralis serve` exposes it on `POST /v1/systemone`, the same request and
 reply as TypeSafe's Jev API and as every other model Qoralis serves
 ([systemone.md](systemone.md#decision-engines)).
 
@@ -20,14 +20,14 @@ hf download fastino/GLiNER2.5-Decide model.safetensors config.json \
    "encoder_config/*" tokenizer.json tokenizer_config.json special_tokens_map.json \
    --local-dir ~/Models/GLiNER2.5-Decide
 make -C c gliner_decide
-./c/coli serve --model ~/Models/GLiNER2.5-Decide
+./c/qoralis serve --model ~/Models/GLiNER2.5-Decide
 ```
 
 `coli` recognises the checkpoint by its `config.json` (`model_type`
 `extractor`, GLiNER2's, or `gliner2` as the repository's config says since its
 transformers form, the same weights) and the encoder's `encoder_config/config.json`; the
-registry keys it `gliner2_span_deberta-v2`. `coli info` shows the encoder and
-the token budget, `coli plan` the RAM, `coli doctor` what is missing.
+registry keys it `gliner2_span_deberta-v2`. `qoralis info` shows the encoder and
+the token budget, `qoralis plan` the RAM, `qoralis doctor` what is missing.
 
 ```sh
 curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
@@ -55,10 +55,10 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
  "usage": {"input_tokens": 118, "output_tokens": 0, "cost": 0}}
 ```
 
-That is the reply `coli serve` gave on the release (the `id` shortened).
+That is the reply `qoralis serve` gave on the release (the `id` shortened).
 `input_tokens` is the length of the one sequence the encoder read. Chat,
 completions and messages answer 400 with a pointer to `/v1/systemone`, and
-`coli chat` says the same before starting anything.
+`qoralis chat` says the same before starting anything.
 
 ## From System One to the model's task
 
@@ -133,7 +133,7 @@ load. Weights are kept in f32 as released.
   handles, unicode and an empty state; plus 30 tokenizer strings and 15
   word-splitter strings. Token ids and markers identical, probabilities within
   2.0e-6 (tolerance 2e-5), every decision the same; then the same fixture
-  through `coli serve`.
+  through `qoralis serve`.
 - **Tokenizer and word splitter fuzzing** (during development, not in CI):
   20,013 random strings per seed mixing ASCII, whitespace of every kind, Greek
   (final sigma), Cyrillic, CJK, combining marks, emoji, the Kelvin sign, long
@@ -156,7 +156,7 @@ sides, on a machine shared with other jobs: the load average stayed between
 Engine and package were run in turn, request by request, so both saw the
 same load (median of 5 each):
 
-| request | tokens | `coli serve`, at the client | of which engine | `gliner2` package (torch, CPU, f32) |
+| request | tokens | `qoralis serve`, at the client | of which engine | `gliner2` package (torch, CPU, f32) |
 |---|---|---|---|---|
 | one question (model card, spam or not) | 37 | 294 ms | 290 ms | 718 ms |
 | the README request, 3 questions | 118 | 897 ms | 888 ms | 1217 ms |
@@ -179,7 +179,7 @@ it.
 RAM: 1.81 GB resident for the engine serving the release (peak 1.88 GB):
 the f32 encoder and classifier, 436M parameters of the 486M in the file.
 
-**On a CUDA device** (a `CUDA=1` build, `coli serve --gpu` or `COLI_CUDA=1`): the encoder runs
+**On a CUDA device** (a `CUDA=1` build, `qoralis serve --gpu` or `COLI_CUDA=1`): the encoder runs
 on the card, the matrices in f32 (docs/cuda.md "The decision engines"). An RTX PRO 4000
 against its host's CPU (an i5-13500, 6 threads), requests of 12 questions over a
 1,700-character email (one sequence of about 1,100 tokens): 0.16-0.21 s a request against

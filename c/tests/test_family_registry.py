@@ -1115,13 +1115,13 @@ class FamilyRegistryTest(unittest.TestCase):
              mock.patch.object(cli, "resolve_model", return_value=resolved), \
              mock.patch.object(cli, "engine_for", return_value="engine"), \
              mock.patch.object(cli, "banner"):
-            with self.assertRaisesRegex(SystemExit, "coli run is not wired"):
+            with self.assertRaisesRegex(SystemExit, "qoralis run is not wired"):
                 cli.cmd_run(args)
             with self.assertRaisesRegex(SystemExit, "gateway adapter is not wired"):
                 cli.cmd_chat(args)
 
-        # a family the gateway drives without a one-shot adapter (Qwen3.8, #2189): coli run
-        # goes through the private server coli chat starts
+        # a family the gateway drives without a one-shot adapter (Qwen3.8, #2189): qoralis run
+        # goes through the private server qoralis chat starts
         resolved = type("R", (), {"descriptor": replace(
             FAMILIES[0], has_cli_adapter=False, has_gateway_adapter=True)})()
         with mock.patch.object(cli, "need_model"), \
@@ -1161,7 +1161,7 @@ class FamilyRegistryTest(unittest.TestCase):
             # MiMo-V2.6: render_chat_mimo's cue with thinking on (its template's default)
             "mimo": "<|im_start|>user\nhello {world}<|im_end|><|im_start|>assistant\n<think>",
             # An image model has no chat template and nothing to tune; the
-            # template is the identity and `coli tune` refuses the modality.
+            # template is the identity and `qoralis tune` refuses the modality.
             "qwen_image": "hello {world}",
             # A decision model answers questions; it has no prompt to replay.
             "laya": "hello {world}",

@@ -114,7 +114,7 @@ class DsV41ClusterShardingParityTest(unittest.TestCase):
             **_ENV,
         }
         # The worker returns from main() before argv is read; "1" is what
-        # `coli cluster worker` passes as the cache size, and is ignored here.
+        # `qoralis cluster worker` passes as the cache size, and is ignored here.
         worker = subprocess.Popen(
             [str(ENGINE), "1"],
             cwd=C_DIR,

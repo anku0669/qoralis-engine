@@ -110,9 +110,9 @@ Starting Qoralis
 ```
 
 **Na próxima vez**, rode `START-HERE.bat` ou `./start-here.sh` de novo: o Qoralis
-inicia direto, sem download e sem compilação. `c/coli status` mostra o que está
-instalado e se está rodando, e `c/coli stop` o encerra (`c\coli.cmd status` e
-`c\coli.cmd stop` no Windows).
+inicia direto, sem download e sem compilação. `c/qoralis status` mostra o que está
+instalado e se está rodando, e `c/qoralis stop` o encerra (`c\qoralis.cmd status` e
+`c\qoralis.cmd stop` no Windows).
 
 As opções vêm depois de `./start-here.sh` ou `START-HERE.bat`:
 
@@ -121,7 +121,7 @@ As opções vêm depois de `./start-here.sh` ou `START-HERE.bat`:
 | `--list` | todos os modelos confrontados com esta máquina, e por que um não cabe |
 | `--model ID` | instala aquele modelo (os ids estão em [the tables below](#which-model-for-my-machine)) |
 | `--yes` | sem perguntas: aceite a recomendação |
-| `--dir DIR` | coloca os modelos em outro disco (padrão `~/colibri-models`) |
+| `--dir DIR` | coloca os modelos em outro disco (padrão `~/qoralis-models`) |
 | `--backend vulkan`, `cuda` ou `cpu` | escolha você mesmo a compilação do motor; `--no-gpu` é `--backend cpu` |
 | `--model-dir DIR` | usa um modelo que você já baixou |
 | `--reconfigure` | escolhe outro modelo |
@@ -136,9 +136,9 @@ O que cada etapa faz, em detalhe: [docs/quickstart.md](docs/quickstart.md#the-on
 | `to use the GPU through ..., first run: <command>` | rode aquele comando e depois a configuração de novo: ela recompila para a GPU e não baixa nada outra vez |
 | `the ... build failed`, por exemplo `Unsupported gpu architecture`, quando o kit CUDA instalado não suporta mais a placa | a configuração confere o kit contra a placa antes e escolhe Vulkan por conta própria, dizendo o motivo; se uma compilação ainda falhar, ela oferece a próxima (Vulkan, depois a CPU). `./start-here.sh --backend vulkan` força o Vulkan; `--no-gpu` fica na CPU |
 | `needs N GB free for the download` | `--dir` com uma pasta num disco maior |
-| no WSL, a pasta do modelo fica em `/mnt/c` | mantenha-a no disco do Linux (o padrão, `~/colibri-models`): o `/mnt/c` é muitas vezes mais lento |
+| no WSL, a pasta do modelo fica em `/mnt/c` | mantenha-a no disco do Linux (o padrão, `~/qoralis-models`): o `/mnt/c` é muitas vezes mais lento |
 | você atualizou o checkout (`git pull`) | rode `./start-here.sh` de novo: ele recompila o motor quando as fontes mudaram e então o inicia |
-| qualquer outra coisa | `c/coli logs -n 50` mostra o log de um servidor iniciado em segundo plano (um iniciado em primeiro plano imprime no próprio terminal) e `c/coli logs --install` o da configuração; abra uma [issue](https://github.com/JustVugg/colibri/issues) com as últimas linhas que a configuração imprimiu |
+| qualquer outra coisa | `c/qoralis logs -n 50` mostra o log de um servidor iniciado em segundo plano (um iniciado em primeiro plano imprime no próprio terminal) e `c/qoralis logs --install` o da configuração; abra uma [issue](https://github.com/JustVugg/colibri/issues) com as últimas linhas que a configuração imprimiu |
 
 ### Deixe o seu assistente de IA configurar
 
@@ -150,15 +150,15 @@ você. Peça:
 O [docs/AI_SETUP.md](docs/AI_SETUP.md) dá ao assistente cada etapa como um comando
 com resultado legível por máquina, e manda perguntar antes de baixar um modelo ou
 instalar um pacote do sistema. Assistentes que falam o Model Context Protocol
-podem usar o servidor MCP do Qoralis: `coli mcp` oferece ferramentas para detectar
+podem usar o servidor MCP do Qoralis: `qoralis mcp` oferece ferramentas para detectar
 o hardware, recomendar um modelo, instalar, iniciar, parar e verificar
 ([docs/MCP_SERVER.md](docs/MCP_SERVER.md)).
 
 ### Ou manualmente
 
 Para escolher cada etapa você mesmo (uma versão já compilada ou uma compilação a
-partir do código, qualquer modelo das tabelas abaixo, e então `coli chat`,
-`coli web` ou `coli serve`), veja [Install by hand](#install-by-hand), ou o
+partir do código, qualquer modelo das tabelas abaixo, e então `qoralis chat`,
+`qoralis web` ou `qoralis serve`), veja [Install by hand](#install-by-hand), ou o
 [Guia de Início Rápido](docs/quickstart.md), com cada plataforma passo a passo.
 
 ## O que é o Qoralis, e por quê
@@ -248,7 +248,7 @@ velocidade: um NVMe rápido ajuda mais)
 
 **A partir de um GGUF: os arquivos publicados, lidos como são**
 
-O `./coli import` recebe o primeiro arquivo de um GGUF (as outras partes ao lado) e
+O `./qoralis import` recebe o primeiro arquivo de um GGUF (as outras partes ao lado) e
 escreve um diretório de modelo ao lado dele; depois esse diretório vai em `--model`, como
 qualquer outro ([gguf.md](docs/gguf.md)). Nada é convertido nem quantizado de novo: os blocos
 rodam como o arquivo os guarda, de IQ1_S a Q8_0, F16, BF16 e MXFP4. Os motores de todos os
@@ -336,9 +336,9 @@ apenas para o Qwen3.6, o Qwen3-Coder e o Qwen3.8-Flash-Next, e por isso cada mot
 decide sozinho se roda ali a cadeia densa (Qwen3.6 sim, Qwen3.8 não).
 `--backend vulkan` pede Vulkan de qualquer maneira.
 
-**Ligar ou desligar a GPU.** `coli setup --backend vulkan` usa a GPU para qualquer
-modelo, e `coli setup --backend cpu` (ou `--no-gpu`) mantém tudo na CPU. Um motor
-compilado com Vulkan só usa a GPU com `COLI_VULKAN=1` no ambiente de `coli chat`,
+**Ligar ou desligar a GPU.** `qoralis setup --backend vulkan` usa a GPU para qualquer
+modelo, e `qoralis setup --backend cpu` (ou `--no-gpu`) mantém tudo na CPU. Um motor
+compilado com Vulkan só usa a GPU com `COLI_VULKAN=1` no ambiente de `qoralis chat`,
 `serve` ou `web` (a configuração define isso quando escolheu Vulkan); sem ela, o
 motor roda na CPU. Com a GPU ligada, `COLI_VK_CHAIN=0` mantém o tier de
 especialistas e roda as camadas densas na CPU. Numa GPU integrada, experimente os
@@ -470,21 +470,21 @@ Quem responde:
 um cliente Jev migra para o Qoralis mudando só a URL base e nada mais:
 `TYPESAFE_BASE_URL=http://127.0.0.1:8000` (a chave que ele já envia é aceita por um
 servidor iniciado sem `COLI_API_KEY`). Os dois SDKs oficiais, sem modificação, são
-testados contra o `coli serve`.
+testados contra o `qoralis serve`.
 
 O mesmo modo está no terminal (`/decide merge | request changes | close` no
-`coli chat`) e na página System One do painel. A requisição e a resposta por
+`qoralis chat`) e na página System One do painel. A requisição e a resposta por
 inteiro, as regras de pontuação e onde isso não ajuda:
 [docs/systemone.md](docs/systemone.md).
 
 ## O painel
 
-O `coli web` o abre, e a configuração de um passo também: o chat, a página do
+O `qoralis web` o abre, e a configuração de um passo também: o chat, a página do
 System One, a página do Brain e a página de Profiling, em tema claro ou escuro.
 
 ### O novo chat
 
-O `coli ui` abre o novo chat ao lado de um `coli serve` em execução: o raciocínio no seu próprio bloco,
+O `qoralis ui` abre o novo chat ao lado de um `qoralis serve` em execução: o raciocínio no seu próprio bloco,
 imagens para os modelos com torre de visão, busca na web, o mapa de especialistas, um monitor ao vivo e os
 agentes de programação já apontados para o colibri. Sete idiomas. Veja [ui/README.md](ui/README.md).
 
@@ -515,7 +515,7 @@ com os últimos 30 turnos como tendência.
 
 ## Use-o a partir de outras aplicações
 
-O `coli serve` (que a configuração inicia para você) é um servidor com várias APIs:
+O `qoralis serve` (que a configuração inicia para você) é um servidor com várias APIs:
 
 - **Compatível com OpenAI**: `/v1/chat/completions`, `/v1/completions` e
   `/v1/models`, com streaming, respostas em JSON, sequências de parada e logprobs;
@@ -525,18 +525,18 @@ O `coli serve` (que a configuração inicia para você) é um servidor com vári
   formato nativo do seu modelo ([the per-engine table](docs/api.md#tool-calling-support));
 - **imagens de entrada** no GLM-5.3-Flash, DeepSeek V4.1 Flash, MiMo-V2.6,
   Qwen3.8-Flash-Next, Qwen3.8-27B, LFM3-VL e Mistral-Large-4 (de um GGUF, com o
-  arquivo `mmproj` ao lado): um caminho numa mensagem do `coli chat`, um anexo no
-  `coli web` ou no `coli ui`, ou uma parte `image_url`;
+  arquivo `mmproj` ao lado): um caminho numa mensagem do `qoralis chat`, um anexo no
+  `qoralis web` ou no `qoralis ui`, ou uma parte `image_url`;
 - **figuras de saída** com o Qwen-Image-2.1 em `POST /v1/images/generations`,
-  e desenhadas dentro do terminal pelo `coli chat`
+  e desenhadas dentro do terminal pelo `qoralis chat`
   ([qwen-image.md](docs/qwen-image.md));
 - **decisões** em `POST /v1/systemone` ([acima](#system-one-a-decision-with-a-probability));
-- **várias conversas ao mesmo tempo** em todo motor de texto: `coli serve
+- **várias conversas ao mesmo tempo** em todo motor de texto: `qoralis serve
   --kv-slots N` mantém até 16, cada uma com o seu próprio cache, e decodifica os
   próximos tokens delas juntos ([api.md](docs/api.md#isolated-kv-contexts)).
 
 CLIs de código e editores se conectam como a qualquer provedor compatível com
-OpenAI: URL base `http://127.0.0.1:8000/v1`, o id do modelo que `coli status`
+OpenAI: URL base `http://127.0.0.1:8000/v1`, o id do modelo que `qoralis status`
 imprime, qualquer chave não vazia
 ([docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)).
 
@@ -598,7 +598,7 @@ as mesmas se um especialista respondeu da VRAM, da RAM ou do disco.
   desligado ([speculative.md](docs/speculative.md),
   [tuning.md](docs/tuning.md#speculation-and-reproducibility)).
 
-O motor é um arquivo C por família de modelos (`c/colibri.c` para o GLM-5.2) sobre
+O motor é um arquivo C por família de modelos (`c/qoralisbri.c` para o GLM-5.2) sobre
 cabeçalhos compartilhados, sem BLAS e sem Python em tempo de execução: o Python
 roda apenas a configuração, o launcher, os conversores e o gateway da API.
 
@@ -628,7 +628,7 @@ vivem. Decodificação do GLM-5.2, a partir de
 ### Três backends numa máquina
 
 Um i5-13500 com 62 GB de RAM e uma RTX PRO 4000 Blackwell SFF (24 GB, 70 W),
-cada modelo servido pelo `coli serve`: um prompt novo de 450 tokens, depois uma
+cada modelo servido pelo `qoralis serve`: um prompt novo de 450 tokens, depois uma
 resposta de 128 tokens em streaming, o HTTP da requisição incluído; a melhor de
 duas execuções, tok/s.
 
@@ -644,7 +644,7 @@ duas execuções, tok/s.
 
 ### Modelos grandes na mesma máquina
 
-A máquina D de novo, cada modelo a partir do seu GGUF publicado pelo `coli serve`:
+A máquina D de novo, cada modelo a partir do seu GGUF publicado pelo `qoralis serve`:
 o que nem a placa nem a RAM guardam vem dos dois NVMe. Tokens por segundo, da
 página de cada modelo:
 
@@ -690,7 +690,7 @@ os números.
 **1. O programa.** Pegue o arquivo da sua plataforma em
 [Releases](https://github.com/JustVugg/colibri/releases) (Linux x86_64, macOS,
 Windows; não é preciso compilador, apenas [Python 3](https://www.python.org/downloads/)
-para o launcher e a API) e descompacte, depois `python3 coli info`. Os motores de
+para o launcher e a API) e descompacte, depois `python3 qoralis info`. Os motores de
 Linux e Windows já vêm com Vulkan embutido, com os seus `shaders/` ao lado, e os
 de macOS com Metal; para uma placa NVIDIA no Windows, acrescente o arquivo CUDA.
 Ou compile a partir do código com `gcc` (ou clang) e OpenMP:
@@ -713,10 +713,10 @@ grupo (gs64) com o cabeçote MTP int8,
 para o GLM-5.3 (419 GB, sem cabeçote MTP). Não use os espelhos int4 por linha mais
 antigos: eles medem cerca de 9 pontos pior em qualidade e causaram as respostas em
 laço da [#455](https://github.com/JustVugg/colibri/issues/455).
-`./coli convert --model /nvme/glm52_i4` monta o mesmo contêiner a partir da versão
+`./qoralis convert --model /nvme/glm52_i4` monta o mesmo contêiner a partir da versão
 FP8, shard a shard, sem nunca precisar dos seus 756 GB no disco de uma vez. Como
 conferir o cabeçote MTP e o resto:
-[quickstart.md](docs/quickstart.md#3-get-the-model). Um GGUF que você já tem não precisa de conversão: `./coli import` no seu primeiro
+[quickstart.md](docs/quickstart.md#3-get-the-model). Um GGUF que você já tem não precisa de conversão: `./qoralis import` no seu primeiro
 arquivo ([acima](#from-a-gguf)).
 
 <a id="3-run-it"></a>
@@ -727,17 +727,17 @@ template de chat dele, então os comandos são os mesmos para todo modelo:
 
 ```bash
 ./c/qoralis chat  --model /nvme/qwen36          # chat in the terminal
-./coli web   --model /nvme/qwen36          # API + dashboard, opens a browser
-./coli serve --model /nvme/qwen36          # API + dashboard, no browser
-./coli plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
-./coli doctor --model /nvme/qwen36         # read-only check: is everything ready?
-./coli tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
-./coli import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
-./coli ui                                  # the chat UI, next to a running coli serve
+./qoralis web   --model /nvme/qwen36          # API + dashboard, opens a browser
+./qoralis serve --model /nvme/qwen36          # API + dashboard, no browser
+./qoralis plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
+./qoralis doctor --model /nvme/qwen36         # read-only check: is everything ready?
+./qoralis tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
+./qoralis import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
+./qoralis ui                                  # the chat UI, next to a running qoralis serve
 ```
 
-No Windows, o arquivo de uma versão traz `coli.cmd` (`coli.cmd chat --model
-D:\qwen36`); a partir de um checkout do código, use `py -3 c\coli`. Os arquivos
+No Windows, o arquivo de uma versão traz `qoralis.cmd` (`qoralis.cmd chat --model
+D:\qwen36`); a partir de um checkout do código, use `py -3 c\qoralis`. Os arquivos
 `.exe` são os motores, não o launcher. Toda opção e variável:
 [SETTINGS.md](docs/SETTINGS.md), [ENVIRONMENT.md](docs/ENVIRONMENT.md).
 
@@ -779,7 +779,7 @@ controlada vale mais aqui do que um número rápido sem explicação.
 | O System One e os modelos de decisão | [systemone.md](docs/systemone.md), [laya.md](docs/laya.md), [gliner_decide.md](docs/gliner_decide.md), [clef.md](docs/clef.md) |
 | Arquivos GGUF: as arquiteturas, os dois modos, o que cada motor faz com os blocos | [gguf.md](docs/gguf.md) |
 | Os modelos no motor Qwen3.6 (Flint, Muse Spark Open, LFM3-VL) e o Mistral-Large-4 | [qwen36.md](docs/qwen36.md), [mistral-large4.md](docs/mistral-large4.md) |
-| A interface de chat (`coli ui`) | [ui/README.md](ui/README.md) |
+| A interface de chat (`qoralis ui`) | [ui/README.md](ui/README.md) |
 | Vulkan: o tier de especialistas, a cadeia densa, placas sem Resizable BAR | [vulkan.md](docs/vulkan.md) |
 | CUDA, e o tier CUDA do Qwen3.6 | [cuda.md](docs/cuda.md), [qwen36-cuda-tier.md](docs/qwen36-cuda-tier.md) |
 | Apple Silicon, Windows | [metal.md](docs/metal.md), [windows.md](docs/windows.md) |
@@ -824,12 +824,12 @@ c/
 │
 ├── coli                  user-facing CLI
 ├── setup_*.py            the one-step setup: hardware, catalog, downloads, flow
-├── mcp_server.py         the MCP server (coli mcp)
+├── mcp_server.py         the MCP server (qoralis mcp)
 ├── openai_server.py      OpenAI- and Anthropic-compatible HTTP gateway
-├── resource_plan.py      RAM/VRAM planner behind coli plan and coli doctor
+├── resource_plan.py      RAM/VRAM planner behind qoralis plan and qoralis doctor
 ├── tools/                conversion, fixtures and benchmarks
 └── tests/                dependency-free C and Python tests
-ui/                       the chat UI (coli ui)
+ui/                       the chat UI (qoralis ui)
 web/                      the dashboard (a pure API client)
 desktop/                  Tauri desktop shell around the dashboard
 docker/                   container images

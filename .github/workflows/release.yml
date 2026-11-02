@@ -188,11 +188,12 @@ jobs:
           # it, exactly like k3_tokenizer.py. Copied explicitly for the same reason.
           cp c/tools/check_ablate_evidence.py dist/tools/
           cp c/coli dist/
+          cp c/qoralis dist/
           # Windows has nothing to click otherwise: `coli` is an extensionless
           # Python script, and the .exe files are engines that exit at once
           # without a model (#1241). coli.cmd is both the double-click entry
           # point and what `coli chat ...` resolves to in cmd/PowerShell.
-          if [ "${{ matrix.ext }}" = ".exe" ]; then cp c/coli.cmd dist/; fi
+          if [ "${{ matrix.ext }}" = ".exe" ]; then cp c/coli.cmd c/qoralis.cmd dist/; fi
           # I file Python non sono piu' elencati qui. Erano sette, scelti a mano,
           # con i commenti che spiegavano quale importava quale: un inseguimento
           # del codice fatto a occhio, e il codice era avanti. #1296: mancavano

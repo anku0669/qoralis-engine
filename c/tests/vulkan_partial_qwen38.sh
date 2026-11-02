@@ -19,7 +19,7 @@
 #   - COLI_VK_DENSE_HOST=0 with N < L: only the N layers' host copies dropped, none read
 #     back on a healthy run, and after a lost device only theirs;
 #   - nothing forced on a device where everything fits: N = L with the head, as before, and
-#     the same logits as with COLI_VK_CHAIN_LAYERS=4; coli plan's N, per-layer, fixed and
+#     the same logits as with COLI_VK_CHAIN_LAYERS=4; qoralis plan's N, per-layer, fixed and
 #     tail bytes the engine's (under the caps above).
 # The CPU's tokens everywhere, logits within 1e-4 of the largest (bf16 trunk).
 
@@ -92,12 +92,12 @@ ptl_q38_cap() {
   local snap; snap=$(printf '%s\n' "${envs[@]}" | sed -n 's/^SNAP=//p' | tail -1)
   ptl_q38_plan "$tag" "$snap" vk.log "${envs[@]}" COLI_VK_DEVICE_CAP_MB="$cap"
 }
-# ptl_q38_plan <tag> <fixture> <log> <env...>: coli plan's prediction (resource_plan.py,
+# ptl_q38_plan <tag> <fixture> <log> <env...>: qoralis plan's prediction (resource_plan.py,
 # vk_chain_fit with qwen38's layout) for the same device and settings: the engine's free
 # bytes, per-layer bytes, fixed bytes, tail and N, from the checkpoint's header and config
 ptl_q38_plan() {
   local tag=$1 fx=$2 log=$3; shift 3
-  $PY - "$fx" "$log" "$@" <<'PY' || fail "$tag: coli plan predicts otherwise"
+  $PY - "$fx" "$log" "$@" <<'PY' || fail "$tag: qoralis plan predicts otherwise"
 import re, sys
 sys.path.insert(0, ".")
 import resource_plan as rp
@@ -113,7 +113,7 @@ info = rp.analyze_model(fx)
 fit = rp.vk_chain_fit(info, "qwen38", env, {"type": "cpu"})
 tail = rp._VK_CHAIN_LAYOUT["qwen38"](info, env, {"type": "cpu"}).tail
 ok = (fit["layers"], fit["fixed"], fit["free"], tail, fit["n"]) == (layers, num("fixed"), num("free"), num("tail"), n)
-print(f"   coli plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
+print(f"   qoralis plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
       f"layers {'= the engine' if fit['layers'] == layers else fit['layers']}, fixed {fit['fixed']} B, "
       f"tail {tail} B, free {fit['free']} B")
 sys.exit(0 if ok else 1)
@@ -177,7 +177,7 @@ ptl_family_qwen38() {
   for k in 1 3 4; do
     ptl_q38_cap "partial qwen38 a device holding $k layers" $k $R SNAP=qwen38_tiny -- 4 8 $T
   done
-  # the int8 trunk and the MTP head's tail, in the engine's fit and in coli plan's
+  # the int8 trunk and the MTP head's tail, in the engine's fit and in qoralis plan's
   ptl_q38_run probe.log $R COLI_VK_DEVICE_CAP_MB=256 Q38_TRUNK_MIN_KB=0 Q38_MTP=1 SNAP=qwen38_tiny_mtp -- 2 8 $M
   PTL_Q38_TOL=0 ptl_q38_cap "partial qwen38 int8 trunk, MTP, a device holding 2 layers" 2 $R Q38_TRUNK_MIN_KB=0 Q38_MTP=1 \
     SNAP=qwen38_tiny_mtp -- 2 8 $M

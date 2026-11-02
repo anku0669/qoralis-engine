@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Il protocollo di serve del motore GLM-5.3, parlato per intero.
 
-`coli chat`, `coli serve` e `coli web` non chiamano la CLI: aprono una pipa e
+`qoralis chat`, `qoralis serve` e `qoralis web` non chiamano la CLI: aprono una pipa e
 parlano il protocollo di docs/serve_protocol.md. Fra la CLI che funziona e il
 server che funziona ci sono l'handshake, il frame a byte contati, la
 tokenizzazione del payload, la decodifica dei token in uscita e i codici di
@@ -50,7 +50,7 @@ def reuse_line(request_id):
 
 def engine(binary, fixture, extra=None):
     # GLM53_VERBOSE: il riuso del prefisso si racconta solo su richiesta,
-    # perche' `coli chat` eredita lo stderr del server e quella riga finirebbe
+    # perche' `qoralis chat` eredita lo stderr del server e quella riga finirebbe
     # a schermo dopo ogni risposta.
     environment = {**os.environ, "SERVE": "1", "SERVE_BATCH": "1",
                    "SNAP": str(fixture), "GLM53_BITS": "32", "GLM53_VERBOSE": "1"}

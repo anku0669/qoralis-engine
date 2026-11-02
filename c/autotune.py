@@ -28,7 +28,7 @@ TOKENS_RE = re.compile(r"\[TOKENS\]\s+\d+\s+generated:\s*([0-9 ]+)")
 # oracle replay; the sibling engines emit `TUNE decode: N tokens in T.TTTs` at
 # the end of an ordinary greedy run, which is deterministic for a fixed prompt
 # and NGEN and therefore comparable across candidates. Accepting both is what
-# lets `coli tune` work on more than GLM (#898).
+# lets `qoralis tune` work on more than GLM (#898).
 TIMING_RE = re.compile(r"(?:REPLAY|TUNE) decode:\s+(\d+)\s+tokens in\s+([0-9.]+)s")
 SPEED_RE = re.compile(r"REPLAY decode:\s+\d+\s+tokens.*?\|\s*([0-9.]+)\s+tok/s")
 HIT_RE = re.compile(r"expert hit\s+([0-9.]+)%")
@@ -388,7 +388,7 @@ def _run(command: list[str], env: dict, timeout: int) -> subprocess.CompletedPro
     # The engine writes UTF-8 ("[prefill] layer 1/78 · 12 token", the PROF
     # verdict's em dash). Decoding in the locale's code page raised in the
     # reader thread on cp949/cp932 or the C locale, left proc.stdout None, and
-    # killed `coli tune` in calibration with a TypeError.
+    # killed `qoralis tune` in calibration with a TypeError.
     return subprocess.run(command, env=env, capture_output=True, timeout=timeout,
                           encoding="utf-8", errors="replace")
 
@@ -423,7 +423,7 @@ def run_tune(engine: str, cap: int, base_env: dict, plan: dict, model: str,
         # as argv[1]="None", which atoi() turns into 0: qwen36 refuses it and
         # tuning dies with "calibration failed (1)", while GLM silently swept
         # its platform default instead of the cap the plan just resolved
-        # (#1190). The plan is authoritative here, exactly like `coli chat`;
+        # (#1190). The plan is authoritative here, exactly like `qoralis chat`;
         # a plan without a resolved cap is a loud error, never "None".
         cap = plan.get("tiers", {}).get("ram", {}).get("cache_slots_per_layer")
         if cap is None:

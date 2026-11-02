@@ -1,4 +1,4 @@
-"""`coli run` on OLMoE must hand the engine the prompt as UTF-8 whatever the locale.
+"""`qoralis run` on OLMoE must hand the engine the prompt as UTF-8 whatever the locale.
 
 cmd_run feeds the one-shot prompt to olmoe's stdin chat loop, which reads raw
 bytes and tokenizes them as UTF-8. The pipe was opened in text mode, so Python
@@ -6,7 +6,7 @@ encoded the prompt in the locale's code page instead:
 
   * where the code page cannot encode a character of the prompt (an accented
     letter or an emoji on cp949/cp932, anything non-ASCII in the C locale),
-    `coli run` died with a UnicodeEncodeError traceback before the engine saw
+    `qoralis run` died with a UnicodeEncodeError traceback before the engine saw
     a byte;
   * where it can (é on cp1252, Hangul on cp949), the engine received the code
     page's bytes, which are not UTF-8, and answered a garbled prompt.
@@ -62,7 +62,7 @@ DRIVER = textwrap.dedent("""
          mock.patch.object(coli, "engine_for", return_value="olmoe"), \\
          mock.patch.object(coli.subprocess, "run", run):
         try:
-            coli.cmd_run(args)
+            qoralis.cmd_run(args)
         except SystemExit as exit_:
             code = exit_.code
     print(json.dumps({"exit": code, "locale": locale.getpreferredencoding(False)}))

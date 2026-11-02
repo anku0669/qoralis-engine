@@ -1,6 +1,6 @@
 """--auto-tier must apply the VRAM tier it printed, or say why it cannot.
 
-`coli plan` and `coli doctor` print a VRAM tier. --auto-tier is documented as
+`qoralis plan` and `qoralis doctor` print a VRAM tier. --auto-tier is documented as
 applying the plan those commands print. On the sibling-engine path it then
 dropped the tier whenever COLI_CUDA was not already "1", which --auto-tier on
 its own never sets, and it dropped it in silence: no [PLAN] line, no [CUDA]

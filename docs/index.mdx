@@ -22,7 +22,7 @@ Qoralis Engine is a dependency-light inference engine for running large mixture-
 
 ## What you can run
 
-The repository currently includes engines for GLM, DeepSeek, Kimi, Qwen, Inkling, and OLMoE families. Each engine uses the same `coli chat`, `coli serve`, and `coli web` front end.
+The repository currently includes engines for GLM, DeepSeek, Kimi, Qwen, Inkling, and OLMoE families. Each engine uses the same `qoralis chat`, `qoralis serve`, and `qoralis web` front end.
 
 <Note>
 Qoralis Engine is an inference engine and research platform, not a hosted service. Throughput depends heavily on model format, memory placement, storage, and prompt size.
@@ -32,11 +32,11 @@ Qoralis Engine is an inference engine and research platform, not a hosted servic
 
 | Command | Use it for |
 | --- | --- |
-| `coli chat` | Interactive terminal inference |
-| `coli serve` | OpenAI- and Anthropic-compatible HTTP endpoints |
-| `coli web` | HTTP endpoints plus the local web dashboard |
-| `coli doctor` | Environment and dependency diagnostics |
-| `coli tune` | Measured placement and performance tuning |
+| `qoralis chat` | Interactive terminal inference |
+| `qoralis serve` | OpenAI- and Anthropic-compatible HTTP endpoints |
+| `qoralis web` | HTTP endpoints plus the local web dashboard |
+| `qoralis doctor` | Environment and dependency diagnostics |
+| `qoralis tune` | Measured placement and performance tuning |
 
 <Warning>
 Set `COLI_API_KEY` before exposing the HTTP server beyond a trusted local machine. Keep raw browser and telemetry endpoints behind the same network boundary.

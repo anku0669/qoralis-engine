@@ -78,7 +78,7 @@ Starting Qoralis
   stop: press Ctrl+C here (or close this window)
 ```
 
-**次回からは**、`START-HERE.bat` か `./start-here.sh` をもう一度実行するだけです：ダウンロードもビルドもなしに、Qoralis がすぐに起動します。`c/coli status` は何がインストールされていて、動いているかどうかを表示し、`c/coli stop` で停止します（Windows では `c\coli.cmd status` と `c\coli.cmd stop`）。
+**次回からは**、`START-HERE.bat` か `./start-here.sh` をもう一度実行するだけです：ダウンロードもビルドもなしに、Qoralis がすぐに起動します。`c/qoralis status` は何がインストールされていて、動いているかどうかを表示し、`c/qoralis stop` で停止します（Windows では `c\qoralis.cmd status` と `c\qoralis.cmd stop`）。
 
 オプションは `./start-here.sh` または `START-HERE.bat` のあとに付けます：
 
@@ -87,7 +87,7 @@ Starting Qoralis
 | `--list` | このマシンに対する全モデルの一覧と、収まらないモデルについてはその理由 |
 | `--model ID` | そのモデルをインストールする（ID は[下の表](#which-model-for-my-machine)にあります） |
 | `--yes` | 質問なしで推奨を選ぶ |
-| `--dir DIR` | モデルを別のディスクに置く（デフォルトは `~/colibri-models`） |
+| `--dir DIR` | モデルを別のディスクに置く（デフォルトは `~/qoralis-models`） |
 | `--backend vulkan`、`cuda` または `cpu` | エンジンのビルドを自分で選ぶ。`--no-gpu` は `--backend cpu` と同じ |
 | `--model-dir DIR` | すでにダウンロードしたモデルを使う |
 | `--reconfigure` | 別のモデルを選び直す |
@@ -102,9 +102,9 @@ Starting Qoralis
 | `to use the GPU through ..., first run: <command>` | そのコマンドを実行してから、もう一度セットアップを実行する：GPU 向けにビルドし直し、ダウンロードはやり直しません |
 | `the ... build failed`。たとえば、インストールされている CUDA ツールキットがそのカードをもうサポートしていないときの `Unsupported gpu architecture` | セットアップはまずツールキットをカードと照らし合わせてチェックし、自分で Vulkan を選びます（理由も表示します）。それでもビルドが失敗する場合は次の選択肢（Vulkan、その次に CPU）を提示します。`./start-here.sh --backend vulkan` は Vulkan を強制します。`--no-gpu` なら CPU のままです |
 | `needs N GB free for the download` | `--dir` で、より大きなディスク上のフォルダーを指定する |
-| WSL で、モデルのフォルダーが `/mnt/c` の下にある | Linux 側のディスク（デフォルトの `~/colibri-models`）に置く：`/mnt/c` は何倍も遅くなります |
+| WSL で、モデルのフォルダーが `/mnt/c` の下にある | Linux 側のディスク（デフォルトの `~/qoralis-models`）に置く：`/mnt/c` は何倍も遅くなります |
 | チェックアウトを更新した（`git pull`） | `./start-here.sh` をもう一度実行してください。ソースが変わっていればエンジンを再ビルドしてから起動します |
-| それ以外 | `c/coli logs -n 50` でバックグラウンドで起動したサーバーのログを（フォアグラウンドで起動したサーバーは自分のターミナルに出力します）、`c/coli logs --install` でセットアップのログを表示できます。セットアップが最後に表示した数行を添えて [issue](https://github.com/JustVugg/colibri/issues) を作成してください |
+| それ以外 | `c/qoralis logs -n 50` でバックグラウンドで起動したサーバーのログを（フォアグラウンドで起動したサーバーは自分のターミナルに出力します）、`c/qoralis logs --install` でセットアップのログを表示できます。セットアップが最後に表示した数行を添えて [issue](https://github.com/JustVugg/colibri/issues) を作成してください |
 
 ### AI アシスタントにセットアップしてもらう
 
@@ -112,11 +112,11 @@ AI コーディングアシスタントを使っているなら、これをす�
 
 > https://github.com/JustVugg/colibri の docs/AI_SETUP.md に従って、このマシンに Qoralis をセットアップしてください
 
-[docs/AI_SETUP.md](docs/AI_SETUP.md) は、各ステップを機械可読な結果を返すコマンドとしてアシスタントに渡し、モデルをダウンロードしたりシステムパッケージをインストールしたりする前に、あなたに確認するよう指示しています。Model Context Protocol に対応したアシスタントは、代わりに Qoralis の MCP サーバーを使えます：`coli mcp` は、ハードウェアの検出、モデルの推奨、インストール、起動、停止、状態確認のためのツールを提供します（[docs/MCP_SERVER.md](docs/MCP_SERVER.md)）。
+[docs/AI_SETUP.md](docs/AI_SETUP.md) は、各ステップを機械可読な結果を返すコマンドとしてアシスタントに渡し、モデルをダウンロードしたりシステムパッケージをインストールしたりする前に、あなたに確認するよう指示しています。Model Context Protocol に対応したアシスタントは、代わりに Qoralis の MCP サーバーを使えます：`qoralis mcp` は、ハードウェアの検出、モデルの推奨、インストール、起動、停止、状態確認のためのツールを提供します（[docs/MCP_SERVER.md](docs/MCP_SERVER.md)）。
 
 ### または手動で
 
-各ステップを自分で選びたい場合（ビルド済みリリースかソースからのビルドか、下の表のどのモデルか、そして `coli chat`、`coli web`、`coli serve` のどれか）は、[手動でのインストール](#install-by-hand)を、全プラットフォームの手順を一つずつ追いたい場合は[クイックスタートガイド](docs/quickstart.md)を参照してください。
+各ステップを自分で選びたい場合（ビルド済みリリースかソースからのビルドか、下の表のどのモデルか、そして `qoralis chat`、`qoralis web`、`qoralis serve` のどれか）は、[手動でのインストール](#install-by-hand)を、全プラットフォームの手順を一つずつ追いたい場合は[クイックスタートガイド](docs/quickstart.md)を参照してください。
 
 ## Qoralis とは何か、そしてなぜ作るのか
 
@@ -177,7 +177,7 @@ Mixture-of-Experts モデルは、ディスク上では巨大でも、1 トー�
 
 **GGUF から：公開済みのファイルをそのまま読み込む**
 
-`./coli import` は GGUF の最初のファイル（ほかのパートはその隣）を受け取り、隣にモデルのディレクトリを書き出します。あとはそのディレクトリをほかのモデルと同じように `--model` に渡します（[gguf.md](docs/gguf.md)）。変換も再量子化もしません。ブロックはファイルにあるとおりに、IQ1_S から Q8_0、F16、BF16、MXFP4 まで動きます。上のチャットモデルのエンジンはすべて GGUF も読めます（[アーキテクチャ](docs/gguf.md#supported-architectures)）。次の 4 つのモデルは GGUF で配布されています：
+`./qoralis import` は GGUF の最初のファイル（ほかのパートはその隣）を受け取り、隣にモデルのディレクトリを書き出します。あとはそのディレクトリをほかのモデルと同じように `--model` に渡します（[gguf.md](docs/gguf.md)）。変換も再量子化もしません。ブロックはファイルにあるとおりに、IQ1_S から Q8_0、F16、BF16、MXFP4 まで動きます。上のチャットモデルのエンジンはすべて GGUF も読めます（[アーキテクチャ](docs/gguf.md#supported-architectures)）。次の 4 つのモデルは GGUF で配布されています：
 
 | モデル | GGUF | GPU | 計測値 |
 |---|---|---|---|
@@ -232,7 +232,7 @@ Mixture-of-Experts モデルは、ディスク上では巨大でも、1 トー�
 
 内蔵 GPU は CPU と RAM を共有しています。内蔵 GPU が節約するのは、保持しているエキスパートの計算とディスク読み込みです。そのため Qwen3.6 のようなモデルでは効果がありますが、OLMoE のようにエキスパートがすでに RAM にある小さなモデルでは、かえって遅くなることがあります。だからセットアップは、内蔵 GPU では Qwen3.6、Qwen3-Coder、Qwen3.8-Flash-Next の場合にだけ Vulkan を有効にし、各エンジンもそこで密チェーンを動かすかどうかを自分で判断します（Qwen3.6 は動かし、Qwen3.8 は動かしません）。それでも Vulkan を使いたい場合は `--backend vulkan` を指定します。
 
-**GPU のオンとオフ。** `coli setup --backend vulkan` はどのモデルでも GPU を使い、`coli setup --backend cpu`（または `--no-gpu`）はすべてを CPU で動かします。Vulkan 付きでビルドしたエンジンが GPU を使うのは、`coli chat`、`serve`、`web` の環境に `COLI_VULKAN=1` があるときだけです（セットアップが Vulkan を選んだときは自動で設定します）。なければ CPU で動きます。GPU がオンのとき、`COLI_VK_CHAIN=0` はエキスパートの層 (tier) をそのままにして、密な層を CPU で動かします。内蔵 GPU では両方試してください：Intel Iris Xe（Core i7-1355U）のノートパソコンでは、Qwen3.6 のデコードは CPU で 2.1 tok/s、Vulkan で 1.7〜1.9、密チェーンをオフにして 2.1 でした。
+**GPU のオンとオフ。** `qoralis setup --backend vulkan` はどのモデルでも GPU を使い、`qoralis setup --backend cpu`（または `--no-gpu`）はすべてを CPU で動かします。Vulkan 付きでビルドしたエンジンが GPU を使うのは、`qoralis chat`、`serve`、`web` の環境に `COLI_VULKAN=1` があるときだけです（セットアップが Vulkan を選んだときは自動で設定します）。なければ CPU で動きます。GPU がオンのとき、`COLI_VK_CHAIN=0` はエキスパートの層 (tier) をそのままにして、密な層を CPU で動かします。内蔵 GPU では両方試してください：Intel Iris Xe（Core i7-1355U）のノートパソコンでは、Qwen3.6 のデコードは CPU で 2.1 tok/s、Vulkan で 1.7〜1.9、密チェーンをオフにして 2.1 でした。
 
 ディスクリート GPU では、セットアップはすべてのエンジンを Vulkan 付きでビルドし（エンジンに CUDA の経路があり、ツールキットが入っていれば CUDA を優先）、密レイヤーはカード上に置きます。これが本来想定しているケースです。RTX PRO 4000（24 GB、マシン D）では Qwen3.6-35B-A3B のデコードが 92.9 tok/s、プロンプト読み込みが 2,076、OLMoE は 299.4 と 6,867 です（[表](#three-backends-on-one-machine)）。カードより大きなモデルは、カードに載らないエキスパートを RAM 上のホストプールに置き、各ステップでカードが自分の分を計算する間に CPU がそれらを同じフレームの中で計算します。Qwen3.8-Flash-Next IQ2_XS（68 GB）はそこで 50.6 tok/s でデコードします（[vulkan.md](docs/vulkan.md#the-routed-experts-in-the-frame-vk_dmoeh)）。あるユーザーは Tesla V100 16 GB で Qwen3.6 を 17〜19 tok/s と計測しました（[#1852](https://github.com/JustVugg/colibri/issues/1852)）。あなたのカードの数値も歓迎します。
 
@@ -280,17 +280,17 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 - **Qoralis が動かすすべてのチャットモデル**。スコアリングによって答えます：回答を書く代わりに、各選択肢の確率を読み取ります。1 つの文書についての複数の質問は、文書を 1 回だけ読みます：Qwen3.6 では、1 つの文書についての 4 つの質問が、同じ CPU マシンで同じ回答を生成する場合より 5.7 倍速く返ってきました。
 - **3 つの判定モデル**。作者が調整した較正を使い、1 回のフォワードパスでネイティブに答えます：[Laya](docs/laya.md)（Convai Innovations）、[GLiNER2.5-Decide](docs/gliner_decide.md)（fastino）、[Clef](docs/clef.md)（Cloudflare。チャットも可能）。サイズと速度は[判定モデルの表](#which-model-for-my-machine)にあります。
 
-**Jev からの切り替え。** リクエストとレスポンスは TypeSafe の Jev API と同じなので、Jev のクライアントは base URL を変えるだけで、ほかは何も変えずに Qoralis に切り替えられます：`TYPESAFE_BASE_URL=http://127.0.0.1:8000`（クライアントがすでに送っているキーは、`COLI_API_KEY` なしで起動したサーバーなら受け入れられます）。2 つの公式 SDK は、改変なしのまま `coli serve` に対してテストされています。
+**Jev からの切り替え。** リクエストとレスポンスは TypeSafe の Jev API と同じなので、Jev のクライアントは base URL を変えるだけで、ほかは何も変えずに Qoralis に切り替えられます：`TYPESAFE_BASE_URL=http://127.0.0.1:8000`（クライアントがすでに送っているキーは、`COLI_API_KEY` なしで起動したサーバーなら受け入れられます）。2 つの公式 SDK は、改変なしのまま `qoralis serve` に対してテストされています。
 
-同じモードはターミナル（`coli chat` での `/decide merge | request changes | close`）と、ダッシュボードの System One ページにもあります。リクエストとレスポンスの全体、スコアリングのルール、そして役に立たない場面：[docs/systemone.md](docs/systemone.md)。
+同じモードはターミナル（`qoralis chat` での `/decide merge | request changes | close`）と、ダッシュボードの System One ページにもあります。リクエストとレスポンスの全体、スコアリングのルール、そして役に立たない場面：[docs/systemone.md](docs/systemone.md)。
 
 ## ダッシュボード
 
-`coli web` で開きます。ワンステップのセットアップでも開きます：チャット、System One ページ、Brain、Profiling ページがあり、ライトテーマとダークテーマに対応しています。
+`qoralis web` で開きます。ワンステップのセットアップでも開きます：チャット、System One ページ、Brain、Profiling ページがあり、ライトテーマとダークテーマに対応しています。
 
 ### 新しいチャット UI
 
-`coli ui` は、実行中の `coli serve` の横で新しいチャットを開きます：推論は専用のブロックに、ビジョンタワーを持つモデルでは画像、Web 検索、エキスパートマップ、ライブモニター、そして Qoralis に向けて設定済みのコーディングエージェント。7 言語に対応。[ui/README.md](ui/README.md) を参照してください。
+`qoralis ui` は、実行中の `qoralis serve` の横で新しいチャットを開きます：推論は専用のブロックに、ビジョンタワーを持つモデルでは画像、Web 検索、エキスパートマップ、ライブモニター、そして Qoralis に向けて設定済みのコーディングエージェント。7 言語に対応。[ui/README.md](ui/README.md) を参照してください。
 
 <p align="center">
   <img src="docs/media/ui/ui-chat.png" width="900" alt="新しいチャット UI：質問、折りたたまれた推論、回答とその速度">
@@ -317,17 +317,17 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 
 ## ほかのアプリから使う
 
-`coli serve`（セットアップが起動してくれるもの）は、複数の API を備えた 1 つのサーバーです：
+`qoralis serve`（セットアップが起動してくれるもの）は、複数の API を備えた 1 つのサーバーです：
 
 - **OpenAI 互換**：`/v1/chat/completions`、`/v1/completions`、`/v1/models`。ストリーミング、JSON での応答、停止シーケンス、logprobs に対応しています。
 - **Anthropic 互換**：`/v1/messages`。Claude Code や Anthropic の SDK をそのまま接続できます。
 - **ツール呼び出し**：Inkling と OLMoE を除くすべてのチャットエンジンで、それぞれのモデルのネイティブ形式で行います（[エンジンごとの表](docs/api.md#tool-calling-support)）。
-- **画像入力**：GLM-5.3-Flash、DeepSeek V4.1 Flash、MiMo-V2.6、Qwen3.8-Flash-Next、Qwen3.8-27B、LFM3-VL、Mistral-Large-4（GGUF の場合は隣に `mmproj` ファイルを置く）で使えます。`coli chat` のメッセージ内のパス、`coli web` や `coli ui` での添付、または `image_url` パートで渡します。
-- **画像出力**：Qwen-Image-2.1 で `POST /v1/images/generations` から生成します。`coli chat` ではターミナル内に描画されます（[qwen-image.md](docs/qwen-image.md)）。
+- **画像入力**：GLM-5.3-Flash、DeepSeek V4.1 Flash、MiMo-V2.6、Qwen3.8-Flash-Next、Qwen3.8-27B、LFM3-VL、Mistral-Large-4（GGUF の場合は隣に `mmproj` ファイルを置く）で使えます。`qoralis chat` のメッセージ内のパス、`qoralis web` や `qoralis ui` での添付、または `image_url` パートで渡します。
+- **画像出力**：Qwen-Image-2.1 で `POST /v1/images/generations` から生成します。`qoralis chat` ではターミナル内に描画されます（[qwen-image.md](docs/qwen-image.md)）。
 - **判定**：`POST /v1/systemone` で行います（[前述](#system-one-a-decision-with-a-probability)）。
-- **複数の会話を同時に**：すべてのテキストエンジンで、`coli serve --kv-slots N` が最大 16 の会話をそれぞれのキャッシュとともに保持し、次のトークンをまとめてデコードします（[api.md](docs/api.md#isolated-kv-contexts)）。
+- **複数の会話を同時に**：すべてのテキストエンジンで、`qoralis serve --kv-slots N` が最大 16 の会話をそれぞれのキャッシュとともに保持し、次のトークンをまとめてデコードします（[api.md](docs/api.md#isolated-kv-contexts)）。
 
-コーディング用の CLI やエディタは、ほかの OpenAI 互換プロバイダーと同じように接続できます：base URL は `http://127.0.0.1:8000/v1`、モデル ID は `coli status` が表示するもの、キーは空でなければ何でもかまいません（[docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)）。
+コーディング用の CLI やエディタは、ほかの OpenAI 互換プロバイダーと同じように接続できます：base URL は `http://127.0.0.1:8000/v1`、モデル ID は `qoralis status` が表示するもの、キーは空でなければ何でもかまいません（[docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)）。
 
 <a id="how-it-works"></a>
 
@@ -350,7 +350,7 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 - **忠実なモデル。** すべてのエンジンは、CI で小さなフィクスチャを使い、そのモデルのリファレンス実装と照合されています。GLM-5.2 の MLA アテンションは圧縮された KV 状態（1 トークンあたり 32,768 個ではなく 576 個の浮動小数点数で、57 分の 1）を保持し、それは再起動をまたいで残るため、会話はプロンプトを読み直すことなく再開できます。
 - **元が取れるときだけの投機的デコード。** GLM-5.2 の int8 MTP ヘッドは、効果がある場合、フォワードあたり 2.2-2.8 トークンをドラフトします。Qwen3.8-Flash-Next の MTP ヘッドはデフォルトで有効で、同じ出力のまま速度を 16-20% 上げます。プロンプトルックアップはコード編集で 6-7% 上げます。Qwen3.6 のヘッド（`Q36_MTP=1`）は、デコードを CUDA で 99.7-104.5 から 115.8-120.1 tok/s に、Vulkan で 83.2-83.8 から 99.9-109.3 に上げます（RTX PRO 4000）。DeepSeek V4.1 の DSpark ヘッドは確信度が示す深さまでドラフトし、割に合わないドラフトはゲートが飛ばします。ドラフトのコストが節約を上回る場合（DeepSeek V4）はオフのままです（[speculative.md](docs/speculative.md)、[tuning.md](docs/tuning.md#speculation-and-reproducibility)）。
 
-エンジンは、共有ヘッダの上に、モデルファミリーごとに C ファイルを 1 つ置いた構成です（GLM-5.2 なら `c/colibri.c`）。BLAS は使わず、実行時に Python も使いません：Python が動かすのは、セットアップ、ランチャー、変換ツール、API ゲートウェイだけです。
+エンジンは、共有ヘッダの上に、モデルファミリーごとに C ファイルを 1 つ置いた構成です（GLM-5.2 なら `c/qoralisbri.c`）。BLAS は使わず、実行時に Python も使いません：Python が動かすのは、セットアップ、ランチャー、変換ツール、API ゲートウェイだけです。
 
 <a id="what-it-achieves"></a>
 <a id="benchmarks"></a>
@@ -372,7 +372,7 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 
 ### 1 台のマシンで 3 つのバックエンド
 
-RAM 62 GB の i5-13500 と RTX PRO 4000 Blackwell SFF（24 GB、70 W）。各モデルを `coli serve` で提供し、新しい 450 トークンのプロンプトのあと 128 トークンの回答をストリーミングします。リクエストの HTTP を含み、2 回のうち良い方、tok/s。
+RAM 62 GB の i5-13500 と RTX PRO 4000 Blackwell SFF（24 GB、70 W）。各モデルを `qoralis serve` で提供し、新しい 450 トークンのプロンプトのあと 128 トークンの回答をストリーミングします。リクエストの HTTP を含み、2 回のうち良い方、tok/s。
 
 | GGUF | CUDA プロンプト | CUDA デコード | Vulkan プロンプト | Vulkan デコード | CPU プロンプト | CPU デコード |
 |---|---:|---:|---:|---:|---:|---:|
@@ -386,7 +386,7 @@ RAM 62 GB の i5-13500 と RTX PRO 4000 Blackwell SFF（24 GB、70 W）。各モ
 
 ### 同じマシンでの大きなモデル
 
-再びマシン D で、各モデルを公開済みの GGUF から `coli serve` で動かしました。カードにも RAM にも載らない分は 2 台の NVMe から読みます。tok/s、各モデルのページより：
+再びマシン D で、各モデルを公開済みの GGUF から `qoralis serve` で動かしました。カードにも RAM にも載らない分は 2 台の NVMe から読みます。tok/s、各モデルのページより：
 
 | GGUF | サイズ | バックエンド | プロンプト | デコード |
 |---|---:|---|---:|---:|
@@ -414,7 +414,7 @@ RAM 62 GB の i5-13500 と RTX PRO 4000 Blackwell SFF（24 GB、70 W）。各モ
 
 <a id="1-get-colibri"></a>
 
-**1. プログラム。** [Releases](https://github.com/JustVugg/colibri/releases) から自分のプラットフォーム用のアーカイブ（Linux x86_64、macOS、Windows。コンパイラは不要で、必要なのはランチャーと API のための [Python 3](https://www.python.org/downloads/) だけ）を取得して展開し、`python3 coli info` を実行します。Linux と Windows のエンジンには Vulkan が組み込まれ（`shaders/` が隣にあります）、macOS のエンジンには Metal が組み込まれています。Windows で NVIDIA のカードを使うなら、CUDA のアーカイブも追加してください。または、`gcc`（または clang）と OpenMP を使ってソースからビルドします：
+**1. プログラム。** [Releases](https://github.com/JustVugg/colibri/releases) から自分のプラットフォーム用のアーカイブ（Linux x86_64、macOS、Windows。コンパイラは不要で、必要なのはランチャーと API のための [Python 3](https://www.python.org/downloads/) だけ）を取得して展開し、`python3 qoralis info` を実行します。Linux と Windows のエンジンには Vulkan が組み込まれ（`shaders/` が隣にあります）、macOS のエンジンには Metal が組み込まれています。Windows で NVIDIA のカードを使うなら、CUDA のアーカイブも追加してください。または、`gcc`（または clang）と OpenMP を使ってソースからビルドします：
 
 ```bash
 git clone https://github.com/anku0669/qoralis-engine && cd qoralis-engine/c
@@ -424,7 +424,7 @@ make qwen36 VK=1                          # one engine, here with Vulkan (CUDA=1
 
 <a id="2-get-the-model"></a>
 
-**2. モデル。** [上の表](#which-model-for-my-machine)にあるどのダウンロードでもかまいません：セットアップの ID は Hugging Face のリポジトリに対応しており、各モデルのページにダウンロードと変換のコマンドがあります。GLM-5.2 には、int8 MTP ヘッド付きのグループスケール（gs64）コンテナ [`mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp`](https://huggingface.co/mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp)（429 GB）を、GLM-5.3 には [`Justvugg/GLM-5.3-colibri-int4-g64`](https://huggingface.co/Justvugg/GLM-5.3-colibri-int4-g64)（419 GB、MTP ヘッドなし）を使ってください。古い行単位 int4 のミラーは使わないでください：品質が約 9 ポイント劣ることが計測されており、[#455](https://github.com/JustVugg/colibri/issues/455) のループする回答の原因でした。`./coli convert --model /nvme/glm52_i4` は、FP8 リリースから同じコンテナをシャードごとに作成するので、756 GB 全体を一度にディスクに置く必要はありません。MTP ヘッドなどの確認方法：[quickstart.md](docs/quickstart.md#3-get-the-model)。手元にある GGUF は変換不要です：最初のファイルに `./coli import`（[上記](#from-a-gguf)）。
+**2. モデル。** [上の表](#which-model-for-my-machine)にあるどのダウンロードでもかまいません：セットアップの ID は Hugging Face のリポジトリに対応しており、各モデルのページにダウンロードと変換のコマンドがあります。GLM-5.2 には、int8 MTP ヘッド付きのグループスケール（gs64）コンテナ [`mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp`](https://huggingface.co/mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp)（429 GB）を、GLM-5.3 には [`Justvugg/GLM-5.3-colibri-int4-g64`](https://huggingface.co/Justvugg/GLM-5.3-colibri-int4-g64)（419 GB、MTP ヘッドなし）を使ってください。古い行単位 int4 のミラーは使わないでください：品質が約 9 ポイント劣ることが計測されており、[#455](https://github.com/JustVugg/colibri/issues/455) のループする回答の原因でした。`./qoralis convert --model /nvme/glm52_i4` は、FP8 リリースから同じコンテナをシャードごとに作成するので、756 GB 全体を一度にディスクに置く必要はありません。MTP ヘッドなどの確認方法：[quickstart.md](docs/quickstart.md#3-get-the-model)。手元にある GGUF は変換不要です：最初のファイルに `./qoralis import`（[上記](#from-a-gguf)）。
 
 <a id="3-run-it"></a>
 
@@ -432,16 +432,16 @@ make qwen36 VK=1                          # one engine, here with Vulkan (CUDA=1
 
 ```bash
 ./c/qoralis chat  --model /nvme/qwen36          # chat in the terminal
-./coli web   --model /nvme/qwen36          # API + dashboard, opens a browser
-./coli serve --model /nvme/qwen36          # API + dashboard, no browser
-./coli plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
-./coli doctor --model /nvme/qwen36         # read-only check: is everything ready?
-./coli tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
-./coli import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
-./coli ui                                  # the chat UI, next to a running coli serve
+./qoralis web   --model /nvme/qwen36          # API + dashboard, opens a browser
+./qoralis serve --model /nvme/qwen36          # API + dashboard, no browser
+./qoralis plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
+./qoralis doctor --model /nvme/qwen36         # read-only check: is everything ready?
+./qoralis tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
+./qoralis import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
+./qoralis ui                                  # the chat UI, next to a running qoralis serve
 ```
 
-Windows では、リリースアーカイブに `coli.cmd` が同梱されています（`coli.cmd chat --model D:\qwen36`）。ソースのチェックアウトからは `py -3 c\coli` を使ってください。`.exe` ファイルはエンジンであり、ランチャーではありません。すべてのオプションと環境変数：[SETTINGS.md](docs/SETTINGS.md)、[ENVIRONMENT.md](docs/ENVIRONMENT.md)。
+Windows では、リリースアーカイブに `qoralis.cmd` が同梱されています（`qoralis.cmd chat --model D:\qwen36`）。ソースのチェックアウトからは `py -3 c\qoralis` を使ってください。`.exe` ファイルはエンジンであり、ランチャーではありません。すべてのオプションと環境変数：[SETTINGS.md](docs/SETTINGS.md)、[ENVIRONMENT.md](docs/ENVIRONMENT.md)。
 
 ## 研究、そして協力の方法
 
@@ -468,7 +468,7 @@ Qoralis は、フロンティアモデルが希少なハードウェアに頼る
 | System One と判定モデル | [systemone.md](docs/systemone.md)、[laya.md](docs/laya.md)、[gliner_decide.md](docs/gliner_decide.md)、[clef.md](docs/clef.md) |
 | GGUF ファイル：アーキテクチャ、2 つのモード、各エンジンがブロックをどう扱うか | [gguf.md](docs/gguf.md) |
 | Qwen3.6 エンジン上のモデル（Flint、Muse Spark Open、LFM3-VL）と Mistral-Large-4 | [qwen36.md](docs/qwen36.md)、[mistral-large4.md](docs/mistral-large4.md) |
-| チャット UI（`coli ui`） | [ui/README.md](ui/README.md) |
+| チャット UI（`qoralis ui`） | [ui/README.md](ui/README.md) |
 | Vulkan：エキスパートティア、密チェーン、Resizable BAR のないカード | [vulkan.md](docs/vulkan.md) |
 | CUDA と、Qwen3.6 の CUDA ティア | [cuda.md](docs/cuda.md)、[qwen36-cuda-tier.md](docs/qwen36-cuda-tier.md) |
 | Apple Silicon、Windows | [metal.md](docs/metal.md)、[windows.md](docs/windows.md) |
@@ -513,12 +513,12 @@ c/
 │
 ├── coli                  user-facing CLI
 ├── setup_*.py            the one-step setup: hardware, catalog, downloads, flow
-├── mcp_server.py         the MCP server (coli mcp)
+├── mcp_server.py         the MCP server (qoralis mcp)
 ├── openai_server.py      OpenAI- and Anthropic-compatible HTTP gateway
-├── resource_plan.py      RAM/VRAM planner behind coli plan and coli doctor
+├── resource_plan.py      RAM/VRAM planner behind qoralis plan and qoralis doctor
 ├── tools/                conversion, fixtures and benchmarks
 └── tests/                dependency-free C and Python tests
-ui/                       the chat UI (coli ui)
+ui/                       the chat UI (qoralis ui)
 web/                      the dashboard (a pure API client)
 desktop/                  Tauri desktop shell around the dashboard
 docker/                   container images

@@ -183,7 +183,7 @@ class SystemParsing(unittest.TestCase):
         self.assertTrue(setup_hw.path_warnings("/mnt/c/Users/me/models", wsl=True))
         self.assertTrue(setup_hw.path_warnings("/mnt/d", wsl=True))
         self.assertTrue(setup_hw.path_warnings("/home/me/../../mnt/e/x", wsl=True))
-        self.assertFalse(setup_hw.path_warnings("/home/me/colibri-models", wsl=True))
+        self.assertFalse(setup_hw.path_warnings("/home/me/qoralis-models", wsl=True))
         self.assertFalse(setup_hw.path_warnings("/mnt/wslg/x", wsl=True))
         self.assertFalse(setup_hw.path_warnings("/mnt/c/Users/me/models", wsl=False))
 
@@ -480,7 +480,7 @@ class Report(unittest.TestCase):
             "cpu": {"name": "Test CPU", "features": ["avx2"], "physical_cores": 6,
                     "logical_cores": 12},
             "memory": {"total": 27 * 10**9, "available": 24 * 10**9},
-            "disk": {"path": "/home/u/colibri-models", "free_bytes": 800 * 10**9, "warnings": []},
+            "disk": {"path": "/home/u/qoralis-models", "free_bytes": 800 * 10**9, "warnings": []},
             "vulkan": {"devices": [], "icd": None},
             "nvidia": [{"name": "NVIDIA RTX 4070", "total_bytes": 12 * 2**30, "driver": "560"}],
             "windows_video": [],

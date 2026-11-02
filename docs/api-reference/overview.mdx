@@ -3,14 +3,14 @@ title: "API overview"
 description: "Start Qoralis Engine's persistent HTTP server and connect OpenAI- or Anthropic-compatible clients."
 ---
 
-`coli serve` keeps one model process loaded and exposes OpenAI- and Anthropic-compatible HTTP endpoints through a Python standard-library gateway.
+`qoralis serve` keeps one model process loaded and exposes OpenAI- and Anthropic-compatible HTTP endpoints through a Python standard-library gateway.
 
 ## Start the server
 
 ```bash
 COLI_MODEL=/nvme/glm52_i4 \
 COLI_API_KEY=local-secret \
-./coli serve --host 127.0.0.1 --port 8000 --model-id glm-5.2-colibri
+./qoralis serve --host 127.0.0.1 --port 8000 --model-id glm-5.2-colibri
 ```
 
 The default base URL is `http://127.0.0.1:8000`. OpenAI-compatible clients normally use `http://127.0.0.1:8000/v1`.

@@ -8,21 +8,21 @@ while it loads them.
 
 The same front ends as the text models reach it:
 
-- `coli chat` is an image session: type a description, watch the progress,
+- `qoralis chat` is an image session: type a description, watch the progress,
   and the picture is drawn **inside the terminal**, then saved as a PNG.
-- `coli run "prompt"` makes one image and writes it to a file.
-- `coli serve` (and `coli web`) expose `POST /v1/images/generations`, the
+- `qoralis run "prompt"` makes one image and writes it to a file.
+- `qoralis serve` (and `qoralis web`) expose `POST /v1/images/generations`, the
   OpenAI images API.
 
 <p align="center">
   <img src="media/qwen-image-web.png" width="820" alt="the web UI: the prompt, and the image Qoralis generated for it, with size, steps, seed and time">
 </p>
 <p align="center">
-  <img src="media/qwen-image-tui.png" width="820" alt="coli chat: the same prompt and seed, the image drawn inside the terminal at full resolution (sixel), then saved as a PNG">
+  <img src="media/qwen-image-tui.png" width="820" alt="qoralis chat: the same prompt and seed, the image drawn inside the terminal at full resolution (sixel), then saved as a PNG">
 </p>
 
 Both pictures come from the real checkpoint on an 8-core CPU server, same
-prompt and seed: the web UI above, `coli chat` attached to the same server
+prompt and seed: the web UI above, `qoralis chat` attached to the same server
 below, as a sixel terminal shows it (the screenshot is xterm.js, the terminal
 of VS Code, fed the session's own bytes; Windows Terminal 1.22 and later, foot,
 WezTerm and kitty show the same picture). Terminals without graphics get half
@@ -41,14 +41,14 @@ make -C c qwenimage
 
 Keep the layout as downloaded: coli recognises the model from
 `model_index.json` at the root of the folder, and there is no `config.json`
-there to add. `coli info --model ~/Models/Qwen-Image-2.1` lists the parts it
+there to add. `qoralis info --model ~/Models/Qwen-Image-2.1` lists the parts it
 found and their size on disk.
 
 ## RAM
 
 The text encoder's language model and the transformer are held as int8 with
 one scale per row; the text encoder's vision tower and its output head are
-never loaded. On the real checkpoint `coli plan` reports (measured from the
+never loaded. On the real checkpoint `qoralis plan` reports (measured from the
 safetensors headers):
 
 | part | on disk | in RAM |
@@ -63,24 +63,24 @@ With the text encoder on demand it is loaded for each prompt and freed before
 denoising starts, so the peak is the larger of the two phases, at the cost of
 reading it again for every prompt. Working buffers (the activations, the
 VAE's full-resolution feature maps) come on top of both numbers. Measured on
-the real checkpoint: `coli run` at 768x512 peaks at **9.0 GB** (the text
-encoder is freed before denoising), and a `coli serve` that keeps everything
+the real checkpoint: `qoralis run` at 768x512 peaks at **9.0 GB** (the text
+encoder is freed before denoising), and a `qoralis serve` that keeps everything
 loaded holds **14.0 GB** once it is ready. The VAE's own working set at
 1024x1024 is 1.9 GB on top of its weights.
 
 ```sh
-coli plan --model ~/Models/Qwen-Image-2.1          # both schedules against your free RAM
-coli plan --model ~/Models/Qwen-Image-2.1 --json   # the same as JSON
+qoralis plan --model ~/Models/Qwen-Image-2.1          # both schedules against your free RAM
+qoralis plan --model ~/Models/Qwen-Image-2.1 --json   # the same as JSON
 ```
 
 ## Chat: images in the terminal
 
 ```sh
-coli chat --model ~/Models/Qwen-Image-2.1
+qoralis chat --model ~/Models/Qwen-Image-2.1
 ```
 
 <p align="center">
-  <img src="media/qwen-image-tui-preview.png" width="720" alt="coli chat while the image is forming: the live preview, smoothly enlarged, redrawn in place at denoising step 5 of 8">
+  <img src="media/qwen-image-tui-preview.png" width="720" alt="qoralis chat while the image is forming: the live preview, smoothly enlarged, redrawn in place at denoising step 5 of 8">
 </p>
 
 Every line you type is a prompt. While the engine works, a status line shows
@@ -103,22 +103,22 @@ Commands (TAB completes them, and the sizes after `/size`):
 | `/help`, `/quit` | the list, and leave (`:q` works too) |
 
 The first size, steps and seed can also be given as flags:
-`coli chat --model ... --size 1024x576 --steps 12 --seed 42`.
+`qoralis chat --model ... --size 1024x576 --steps 12 --seed 42`.
 
-If a `coli serve` with this model is already running on `127.0.0.1:8000`,
-`coli chat` attaches to it instead of loading a second engine (the model stays
+If a `qoralis serve` with this model is already running on `127.0.0.1:8000`,
+`qoralis chat` attaches to it instead of loading a second engine (the model stays
 loaded after you quit). `--attach URL` picks another server, `--no-attach`
 forces a private engine.
 
 ## One image from the command line
 
 ```sh
-coli run --model ~/Models/Qwen-Image-2.1 --size 1024x576 --seed 42 \
+qoralis run --model ~/Models/Qwen-Image-2.1 --size 1024x576 --seed 42 \
   --out lighthouse.png "a lighthouse on a cliff at dusk, oil painting"
 ```
 
 Without `--out` the PNG goes to the images folder. When the output is a
-terminal the picture is drawn there too; when it is piped, `coli run` prints
+terminal the picture is drawn there too; when it is piped, `qoralis run` prints
 only the path on stdout.
 
 ## Sizes, steps, seed
@@ -147,7 +147,7 @@ time, the prompt and the seed:
 
 `COLI_IMAGE_DIR=/some/folder` puts them elsewhere. Nothing is overwritten: a
 second image with the same name gets `-2`, `-3`, ... The path is printed under
-every image, and `/save PATH` in `coli chat` keeps a copy of the last one where
+every image, and `/save PATH` in `qoralis chat` keeps a copy of the last one where
 you choose (a Windows path such as `C:\Users\me\Desktop` works from WSL).
 
 ## Terminal support
@@ -170,7 +170,7 @@ with a timeout of 0.4 s); a terminal that does not answer in time gets half
 blocks. Override the choice with `COLI_IMAGE_PROTOCOL`:
 
 ```sh
-COLI_IMAGE_PROTOCOL=sixel coli chat --model ...    # kitty | iterm | sixel | blocks | none
+COLI_IMAGE_PROTOCOL=sixel qoralis chat --model ...    # kitty | iterm | sixel | blocks | none
 ```
 
 `/render` switches it inside a session. Other knobs: `COLI_IMAGE_PREVIEW=0`
@@ -179,7 +179,7 @@ image in pixels (default 1024).
 
 ## HTTP API
 
-`coli serve --model ~/Models/Qwen-Image-2.1` starts the gateway on
+`qoralis serve --model ~/Models/Qwen-Image-2.1` starts the gateway on
 `127.0.0.1:8000`, with the same API key, CORS and Host rules as for text
 models (`--api-key` or `COLI_API_KEY`).
 
@@ -242,15 +242,15 @@ Measured on a server with 8 Zen 4 cores (AVX-512, 8 OpenMP threads), 768x512,
 
 | | per denoising step | one image |
 |---|---|---|
-| int8 activations in the DiT (default where VNNI exists) | 18.3 to 19.6 s | 3.4 min with `coli run` (load included), 2 min 40 s through a loaded `coli serve` |
-| f32 activations (`COLI_IMG_ACT8=0`) | 34.3 s | 5.5 min with `coli run` |
+| int8 activations in the DiT (default where VNNI exists) | 18.3 to 19.6 s | 3.4 min with `qoralis run` (load included), 2 min 40 s through a loaded `qoralis serve` |
+| f32 activations (`COLI_IMG_ACT8=0`) | 34.3 s | 5.5 min with `qoralis run` |
 
 - The text encoder and the prompt's side of the transformer take about 3.5 s
   on a loaded server, and nothing at all when the same prompt comes back with
   a new seed: they are computed once per prompt and kept.
 - The VAE decodes 512x512 in 7 s, 768x512 in 10 to 12 s, 1024x1024 in 29 s.
 - Without VNNI the transformer takes the f32 activations. An i5-10500H (6 cores, AVX2 and FMA,
-  32 GB) drew 512x512 at 8 steps in 7.7 min with `coli run` (load included) and at 12 steps in
+  32 GB) drew 512x512 at 8 steps in 7.7 min with `qoralis run` (load included) and at 12 steps in
   10.9 min, peak RSS about 15.5 GB
   ([#2221](https://github.com/JustVugg/colibri/issues/2221)).
 - For reference, the diffusers pipeline in PyTorch runs the same step in

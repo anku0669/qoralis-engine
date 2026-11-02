@@ -1,4 +1,4 @@
-"""`coli doctor` must inspect the engine the model would actually run on (#783).
+"""`qoralis doctor` must inspect the engine the model would actually run on (#783).
 
 engine_path was hardcoded to the GLM binary, so doctor reported against Qoralis
 whatever the model was. That misled in both directions: a user who had built

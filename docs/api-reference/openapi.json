@@ -165,7 +165,7 @@
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } }
           },
           "503": {
-            "description": "The engine stopped. `restarting`: coli serve is starting it again, and requests wait in the queue for it; `engine_down`: nothing is starting it (an embedded server).",
+            "description": "The engine stopped. `restarting`: qoralis serve is starting it again, and requests wait in the queue for it; `engine_down`: nothing is starting it (an embedded server).",
             "headers": { "Retry-After": { "schema": { "type": "string" } } },
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EngineDown" } } }
           }

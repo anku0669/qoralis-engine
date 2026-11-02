@@ -176,7 +176,7 @@ The same models on the CPU, Vulkan and CUDA, one machine and one build: [gpu-par
 ## OLMoE on the card (`olmoe_cuda_chain.h`)
 
 OLMoE-1B-7B is small enough to hold whole on a card (Q4_K_M: 3.9 GiB of experts and 0.6 GiB of
-the rest), so a CUDA build (`make olmoe CUDA=1`) with `COLI_CUDA=1` (`coli serve --gpu`) puts
+the rest), so a CUDA build (`make olmoe CUDA=1`) with `COLI_CUDA=1` (`qoralis serve --gpu`) puts
 every layer, every routed expert and lm_head on the device and runs a step of any rows as one
 frame: the norms, q/k/v (one matrix where their forms agree), OLMoE's q and k norms over the
 whole projection, RoPE, the new K/V rows into a float16 mirror, the attention, o_proj, the router,
@@ -190,7 +190,7 @@ CPU needs it (a step the chain declines reads the missing rows down), and a devi
 rebuilds them on the CPU from the token ids the chain recorded, the CPU running from then on
 (`COLI_CUDA_CHAIN_FAULT=n` fakes the loss at the n-th frame).
 
-Measured on an RTX PRO 4000 (PCIe gen 4 x8), OLMoE-1B-7B-0125-Instruct Q4_K_M, `coli serve`,
+Measured on an RTX PRO 4000 (PCIe gen 4 x8), OLMoE-1B-7B-0125-Instruct Q4_K_M, `qoralis serve`,
 tok/s:
 
 | | prompt 1K / 3K tokens | decode after 1K |
@@ -215,7 +215,7 @@ reference's tokens and the last logits within 1e-5 of the CPU's.
 
 Laya (`laya.c`) and GLiNER2.5-Decide (`gliner_decide.c`) answer a decision with one forward
 over the request's rows and generate no text ([systemone.md](systemone.md#decision-engines)).
-In a CUDA build (`make laya gliner_decide CUDA=1`) with `COLI_CUDA=1` (`coli serve --gpu`),
+In a CUDA build (`make laya gliner_decide CUDA=1`) with `COLI_CUDA=1` (`qoralis serve --gpu`),
 `decide_cuda.h` opens the device once the weights are loaded, uploads every matrix of the
 encoder and of Laya's head as f32 (the checkpoint's values), and runs each forward as frames
 of the CUDA chain, one submission a forward: the embedding rows go up, the activations stay on

@@ -211,9 +211,9 @@ teacher-forced logit streams at C=32 vs C=1 match exactly). Measured prefill:
 ./kimi_k3 <model_dir> --chat "your question" [--system "..."] --ngen 300
 
 # first-class multi-turn interfaces (config.json auto-detects Kimi K3)
-COLI_MODEL=<model_dir> ./coli chat
-COLI_MODEL=<model_dir> ./coli serve
-COLI_MODEL=<model_dir> ./coli web
+COLI_MODEL=<model_dir> ./qoralis chat
+COLI_MODEL=<model_dir> ./qoralis serve
+COLI_MODEL=<model_dir> ./qoralis web
 ```
 
 K3's chat format ("XTML", from the checkpoint's own `encoding_k3.py`) uses
@@ -236,9 +236,9 @@ produced **identical numbers on all 77 test conversations** — multi-turn
 histories with system, user and assistant messages, including non-ASCII text.
 So the engine is not subtly mangling anything before the model sees it.
 
-`coli chat` starts a private local server for Kimi and keeps the 2.8T model
-loaded for the whole terminal session. `coli serve` exposes streaming and
-non-streaming `/v1/chat/completions`; `coli web` uses that same API. Reasoning
+`qoralis chat` starts a private local server for Kimi and keeps the 2.8T model
+loaded for the whole terminal session. `qoralis serve` exposes streaming and
+non-streaming `/v1/chat/completions`; `qoralis web` uses that same API. Reasoning
 is returned as `reasoning_content`, response text as `content`, and
 `<|end_of_msg|>` remains the model-owned stop token. `STOP` and `CANCEL` are
 honoured between generated tokens. Long prefill also polls `CANCEL` between

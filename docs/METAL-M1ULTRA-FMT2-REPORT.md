@@ -7,7 +7,7 @@
 - **Hardware:** Mac Studio, Apple M1 Ultra — 20 CPU cores (16 P + 4 E), 48-core GPU, 128 GB unified memory, macOS 26.5.2, internal SSD; `sudo sysctl iogpu.wired_limit_mb=120832` (118 GB)
 - **Engine:** Qoralis dev @ `c024a46` (v1.4.0, post-rebase); the pre-rebase comparison runs used the v1.2.0-era build (see "Rebase check")
 - **Model:** GLM-5.2 int4 (744B MoE, 78 layers, 256 experts, topk=8) converted to **fmt=2 (per-row int4)** from the official fmt=4 (g64) container with `c/tools/convert_fmt4_to_fmt2.py`. fmt=2 is the format the Metal backend fully supports (fmt=4 Metal dispatch is still open: #585/#587). **Quality caveat:** per-row scales cost ~9pp vs grouped (see the benchmarks.md quality section) — fmt=2 here is a Metal-compatibility vehicle, not a quality recommendation.
-- **Workload:** `./coli run "Compare the myths of Lucifer and Prometheus"`, 1024 tokens generated (warmup 128). Prefill ~11 s, excluded from tok/s.
+- **Workload:** `./qoralis run "Compare the myths of Lucifer and Prometheus"`, 1024 tokens generated (warmup 128). Prefill ~11 s, excluded from tok/s.
 - **Constant flags:** `COLI_METAL=1 DIRECT=1 MTP=0 --cap 33`
 - **Expert history frozen:** the same 6.37M-selection usage snapshot is restored before every run → identical pin (2478 experts / 46.9 GB mlock'd, no compression) in all runs except `ram105` (auto-capped to 41.9 GB to preserve LRU room).
 - **Disk (iobench, 19 MB × 64, 8 threads — benchmarks.md methodology):** **6.89 GB/s F_NOCACHE**, 8.93 GB/s buffered (cache-influenced).
@@ -41,7 +41,7 @@ Winner command:
 
 ```bash
 COLI_METAL=1 DIRECT=1 MTP=0 COLI_NO_OMP_TUNE=1 PIPE=1 PIPE_WORKERS=8 \
-  ./coli run --model /path/to/GLM-5.2-colibri-int4-perrow \
+  ./qoralis run --model /path/to/GLM-5.2-colibri-int4-perrow \
   "Compare the myths of Lucifer and Prometheus" --ram 125 --cap 33 --ngen 1024
 ```
 

@@ -5,7 +5,7 @@ The default ``persistent`` mode starts one engine through the shared mux
 ``SERVE=1`` protocol and keeps it alive for the complete campaign: one cold
 request, a repeated-prompt warm upper bound, then a deterministic rotation of
 different prompts as the primary serving workload.  Expert, KV, GPU-residency
-and allocator state therefore survive exactly as they do in ``coli serve``,
+and allocator state therefore survive exactly as they do in ``qoralis serve``,
 without letting one repeated prompt define the headline result.  The engine's
 DONE frame supplies the real completion count, decode tok/s, expert hit rate
 and RSS; no output re-tokenization is needed.

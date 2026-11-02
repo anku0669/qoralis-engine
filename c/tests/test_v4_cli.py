@@ -118,7 +118,7 @@ class V4CliTest(unittest.TestCase):
         self.assertEqual(env["CTX"], "4096")
 
     def test_sister_engines_get_snap_from_the_model_flag(self):
-        """#1501 / #1600: `coli run` handed olmoe (and every non-GLM engine) an
+        """#1501 / #1600: `qoralis run` handed olmoe (and every non-GLM engine) an
         environment without SNAP, so the engine exited with "started without
         a model" while chat and serve, which set it elsewhere, worked.
         SNAP is the model directory, same as env_for() for glm: --model wins
@@ -241,7 +241,7 @@ class V4CliTest(unittest.TestCase):
             self.assertNotIn("COLI_PROFILE_CAP", explicit_env)
 
     def test_ngen_default_differs_for_interactive_commands(self):
-        """#889: `coli web` passed --max-tokens 1024, and openai_server clamps a
+        """#889: `qoralis web` passed --max-tokens 1024, and openai_server clamps a
         request to that ceiling (#260), so the browser's own "max output tokens"
         control silently did nothing above 1024. One-shot runs keep 1024; a
         session where the user has a control gets a ceiling that is not in the
@@ -254,7 +254,7 @@ class V4CliTest(unittest.TestCase):
         self.assertEqual(self.cli.ngen_for(explicit, interactive=True), 300)
 
     def test_served_sessions_leave_the_ceiling_to_the_context(self):
-        """#382: coli serve, web and chat hand the gateway 0 without --ngen, which it
+        """#382: qoralis serve, web and chat hand the gateway 0 without --ngen, which it
         reads as the context the engine holds; a reasoning model's turn is its reasoning
         plus its answer, and the family's fixed 16384 (8192 for Qwen) cut some short."""
         self.assertEqual(self.cli.serve_max_tokens(argparse.Namespace(ngen=None)), 0)

@@ -239,7 +239,7 @@ own.
 
 It is on by default for Qwen3.6 (`Q36_MTP_PSTEP=0` turns it off) and opt-in for Qwen3.8
 (`Q38_MTP_PSTEP=1`) and GLM-5.2 (`MTP_PSTEP=1`). Measured on an RTX PRO 4000 (24 GB),
-`coli serve`, 128 tokens, two rounds of three prompts, each setting in turn (decode
+`qoralis serve`, 128 tokens, two rounds of three prompts, each setting in turn (decode
 tok/s; every Qwen3.6 run printed the text of the run without the head, prompt by prompt):
 
 | Qwen3.6-35B-A3B int4-g64, its head | CUDA chain | Vulkan chain |
@@ -291,7 +291,7 @@ state is the one plain decoding leaves.
 | Variable | Default | Effect |
 |---|---|---|
 | `Q38_MTP_CHAIN` | on | qwen38 with the MTP head on beside a dense chain that holds every layer: the head's layer runs on the device (`q38c_mtp_rows`); `0`: on the CPU. |
-| `Q38_MTP` | on when the checkpoint has the head, off beside a dense chain that holds every layer | `0`: plain decoding, the head unread; `1`: the head, and a checkpoint without one is refused. The RAM plan (`coli plan`) prices the head when it is on: its dense tensors and its own expert cache (`Q38_MTP_CAP`, the layers' cap by default and every expert of the head where the engine sets that, at the head's FP8 record). |
+| `Q38_MTP` | on when the checkpoint has the head, off beside a dense chain that holds every layer | `0`: plain decoding, the head unread; `1`: the head, and a checkpoint without one is refused. The RAM plan (`qoralis plan`) prices the head when it is on: its dense tensors and its own expert cache (`Q38_MTP_CAP`, the layers' cap by default and every expert of the head where the engine sets that, at the head's FP8 record). |
 | `Q38_MTP_DRAFTS` | `2`; `1` on an integrated GPU with 32 or more compute units, the expert tier and the dense chain on | qwen38 with the MTP head on: the MTP head's drafts per verify, `1` to `3`, or `0` / `auto` for the gate's pick. |
 | `Q38_MTP_VOCAB` | `16000` | qwen38 with the MTP head on: how many of the most used tokens the head scores for a draft. `0`: the whole vocabulary. |
 | `COLI_LOOKUP` | `1` | Prompt-lookup drafts (qwen38, qwen36), and Qoralis's n-gram drafts from the same lookup and gate when it has no MTP head; always gated. `0` turns them off. |

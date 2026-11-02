@@ -3586,7 +3586,7 @@ def _image_bytes_from_url(url):
     sets COLI_IMAGE_ROOT, and then only inside it (resolve() follows symlinks
     before the relative_to() check, the same one serve_static uses). The
     clients that used to send paths read the file themselves with the user's
-    own rights and send a data: URI: `coli chat` since this change, `coli web`
+    own rights and send a data: URI: `qoralis chat` since this change, `qoralis web`
     always did. Errors stay generic so a reply never confirms a path or its
     permissions."""
     if not isinstance(url, str) or not url:
@@ -3610,7 +3610,7 @@ def _image_bytes_from_url(url):
     image_root = os.environ.get("COLI_IMAGE_ROOT")
     if not image_root:
         raise APIError(400, "local image paths are disabled on this server: send the image "
-                            "as a base64 data: URI (coli chat and coli web do), or start the "
+                            "as a base64 data: URI (qoralis chat and qoralis web do), or start the "
                             "server with COLI_IMAGE_ROOT=<dir> to allow files under that "
                             "directory.", "messages")
     if ".." in Path(raw).parts:
@@ -4241,7 +4241,7 @@ def _ml4_render_content(content, where, kinds, thinking, images):
                 # expand_ml4_images turned every picture into its [IMG] rows before this; one left
                 # here is one the engine cannot read
                 raise APIError(400, "Mistral-Large-4's pictures need its vision tower: link the GGUF's "
-                                    "mmproj-*.gguf (coli import) and serve again.", "messages",
+                                    "mmproj-*.gguf (qoralis import) and serve again.", "messages",
                                "unsupported_content_type")
             else:
                 raise APIError(400, f"Only {kinds} chunks are supported in {where}.", "messages")
@@ -5197,7 +5197,7 @@ def conversation_cache_slot(messages, kv_slots):
 # ---- context compaction -------------------------------------------------------------------
 # A chat that outgrows the engine's context used to end in a 400 the user could do nothing
 # with but start over. A request that asks for it (`context_compaction: "auto"`, which the
-# dashboard and `coli chat` send) is compacted instead: the oldest turns are summarized by
+# dashboard and `qoralis chat` send) is compacted instead: the oldest turns are summarized by
 # the model itself, the summary joins the system message, and the turn runs on the summary
 # plus the last exchanges, which stay verbatim.
 #
@@ -5646,7 +5646,7 @@ def generation_options(body, limit):
         maximum_param = "max_tokens"
     if maximum is None:
         # Client omitted max_tokens: honor the operator's configured budget (--max-tokens /
-        # --ngen), not an arbitrary 256 — `coli serve --ngen 32768` must mean 32768 (#382).
+        # --ngen), not an arbitrary 256 — `qoralis serve --ngen 32768` must mean 32768 (#382).
         # Generation still ends at EOS, so this is a cap, not a target.
         maximum = limit
     temperature = body.get("temperature")
@@ -6361,10 +6361,10 @@ def cap_for_arch(arch, cap, env=None, model=None):
         # V4.1, MiMo, Qwen3.6 and Qwen3.8 only read their argv cap, not RAM_GB.
         # Without --auto-tier the legacy eight slots silently discarded both --ram
         # and RAM_GB (#1666), and Qwen3.8's implicit one slot, Qwen3.6's eight, left
-        # a `coli web` or `coli serve` without --cap or a tune profile reading
+        # a `qoralis web` or `qoralis serve` without --cap or a tune profile reading
         # nearly every expert from the disk: the setup passes --auto-tier only
         # for CUDA. Qwen3.8 on a 61 GB box planned 275 slots and started at 1;
-        # Qwen3.6 plans 153 at 20 GB, and coli tune measured 105 on a 32 GB laptop.
+        # Qwen3.6 plans 153 at 20 GB, and qoralis tune measured 105 on a 32 GB laptop.
         from resource_plan import build_plan
         settings = env if env is not None else os.environ
         ram = settings.get("RAM_GB", "0")
@@ -6382,7 +6382,7 @@ def cap_for_arch(arch, cap, env=None, model=None):
             # with at least one token's route (top-k) in the cache.
             floor = max(limits.implicit_cap, _route_top_k(model))
             print(f"[{arch}] no RAM plan ({error}); {floor} expert cache "
-                  f"slots/layer, --cap or coli tune sets more", file=sys.stderr)
+                  f"slots/layer, --cap or qoralis tune sets more", file=sys.stderr)
             return floor
         # A Qwen cache below one token's route (top-k) reads that token's experts
         # from the disk at every step: Qwen3.8's implicit cap is 1 and its route
@@ -6470,7 +6470,7 @@ def decision_head_env(env, model):
 def tune_child_env(env, arch):
     """Apply the engine-local defaults that a direct server launch otherwise misses.
 
-    ``coli chat`` already supplies these values, but users also launch this file
+    ``qoralis chat`` already supplies these values, but users also launch this file
     directly.  Keep setdefault semantics so every explicit operator setting wins.
     """
     if arch != "deepseek_v4":
@@ -8090,10 +8090,10 @@ class APIHandler(BaseHTTPRequestHandler):
             # POSIX spellings and let the Windows one through. #854's log is pages of
             # `ConnectionAbortedError: [WinError 10053] An established connection was
             # aborted by the software in your host machine` escaping to socketserver,
-            # from a `coli web` start that was otherwise healthy.
+            # from a `qoralis web` start that was otherwise healthy.
             #
             # The client hung up mid-response. That is not an error here, it is
-            # how HTTP clients behave: `coli chat` polls /health while the model
+            # how HTTP clients behave: `qoralis chat` polls /health while the model
             # loads and drops each connection as soon as it has its answer, and
             # Ctrl-C during a stream closes the socket by design -- the banner
             # tells the user to do exactly that. Without this, socketserver's
@@ -8291,7 +8291,7 @@ class APIHandler(BaseHTTPRequestHandler):
         Path(__file__).resolve().parent.parent / "web" / "dist")
 
     def serve_static(self, path):
-        """Serve the built web UI (web/dist) so `coli web` is one process.
+        """Serve the built web UI (web/dist) so `qoralis web` is one process.
         Read-only, no auth (same trust level as /health), traversal-safe."""
         if path.startswith("/v1/") or path == "/health":
             return False
@@ -8355,7 +8355,7 @@ class APIHandler(BaseHTTPRequestHandler):
                 # past a bare 200 to an unauthenticated probe. (#SEC-8)
                 payload = {"status": "ok"}
                 if self._is_authed():
-                    payload["arch"] = ARCH            # which family answers: coli chat reads it
+                    payload["arch"] = ARCH            # which family answers: qoralis chat reads it
                     payload["scheduler"] = self.server.scheduler.snapshot()
                     payload["engine_restarts"] = self.server.engine_restarts
                     payload["kv_slots"] = self.server.kv_slots

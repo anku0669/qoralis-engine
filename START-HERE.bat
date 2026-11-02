@@ -7,8 +7,8 @@ rem model (safe to interrupt: run this file again to continue), then opens the
 rem dashboard in your browser.
 rem Later runs: start Qoralis straight away.
 rem
-rem Options are passed through to `coli setup`, for example:
-rem     START-HERE.bat --model qwen3-coder-30b --dir D:\colibri-models
+rem Options are passed through to `qoralis setup`, for example:
+rem     START-HERE.bat --model qwen3-coder-30b --dir D:\qoralis-models
 rem     START-HERE.bat --reconfigure          choose another model
 rem     START-HERE.bat --no-gpu               CPU only
 rem Stop: close this window, or press Ctrl+C in it.
@@ -17,8 +17,8 @@ title Qoralis
 cd /d "%~dp0"
 
 set "COLI_LAUNCHER="
-if exist "%~dp0c\coli" set "COLI_LAUNCHER=%~dp0c\coli"
-if not defined COLI_LAUNCHER if exist "%~dp0coli" set "COLI_LAUNCHER=%~dp0coli"
+if exist "%~dp0c\qoralis" set "COLI_LAUNCHER=%~dp0c\qoralis"
+if not defined COLI_LAUNCHER if exist "%~dp0qoralis" set "COLI_LAUNCHER=%~dp0qoralis"
 if not defined COLI_LAUNCHER (
     echo This file belongs at the top of the Qoralis folder, next to the c folder.
     goto :hold_fail

@@ -19,13 +19,13 @@ unpack the [latest Windows release](https://github.com/JustVugg/colibri/releases
 then start Qoralis through the release launcher:
 
 ```powershell
-coli.cmd web --model F:\path\to\DeepSeek-V4-Flash
+qoralis.cmd web --model F:\path\to\DeepSeek-V4-Flash
 ```
 
 The launcher reads the checkpoint's `config.json`, selects `deepseek_v4` from
 its `model_type`, and starts the matching prebuilt engine. The archive also
 contains the CUDA backend; hardware detection and the safe initial CPU/GPU
-plan are automatic. Use `coli.cmd doctor --model F:\path\to\DeepSeek-V4-Flash`
+plan are automatic. Use `qoralis.cmd doctor --model F:\path\to\DeepSeek-V4-Flash`
 to inspect that plan before changing any of the advanced CUDA controls below.
 
 The build instructions in this document are for contributors and custom
@@ -194,10 +194,10 @@ $env:COLI_CUDA = "1"; $env:COLI_GPU = "0"; $env:CUDA_DENSE = "1"; $env:COLI_CUDA
 $env:COLI_CUDA_ATTN_BATCH = "1"; $env:COLI_CUDA_MOE_BATCH = "1"
 $env:V4_MOE_REFILL_GROUP = "12"; $env:DSV4_CUDA_EXPERT_MIRRORS = "688"
 $env:V4_LOADER_LANES = "3"   # GPU tier: 9-lane default tuned for the CPU path, see the env table
-python ./coli serve --model C:\models\DeepSeek-V4-Flash --ram 32 --ctx 20000
+python ./qoralis serve --model C:\models\DeepSeek-V4-Flash --ram 32 --ctx 20000
 ```
 
-`coli run|chat|web` take the same environment. On Windows a prompt with text
+`qoralis run|chat|web` take the same environment. On Windows a prompt with text
 outside ASCII (Chinese, accented letters) does not survive the command line of
 the engine run by hand: give it with `--prompt-file <UTF-8 file>`. `--ngen` is a ceiling, not a
 target (answers end at EOS; an oversized ceiling is clamped to the context

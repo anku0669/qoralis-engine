@@ -114,9 +114,9 @@ Starting Qoralis
 
 **Pada penggunaan berikutnya**, jalankan kembali `START-HERE.bat` atau
 `./start-here.sh`: Qoralis akan langsung berjalan tanpa mengunduh atau melakukan
-build lagi. `c/coli status` menunjukkan apa yang sudah terinstal dan apakah
-sedang berjalan, sedangkan `c/coli stop` menghentikannya (`c\coli.cmd status`
-dan `c\coli.cmd stop` di Windows).
+build lagi. `c/qoralis status` menunjukkan apa yang sudah terinstal dan apakah
+sedang berjalan, sedangkan `c/qoralis stop` menghentikannya (`c\qoralis.cmd status`
+dan `c\qoralis.cmd stop` di Windows).
 
 Opsi ditempatkan setelah `./start-here.sh` atau `START-HERE.bat`:
 
@@ -125,7 +125,7 @@ Opsi ditempatkan setelah `./start-here.sh` atau `START-HERE.bat`:
 | `--list` | menampilkan setiap model untuk mesin ini, serta alasan jika suatu model tidak muat |
 | `--model ID` | menginstal model tersebut (id tersedia di [tabel di bawah](#which-model-for-my-machine)) |
 | `--yes` | tanpa pertanyaan: gunakan rekomendasi |
-| `--dir DIR` | menyimpan model di disk lain (default `~/colibri-models`) |
+| `--dir DIR` | menyimpan model di disk lain (default `~/qoralis-models`) |
 | `--backend vulkan`, `cuda` atau `cpu` | memilih sendiri build engine; `--no-gpu` sama dengan `--backend cpu` |
 | `--model-dir DIR` | menggunakan model yang sudah Anda unduh |
 | `--reconfigure` | memilih model lain |
@@ -141,8 +141,8 @@ Penjelasan mendetail mengenai setiap langkah:
 | `to use the GPU through ..., first run: <command>` | jalankan perintah tersebut, lalu jalankan kembali proses penyiapan: engine akan di-build ulang untuk GPU tanpa mengunduh ulang |
 | `the ... build failed`, misalnya `Unsupported gpu architecture` ketika CUDA toolkit yang terinstal tidak lagi mendukung kartu tersebut | proses penyiapan terlebih dahulu memeriksa toolkit terhadap kartu dan memilih Vulkan secara otomatis sambil menjelaskan alasannya; jika build masih gagal, proses tersebut menawarkan pilihan berikutnya (Vulkan, lalu CPU). `./start-here.sh --backend vulkan` memaksa penggunaan Vulkan; `--no-gpu` tetap menggunakan CPU |
 | `needs N GB free for the download` | gunakan `--dir` dengan folder pada disk yang lebih besar |
-| di WSL, folder model berada di bawah `/mnt/c` | simpan di disk Linux (default, `~/colibri-models`): `/mnt/c` berkali-kali lebih lambat |
-| hal lainnya | `c/coli logs -n 50` menampilkan log server dan `c/coli logs --install` menampilkan log proses penyiapan; buka [issue](https://github.com/JustVugg/colibri/issues) dengan menyertakan baris terakhir yang ditampilkan proses penyiapan |
+| di WSL, folder model berada di bawah `/mnt/c` | simpan di disk Linux (default, `~/qoralis-models`): `/mnt/c` berkali-kali lebih lambat |
+| hal lainnya | `c/qoralis logs -n 50` menampilkan log server dan `c/qoralis logs --install` menampilkan log proses penyiapan; buka [issue](https://github.com/JustVugg/colibri/issues) dengan menyertakan baris terakhir yang ditampilkan proses penyiapan |
 
 ### Biarkan asisten AI Anda menyiapkannya
 
@@ -155,15 +155,15 @@ ini untuk Anda. Minta asisten tersebut:
 sebagai perintah dengan hasil yang dapat dibaca mesin, dan memerintahkannya untuk
 meminta persetujuan Anda sebelum mengunduh model atau menginstal paket sistem.
 Asisten yang mendukung Model Context Protocol dapat menggunakan server MCP
-Qoralis sebagai gantinya: `coli mcp` menyediakan tools untuk mendeteksi hardware,
+Qoralis sebagai gantinya: `qoralis mcp` menyediakan tools untuk mendeteksi hardware,
 merekomendasikan model, menginstal, menjalankan, menghentikan, dan memeriksanya
 ([docs/MCP_SERVER.md](docs/MCP_SERVER.md)).
 
 ### Atau secara manual
 
 Untuk memilih sendiri setiap langkah (rilis prebuilt atau build dari source,
-model apa pun dari tabel di bawah, lalu `coli chat`, `coli web`, atau
-`coli serve`), lihat [Instal secara manual](#install-by-hand), atau
+model apa pun dari tabel di bawah, lalu `qoralis chat`, `qoralis web`, atau
+`qoralis serve`), lihat [Instal secara manual](#install-by-hand), atau
 [panduan Quick Start](docs/quickstart.md) untuk langkah demi langkah pada setiap
 platform.
 
@@ -257,7 +257,7 @@ kecepatan: drive NVMe yang cepat paling membantu)
 
 **Dari GGUF: file yang sudah dipublikasikan, dibaca apa adanya**
 
-`./coli import` menerima file pertama dari sebuah GGUF (bagian lainnya di sebelahnya) dan
+`./qoralis import` menerima file pertama dari sebuah GGUF (bagian lainnya di sebelahnya) dan
 menulis direktori model di sampingnya; lalu direktori itu dipakai untuk `--model`, seperti model
 lain ([gguf.md](docs/gguf.md)). Tidak ada yang dikonversi atau dikuantisasi ulang: blok berjalan
 seperti yang disimpan file, dari IQ1_S sampai Q8_0, F16, BF16, dan MXFP4. Engine semua model chat
@@ -346,10 +346,10 @@ Qwen3-Coder, dan Qwen3.8-Flash-Next, dan setiap engine memutuskan sendiri apakah
 dense chain dijalankan di sana (Qwen3.6 ya, Qwen3.8 tidak). `--backend vulkan`
 tetap meminta Vulkan secara eksplisit.
 
-**Menyalakan atau mematikan GPU.** `coli setup --backend vulkan` memakai GPU untuk
-model apa pun, dan `coli setup --backend cpu` (atau `--no-gpu`) menjalankan
+**Menyalakan atau mematikan GPU.** `qoralis setup --backend vulkan` memakai GPU untuk
+model apa pun, dan `qoralis setup --backend cpu` (atau `--no-gpu`) menjalankan
 semuanya di CPU. Engine yang di-build dengan Vulkan memakai GPU hanya jika ada
-`COLI_VULKAN=1` di environment `coli chat`, `serve` atau `web` (proses penyiapan
+`COLI_VULKAN=1` di environment `qoralis chat`, `serve` atau `web` (proses penyiapan
 mengaturnya ketika memilih Vulkan); tanpanya, engine berjalan di CPU. Dengan GPU
 menyala, `COLI_VK_CHAIN=0` mempertahankan expert tier dan menjalankan layer dense
 di CPU. Pada GPU terintegrasi, coba keduanya: pada laptop dengan Intel Iris Xe
@@ -488,22 +488,22 @@ sehingga client Jev dapat beralih ke Qoralis hanya dengan mengganti base URL,
 tanpa perubahan lain:
 `TYPESAFE_BASE_URL=http://127.0.0.1:8000` (key yang sudah dikirim client tetap
 diterima oleh server yang dijalankan tanpa `COLI_API_KEY`). Kedua SDK resmi,
-tanpa modifikasi, diuji terhadap `coli serve`.
+tanpa modifikasi, diuji terhadap `qoralis serve`.
 
 Mode yang sama juga tersedia di terminal
-(`/decide merge | request changes | close` dalam `coli chat`) dan pada halaman
+(`/decide merge | request changes | close` dalam `qoralis chat`) dan pada halaman
 System One di dashboard. Request dan reply lengkap, aturan scoring, serta kapan
 mode ini tidak membantu dijelaskan di
 [docs/systemone.md](docs/systemone.md).
 
 ## Dashboard
 
-`coli web` membukanya, begitu juga proses penyiapan satu langkah: chat, halaman
+`qoralis web` membukanya, begitu juga proses penyiapan satu langkah: chat, halaman
 System One, Brain, dan halaman Profiling, dalam tema terang atau gelap.
 
 ### UI chat baru
 
-`coli ui` membuka chat baru di samping `coli serve` yang sedang berjalan: penalaran di bloknya sendiri,
+`qoralis ui` membuka chat baru di samping `qoralis serve` yang sedang berjalan: penalaran di bloknya sendiri,
 gambar untuk model dengan menara visi, pencarian web, peta pakar, monitor langsung, dan agen pemrograman
 yang sudah diarahkan ke colibri. Tujuh bahasa. Lihat [ui/README.md](ui/README.md).
 
@@ -534,7 +534,7 @@ fase, dengan 30 turn terakhir sebagai tren.
 
 ## Gunakan dari aplikasi lain
 
-`coli serve` (yang dijalankan proses penyiapan untuk Anda) adalah satu server
+`qoralis serve` (yang dijalankan proses penyiapan untuk Anda) adalah satu server
 dengan beberapa API:
 
 - **kompatibel dengan OpenAI**: `/v1/chat/completions`, `/v1/completions`, dan
@@ -546,20 +546,20 @@ dengan beberapa API:
   ([tabel per-engine](docs/api.md#tool-calling-support));
 - **input gambar** pada GLM-5.3-Flash, DeepSeek V4.1 Flash, MiMo-V2.6,
   Qwen3.8-Flash-Next, Qwen3.8-27B, LFM3-VL, dan Mistral-Large-4 (dari GGUF, dengan
-  file `mmproj` di sebelahnya): sebuah path dalam pesan `coli chat`, attachment di
-  `coli web` atau `coli ui`, atau bagian `image_url`;
+  file `mmproj` di sebelahnya): sebuah path dalam pesan `qoralis chat`, attachment di
+  `qoralis web` atau `qoralis ui`, atau bagian `image_url`;
 - **output gambar** dengan Qwen-Image-2.1 pada `POST /v1/images/generations`,
-  dan digambar langsung di terminal oleh `coli chat`
+  dan digambar langsung di terminal oleh `qoralis chat`
   ([qwen-image.md](docs/qwen-image.md));
 - **keputusan** pada `POST /v1/systemone`
   ([di atas](#system-one-a-decision-with-a-probability));
-- **beberapa percakapan sekaligus** di setiap engine teks: `coli serve
+- **beberapa percakapan sekaligus** di setiap engine teks: `qoralis serve
   --kv-slots N` menyimpan hingga 16, masing-masing dengan cache sendiri, dan
   mendekode token berikutnya bersama-sama ([api.md](docs/api.md#isolated-kv-contexts)).
 
 CLI coding dan editor terhubung seperti ke provider lain yang kompatibel dengan
 OpenAI: base URL `http://127.0.0.1:8000/v1`, model id yang ditampilkan
-`coli status`, dan key apa pun yang tidak kosong
+`qoralis status`, dan key apa pun yang tidak kosong
 ([docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)).
 
 <a id="how-it-works"></a>
@@ -622,7 +622,7 @@ dari VRAM, RAM, maupun disk.
   ([speculative.md](docs/speculative.md),
   [tuning.md](docs/tuning.md#speculation-and-reproducibility)).
 
-Engine menggunakan satu file C per keluarga model (`c/colibri.c` untuk GLM-5.2)
+Engine menggunakan satu file C per keluarga model (`c/qoralisbri.c` untuk GLM-5.2)
 di atas header bersama, tanpa BLAS dan tanpa Python saat runtime: Python hanya
 menjalankan proses penyiapan, launcher, converter, dan API gateway.
 
@@ -653,7 +653,7 @@ pakar berada. Decode GLM-5.2, dari [tabel lengkap](docs/benchmarks.md):
 ### Tiga backend di satu mesin
 
 Sebuah i5-13500 dengan RAM 62 GB dan RTX PRO 4000 Blackwell SFF (24 GB, 70 W),
-setiap model dilayani oleh `coli serve`: prompt baru 450 token, lalu jawaban 128
+setiap model dilayani oleh `qoralis serve`: prompt baru 450 token, lalu jawaban 128
 token yang di-stream, termasuk HTTP permintaannya; yang terbaik dari dua run,
 tok/s.
 
@@ -669,7 +669,7 @@ tok/s.
 
 ### Model besar di mesin yang sama
 
-Mesin D lagi, setiap model dari GGUF yang dipublikasikan lewat `coli serve`: apa
+Mesin D lagi, setiap model dari GGUF yang dipublikasikan lewat `qoralis serve`: apa
 yang tidak dipegang kartu maupun RAM datang dari dua NVMe. Token per detik, dari
 halaman setiap model:
 
@@ -714,7 +714,7 @@ hasil pengukurannya.
 **1. Programnya.** Ambil archive untuk platform Anda dari
 [Releases](https://github.com/JustVugg/colibri/releases) (Linux x86_64, macOS,
 Windows; tidak memerlukan compiler, hanya [Python 3](https://www.python.org/downloads/)
-untuk launcher dan API), ekstrak, lalu jalankan `python3 coli info`. Engine
+untuk launcher dan API), ekstrak, lalu jalankan `python3 qoralis info`. Engine
 Linux dan Windows sudah berisi Vulkan, dengan `shaders/` di sampingnya, dan engine
 macOS berisi Metal; untuk kartu NVIDIA di Windows tambahkan archive CUDA. Atau build
 dari source menggunakan `gcc` (atau clang) dan OpenMP:
@@ -737,11 +737,11 @@ MTP head,
 untuk GLM-5.3 (419 GB, tanpa MTP head). Jangan gunakan mirror int4 per-row yang
 lebih lama: hasil pengukurannya sekitar 9 poin lebih buruk dalam kualitas dan
 menyebabkan jawaban berulang pada
-[#455](https://github.com/JustVugg/colibri/issues/455). `./coli convert --model
+[#455](https://github.com/JustVugg/colibri/issues/455). `./qoralis convert --model
 /nvme/glm52_i4` membuat container yang sama dari rilis FP8, shard demi shard,
 tanpa pernah memerlukan seluruh 756 GB berada di disk sekaligus. Cara memeriksa
 MTP head dan bagian lainnya:
-[quickstart.md](docs/quickstart.md#3-get-the-model). GGUF yang sudah Anda miliki tidak perlu dikonversi: `./coli import` pada file
+[quickstart.md](docs/quickstart.md#3-get-the-model). GGUF yang sudah Anda miliki tidak perlu dikonversi: `./qoralis import` pada file
 pertamanya ([di atas](#from-a-gguf)).
 
 <a id="3-run-it"></a>
@@ -752,17 +752,17 @@ chat template-nya, sehingga perintahnya sama untuk setiap model:
 
 ```bash
 ./c/qoralis chat  --model /nvme/qwen36          # chat in the terminal
-./coli web   --model /nvme/qwen36          # API + dashboard, opens a browser
-./coli serve --model /nvme/qwen36          # API + dashboard, no browser
-./coli plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
-./coli doctor --model /nvme/qwen36         # read-only check: is everything ready?
-./coli tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
-./coli import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
-./coli ui                                  # the chat UI, next to a running coli serve
+./qoralis web   --model /nvme/qwen36          # API + dashboard, opens a browser
+./qoralis serve --model /nvme/qwen36          # API + dashboard, no browser
+./qoralis plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
+./qoralis doctor --model /nvme/qwen36         # read-only check: is everything ready?
+./qoralis tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
+./qoralis import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
+./qoralis ui                                  # the chat UI, next to a running qoralis serve
 ```
 
-Di Windows, archive rilis menyertakan `coli.cmd` (`coli.cmd chat --model
-D:\qwen36`); dari source checkout gunakan `py -3 c\coli`. File `.exe` adalah
+Di Windows, archive rilis menyertakan `qoralis.cmd` (`qoralis.cmd chat --model
+D:\qwen36`); dari source checkout gunakan `py -3 c\qoralis`. File `.exe` adalah
 engine, bukan launcher. Semua opsi dan variabel:
 [SETTINGS.md](docs/SETTINGS.md), [ENVIRONMENT.md](docs/ENVIRONMENT.md).
 
@@ -806,7 +806,7 @@ penjelasan.
 | System One dan model keputusan | [systemone.md](docs/systemone.md), [laya.md](docs/laya.md), [gliner_decide.md](docs/gliner_decide.md), [clef.md](docs/clef.md) |
 | File GGUF: arsitektur, dua mode, apa yang dilakukan setiap engine dengan bloknya | [gguf.md](docs/gguf.md) |
 | Model pada engine Qwen3.6 (Flint, Muse Spark Open, LFM3-VL) dan Mistral-Large-4 | [qwen36.md](docs/qwen36.md), [mistral-large4.md](docs/mistral-large4.md) |
-| UI chat (`coli ui`) | [ui/README.md](ui/README.md) |
+| UI chat (`qoralis ui`) | [ui/README.md](ui/README.md) |
 | Vulkan: expert tier, dense chain, kartu tanpa Resizable BAR | [vulkan.md](docs/vulkan.md) |
 | CUDA, dan CUDA tier Qwen3.6 | [cuda.md](docs/cuda.md), [qwen36-cuda-tier.md](docs/qwen36-cuda-tier.md) |
 | Apple Silicon, Windows | [metal.md](docs/metal.md), [windows.md](docs/windows.md) |
@@ -851,12 +851,12 @@ c/
 │
 ├── coli                  user-facing CLI
 ├── setup_*.py            the one-step setup: hardware, catalog, downloads, flow
-├── mcp_server.py         the MCP server (coli mcp)
+├── mcp_server.py         the MCP server (qoralis mcp)
 ├── openai_server.py      OpenAI- and Anthropic-compatible HTTP gateway
-├── resource_plan.py      RAM/VRAM planner behind coli plan and coli doctor
+├── resource_plan.py      RAM/VRAM planner behind qoralis plan and qoralis doctor
 ├── tools/                conversion, fixtures and benchmarks
 └── tests/                dependency-free C and Python tests
-ui/                       the chat UI (coli ui)
+ui/                       the chat UI (qoralis ui)
 web/                      the dashboard (a pure API client)
 desktop/                  Tauri desktop shell around the dashboard
 docker/                   container images

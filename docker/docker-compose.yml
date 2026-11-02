@@ -8,11 +8,12 @@
 # The model is bind-mounted read-only from MODEL_DIR on the host — keep it on
 # NVMe/ext4, never a network mount (expert streaming is latency-bound).
 services:
-  Qoralis:
+  qoralis:
     build:
       context: ..
       dockerfile: docker/Dockerfile.slim
-    image: Qoralis
+    image: qoralis-engine
+    container_name: qoralis-engine
     ports:
       - "5000:5000"
     volumes:

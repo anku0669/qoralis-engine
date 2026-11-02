@@ -7,7 +7,7 @@ Two invariants from the field report in #1689:
   /usr/bin/coli, and abspath() kept the alias, deriving /libexec/colibri;
 - every root-level Python module the launcher reaches (tools/pack_python.py
   computes that closure for the release archive) must be in the handwritten
-  `make install` list, or installed `coli serve` fails on an import the
+  `make install` list, or installed `qoralis serve` fails on an import the
   source tree satisfied (v41_dsml.py in 1.12.0).
 """
 import os

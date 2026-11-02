@@ -153,15 +153,15 @@ class FamilyDescriptor:
     # the trunk out of the VRAM budget before it counts hot experts. None: the
     # engine keeps its trunk on the CPU (or has none).
     trunk_inventory: object = None
-    # Lo script sotto tools/ che `coli convert` puo' guidare per questa famiglia,
-    # e le opzioni di `coli convert` che quello script accetta davvero.
+    # Lo script sotto tools/ che `qoralis convert` puo' guidare per questa famiglia,
+    # e le opzioni di `qoralis convert` che quello script accetta davvero.
     #
-    # #1368: `coli convert` lanciava convert_fp8_to_int4.py qualunque cosa gli si
+    # #1368: `qoralis convert` lanciava convert_fp8_to_int4.py qualunque cosa gli si
     # desse. Quel convertitore e' di GLM-5.2 e classifica i tensori per nome
     # PIATTO, mentre GLM-5.3-Flash annida il testuale sotto il wrapper vision:
     # `model.language_model.embed_tokens.weight` non corrisponde a nessuna regola
     # e cade nel fallback finale, che lo quantizza. Poi glm53.c lo legge con
-    # load_f32, rifiuta l'U8, e il motore muore dentro `coli web`.
+    # load_f32, rifiuta l'U8, e il motore muore dentro `qoralis web`.
     #
     # Vuoto significa "coli non guida questa famiglia": non e' una lacuna, e'
     # che il suo convertitore ha un'altra riga di comando (convert_qwen36.py usa
@@ -187,13 +187,13 @@ class FamilyDescriptor:
     # planner and POST /v1/images/generations, and every text-only invariant
     # (context variable, segment conformance, tuning) is scoped to modality
     # "text". A decision family has none of them either: it is served by
-    # `coli serve` / `coli web` and answers POST /v1/systemone only.
+    # `qoralis serve` / `qoralis web` and answers POST /v1/systemone only.
     modality: str = "text"
     # Where the tokenizer lives, relative to the model directory. A diffusers
     # pipeline keeps it in processor/, not at the root.
     tokenizer_file: str = "tokenizer.json"
     # The other files a decision checkpoint needs besides model.safetensors and
-    # the tokenizer, relative to the model directory: what `coli doctor`
+    # the tokenizer, relative to the model directory: what `qoralis doctor`
     # checks. Each decision family keeps its configuration in its own layout.
     checkpoint_files: tuple = ()
 
@@ -1078,7 +1078,7 @@ def _dsv41_resident_inventory(name, size, _config, _dtype=None):
     behind a small LRU whose size is a runtime knob. Counted as dense they turn
     a 552B model that fits a workstation into one that needs 214 GB of RAM, and
     the plan then plans nothing: measured against the real checkpoint on a 61 GB
-    box, `coli plan` reported 214.3 GB of dense weights, 0% projected expert
+    box, `qoralis plan` reported 214.3 GB of dense weights, 0% projected expert
     residency and a cap of zero, for a model whose resident trunk is 11 GB.
     """
     return 0 if _DSV41_ENGRAM.match(name) else size
@@ -1499,7 +1499,7 @@ FAMILIES = (
         # a Vulkan device too (COLI_VULKAN=1), opt-in and outside the planner.
         supports_accelerator=True,
         expert_inventory=_individual_expert_inventory(_GLM_EXPERT),
-        # coli convert routes to convert_olmoe_merged.py (d4d11ef dispatch);
+        # qoralis convert routes to convert_olmoe_merged.py (d4d11ef dispatch);
         # the converter takes no precision flags (--ebits / --group-size etc.).
         converter="convert_olmoe_merged.py",
         converter_accepts=(),
@@ -1583,10 +1583,10 @@ FAMILIES = (
         capabilities=FamilyCapabilities(True, False, False, True, image=True,
                                         logprobs_echo=True),
         has_gateway_adapter=True,
-        # coli run stays unwired on purpose: cmd_run dispatches per arch after
+        # qoralis run stays unwired on purpose: cmd_run dispatches per arch after
         # this gate, and without a qwen36 branch the engine would inherit GLM's
         # prompt template -- a wrong template does not fail loudly, it degrades
-        # the answer. False gives the user "use coli chat or coli serve", which
+        # the answer. False gives the user "use qoralis chat or qoralis serve", which
         # is true and actionable; chat/serve/web all work through the gateway.
         has_cli_adapter=False,
         tune_prompt_template=(
@@ -1616,7 +1616,7 @@ FAMILIES = (
         limits=FamilyLimits(8192, 262144, 1024, 8192, 16, 1, "Q38_MAXT"),
         capabilities=FamilyCapabilities(True, False, False, True, image=True),
         has_gateway_adapter=True,
-        # Like Qwen3.6, direct `coli run` is intentionally not exposed until
+        # Like Qwen3.6, direct `qoralis run` is intentionally not exposed until
         # an engine-specific CLI prompt path exists; chat/serve use the gateway.
         has_cli_adapter=False,
         tune_prompt_template=(
@@ -1697,12 +1697,12 @@ FAMILIES = (
         # at the gateway rather than desync the wire.
         capabilities=FamilyCapabilities(True, False, False, True, image=True),
         has_gateway_adapter=True,
-        # coli run stays unwired, for the reason qwen36 gives above and one more:
+        # qoralis run stays unwired, for the reason qwen36 gives above and one more:
         # cmd_run dispatches per arch after this gate, and with no deepseek_v41
         # branch of its own the launcher would fall through to GLM's binary and
         # GLM's prompt template. The engine speaks the SERVE protocol and nothing
         # else, so a one-shot has nowhere to go but the gateway -- which is what
-        # coli chat, coli serve and coli web already use.
+        # qoralis chat, qoralis serve and qoralis web already use.
         has_cli_adapter=False,
     ),
     FamilyDescriptor(
@@ -1747,7 +1747,7 @@ FAMILIES = (
         capabilities=FamilyCapabilities(True, False, False, True, image=True,
                                         logprobs_echo=True, submit_gbytes=True),
         has_gateway_adapter=True,
-        # the engine is driven through the gateway (SERVE); coli run has no mimo
+        # the engine is driven through the gateway (SERVE); qoralis run has no mimo
         # branch and would fall through to GLM's binary, as for deepseek_v41
         has_cli_adapter=False,
         # the gateway's cue with thinking on (render_chat_mimo): the template's
@@ -1774,7 +1774,7 @@ FAMILIES = (
         planner_id="qwen_image",
         planner_geometry=None,
         planner_unsupported_reason=(
-            "an image model has no KV cache and no experts; coli plan sizes its "
+            "an image model has no KV cache and no experts; qoralis plan sizes its "
             "text encoder, DiT and VAE instead (image_engine.plan_image_model)"),
         expert_inventory=lambda _name, _size, _config, _dtype=None: (),
         config_section="root",
@@ -1829,8 +1829,8 @@ FAMILIES = (
         limits=FamilyLimits(512, 8192, 1, 1, 1, 0, ""),
         capabilities=FamilyCapabilities(False, False, False, False, decision=True),
         has_gateway_adapter=True,
-        # one-shot `coli run` has nothing to run: a decision needs questions,
-        # which come over POST /v1/systemone from `coli serve` / `coli web`
+        # one-shot `qoralis run` has nothing to run: a decision needs questions,
+        # which come over POST /v1/systemone from `qoralis serve` / `qoralis web`
         has_cli_adapter=False,
         # COLI_CUDA=1 (--gpu): the forward on a CUDA device (decide_cuda.h); no tier to size
         supports_accelerator=True,

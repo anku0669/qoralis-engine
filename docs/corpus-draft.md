@@ -67,11 +67,11 @@ produce spurious matches; that is what the guard is for.
 
 ```bash
 # 1. freeze a run's output ids (TOKENS=1 already dumps them to stderr)
-TOKENS=1 COLI_TEMP=0 ./coli run --ngen 96 "..." 2>&1 |
+TOKENS=1 COLI_TEMP=0 ./qoralis run --ngen 96 "..." 2>&1 |
   sed -n 's/.*\[TOKENS\][0-9 ]*generated://p' > corpus.txt
 
 # 2. draft from it on later runs
-COLI_DRAFT_CORPUS=corpus.txt COLI_CORPUS_K=8 COLI_TEMP=0 ./coli run --ngen 96 "..."
+COLI_DRAFT_CORPUS=corpus.txt COLI_CORPUS_K=8 COLI_TEMP=0 ./qoralis run --ngen 96 "..."
 ```
 
 - `COLI_DRAFT_CORPUS=<file>` — whitespace-separated token ids. `-1` separates

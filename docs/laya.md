@@ -6,7 +6,7 @@ questions (`choice`, `score`, `noul`) and it answers every question with
 calibrated probabilities in one forward pass. It never generates text.
 
 `c/laya` runs it from the official checkpoint with no conversion, and
-`coli serve` exposes it on `POST /v1/systemone`, the same request and reply
+`qoralis serve` exposes it on `POST /v1/systemone`, the same request and reply
 as TypeSafe's Jev API and as every other model Qoralis serves
 ([systemone.md](systemone.md#decision-engines)).
 
@@ -18,13 +18,13 @@ The English checkpoint is the root of the repository (842 MB):
 hf download convaiinnovations/laya model.safetensors rl_agent_config.json \
    "encoder/*" "tokenizer/*" --local-dir ~/Models/laya
 make -C c laya
-./c/coli serve --model ~/Models/laya
+./c/qoralis serve --model ~/Models/laya
 ```
 
 `coli` recognises the checkpoint by its `rl_agent_config.json` and the
 encoder's `encoder/config.json`; there is no root `config.json` to add.
-`coli info --model ~/Models/laya` shows the encoder and the token budget,
-`coli plan` the RAM.
+`qoralis info --model ~/Models/laya` shows the encoder and the token budget,
+`qoralis plan` the RAM.
 
 ```sh
 curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
@@ -54,7 +54,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 
 `input_tokens` is what the encoder read, every question's sequence counted.
 Chat, completions and messages answer 400 with a pointer to `/v1/systemone`,
-and `coli chat` says the same before starting anything.
+and `qoralis chat` says the same before starting anything.
 
 ## What the engine computes
 
@@ -83,7 +83,7 @@ question's sequence.
   long states and conversations cut at `max_len`, JSON states and
   instructions, `[MASK]` in the text, NFC and the added tokens. Token ids and
   markers identical, probabilities within 4.8e-7 (tolerance 2e-5), every
-  decision the same; then the same fixture through `coli serve`.
+  decision the same; then the same fixture through `qoralis serve`.
 - **The real checkpoints** (`tools/compare_laya.py`): 36 requests, 117
   questions (the model card's examples, the package's presets, documents cut
   at 512 tokens, a 40-option question, unicode, emoji). Root checkpoint:
@@ -99,15 +99,15 @@ processes on the machine, so the numbers move by 20-30% from run to run:
 |---|---|---|
 | 36 requests, median per request | 1.9 s | 3.1 s |
 | one short question (41 tokens) | 300 ms | 250 ms |
-| README request, 3 questions, through `coli serve` | 882 ms, of which 2.5 ms gateway | |
-| Jev request, 1 question, through `coli serve` | 219 ms, of which 2.5 ms gateway | |
+| README request, 3 questions, through `qoralis serve` | 882 ms, of which 2.5 ms gateway | |
+| Jev request, 1 question, through `qoralis serve` | 219 ms, of which 2.5 ms gateway | |
 
 The engine is ahead when a request has several questions and slightly behind
 on a single short one. There is no int8 option: measured on the same 117
 questions, int8 weights changed 1 decision and int8 weights with int8
 activations changed 4, which is not a trade a decision model should make.
 
-**On a CUDA device** (a `CUDA=1` build, `coli serve --gpu` or `COLI_CUDA=1`): the encoder and
+**On a CUDA device** (a `CUDA=1` build, `qoralis serve --gpu` or `COLI_CUDA=1`): the encoder and
 the head run on the card, the matrices in f32 (docs/cuda.md "The decision engines"). An RTX
 PRO 4000 against its host's CPU (an i5-13500, 6 threads), requests of 12 questions over a
 1,700-character email (6,144 rows each): 0.69 s a request against 11.4-13.0 s, the CPU's

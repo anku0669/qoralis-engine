@@ -117,7 +117,7 @@ class ClusterServer(openai_server.APIServer):
         # no API key or CORS surface, and its Host guard stays loopback + bind
         # address (the same default openai_server enforces). A cross-host worker
         # registers from a LAN IP, so the operator opts those hosts in via
-        # --allowed-host (the same #597 escape hatch coli serve exposes); the
+        # --allowed-host (the same #597 escape hatch qoralis serve exposes); the
         # default stays loopback + bind address.
         self.cors_origins = ()
         self.allowed_hosts = tuple(

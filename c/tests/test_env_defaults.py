@@ -123,7 +123,7 @@ class SiblingPlanRefusalTest(unittest.TestCase):
              mock.patch.object(coli, "banner"), build_plan, environment, \
              mock.patch.object(coli.subprocess, "Popen") as popen:
             with self.assertRaises(SystemExit) as stopped:
-                coli.cmd_chat(self.refusal_args())
+                qoralis.cmd_chat(self.refusal_args())
         message = str(stopped.exception)
         self.assertIn("invalid resource plan", message)
         self.assertIn("one expert slot", message)
@@ -146,14 +146,14 @@ class SiblingPlanRefusalTest(unittest.TestCase):
              mock.patch("openai_server.ARCH", "glm"), \
              mock.patch("openai_server.serve") as serve:
             with self.assertRaises(SystemExit) as stopped:
-                coli.cmd_serve(arguments)
+                qoralis.cmd_serve(arguments)
         self.assertIn("invalid resource plan", str(stopped.exception))
         serve.assert_not_called()
         self.assertFalse(pidfile.exists())
 
 
 class CudaAutoEnableTest(unittest.TestCase):
-    """Windows bare `coli chat` (no --gpu/--vram/--auto-tier) used to ALWAYS run
+    """Windows bare `qoralis chat` (no --gpu/--vram/--auto-tier) used to ALWAYS run
     CPU-only even on a CUDA build with a GPU present. env_for now auto-enables
     CUDA on win32 when cuda_binary() is True and a GPU is discoverable; falls
     back to CPU with a warning if nvidia-smi (discover_gpus) is missing; stays
@@ -273,7 +273,7 @@ class CudaAutoEnableTest(unittest.TestCase):
         # A device whose free memory is not qualified as a placement budget
         # (free_bytes is None -- a Windows AMD part found through hipInfo) is
         # discovered and worth reporting, but auto-enable is an automatic
-        # placement decision and must not be made from it. Bare `coli chat`
+        # placement decision and must not be made from it. Bare `qoralis chat`
         # stays on the CPU path, exactly as if nothing had been found.
         identity_only = {"index": 0, "name": "AMD Radeon(TM) 8060S Graphics",
                          "arch": "gfx1151", "total_bytes": 78 * 1024 ** 3,
@@ -352,7 +352,7 @@ class Dsv4CudaDetectTest(unittest.TestCase):
 
     def test_win32_deepgemm_dll_alone_detected(self):
         # backend_loader_dsv4.c tries coli_cuda_dsv4_dg.dll first and
-        # coli_cuda_dsv4.dll second, and `coli doctor` accepts either. --gpu
+        # coli_cuda_dsv4.dll second, and `qoralis doctor` accepts either. --gpu
         # refused an install that had only the DeepGEMM build next to it.
         self.assertTrue(self._detect("win32", dll=True,
                                      dll_name="coli_cuda_dsv4_dg.dll"))
@@ -382,7 +382,7 @@ if __name__ == "__main__":
 
 
 class ClusterWorkerCapTest(unittest.TestCase):
-    """`coli cluster worker` must hand the engine a number, never "None".
+    """`qoralis cluster worker` must hand the engine a number, never "None".
 
     --cap comes from the shared parser and defaults to None, meaning "auto".
     The worker used to stringify it straight into argv, so a launch without an
@@ -403,7 +403,7 @@ class ClusterWorkerCapTest(unittest.TestCase):
                  coordinator=None, advertise_host=None, node_id=None)
         with mock.patch.object(coli, "need_worker_model", return_value="/tmp/engine"), \
              mock.patch.object(coli.subprocess, "call", fake_call):
-            coli.cmd_cluster_worker(a)
+            qoralis.cmd_cluster_worker(a)
         return captured["cmd"]
 
     def test_auto_cap_becomes_a_number(self):
@@ -415,7 +415,7 @@ class ClusterWorkerCapTest(unittest.TestCase):
         self.assertEqual(self._worker_argv(24)[1], "24")
 
     def test_glm53_serve_env_carries_cluster_workers(self):
-        """`coli serve --cluster-workers` on a glm53 model must reach the
+        """`qoralis serve --cluster-workers` on a glm53 model must reach the
         engine: env_for_engine, not env_for, builds glm53's environment."""
         a = args(cluster_workers="10.0.0.2:9100,10.0.0.3:9100", cluster_coordinator=None)
         with mock.patch.dict(os.environ, {}, clear=True):
@@ -436,7 +436,7 @@ class ClusterWorkerCapTest(unittest.TestCase):
                  mock.patch.object(coli, "engine_for", return_value="/tmp/glm53"), \
                  mock.patch.object(coli.subprocess, "call",
                                    lambda cmd, env=None, **kw: captured.update(cmd=cmd, env=env) or 0):
-                coli.cmd_cluster_worker(a)
+                qoralis.cmd_cluster_worker(a)
         self.assertEqual(captured["cmd"], ["/tmp/glm53", "24", "--model", os.path.abspath(model)])
         self.assertEqual(captured["env"]["EXPERT_WORKER"], "1")
         self.assertEqual(captured["env"]["CLUSTER_WORKER_PORT"], "9100")

@@ -3429,7 +3429,7 @@ class HTTPTest(unittest.TestCase):
         with self.request("/health") as response:
             health = json.load(response)
             scheduler = health["scheduler"]
-        # the family, for coli chat's per-family defaults (authed probes only)
+        # the family, for qoralis chat's per-family defaults (authed probes only)
         self.assertEqual(health["arch"], openai_server.ARCH)
         self.assertEqual(scheduler["max_queue"], 8)
         self.assertIn("queued", scheduler)
@@ -4049,7 +4049,7 @@ class HTTPTest(unittest.TestCase):
 class ClientHangupTest(unittest.TestCase):
     """A client that disconnects mid-response must not print a traceback.
 
-    `coli chat` polls /health on a 2 s timeout while the model loads and drops
+    `qoralis chat` polls /health on a 2 s timeout while the model loads and drops
     each connection the moment it has an answer; Ctrl-C during a stream closes
     the socket by design -- the banner tells the user to do exactly that. Both
     reach the handler as BrokenPipeError, and socketserver logs an unhandled

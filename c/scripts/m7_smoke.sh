@@ -36,7 +36,7 @@ make coli_train
 stamp "stage 0: build"
 
 echo "== stage 0b: read-only readiness =="
-COLI_MODEL="$MODEL" ./coli doctor || echo "(doctor warnings above — review before continuing)"
+COLI_MODEL="$MODEL" ./qoralis doctor || echo "(doctor warnings above — review before continuing)"
 
 stamp "stage 0b: doctor"
 

@@ -459,7 +459,7 @@ class SystemOneApi(unittest.TestCase):
 
 
 class DecideCommand(unittest.TestCase):
-    """`/decide` in coli chat posts to /v1/systemone: the conversation so far as
+    """`/decide` in qoralis chat posts to /v1/systemone: the conversation so far as
     the state, the question as one choice whose labels are the options."""
 
     def test_the_tui_request_is_a_systemone_request(self):

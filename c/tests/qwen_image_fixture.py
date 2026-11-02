@@ -3,7 +3,7 @@
 The directory has the real checkpoint's layout (model_index.json at the root,
 no config.json, one folder per component, processor/tokenizer.json) and
 safetensors files whose headers name real tensor names with tiny shapes. The
-data is zeros: nothing here reads it, the planner and `coli info` only parse
+data is zeros: nothing here reads it, the planner and `qoralis info` only parse
 headers. The engine is tools/qwenimage_stub.py.
 """
 import json

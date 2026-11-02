@@ -13,7 +13,7 @@ cd c
 make glm VK=1                # needs the Vulkan headers + glslc (shaderc) for the shaders
 COLI_VULKAN=1 COLI_VK_DENSE=1 COLI_VK_ATTN=1 \
 PIN=<model>/.coli_usage PIN_GB=0 COLI_NO_OMP_TUNE=1 \
-./coli run "Hello" --topp 0.7
+./qoralis run "Hello" --topp 0.7
 ```
 
 Requirements: a Vulkan **1.2** driver with
@@ -33,7 +33,7 @@ starts on a machine with no Vulkan at all and runs on the CPU there, and with
 `COLI_VULKAN=1` says `[VK] no Vulkan loader (...)`. The release archives for
 Linux and Windows are built this way, with the shaders in `shaders/` next to the
 engines: unpacked, they run on a Vulkan GPU with nothing to build, and
-`coli setup` turns the GPU on when it finds one.
+`qoralis setup` turns the GPU on when it finds one.
 
 Set `COLI_NO_OMP_TUNE=1` on multi-core boxes: the engine's OMP self-tune
 (active spin-wait) is skipped under `COLI_CUDA`/`COLI_METAL` but not under
@@ -66,7 +66,7 @@ The driver's EGL library starts with no display: a file like it naming
 `libEGL_nvidia.so.0`, given with `VK_DRIVER_FILES` (`VK_ICD_FILENAMES` for an
 older loader), shows the card. The `api_version` below is driver 580's; take
 yours from the original. Set the variable for every command that opens Vulkan,
-`coli plan` included.
+`qoralis plan` included.
 
 ```bash
 cat > nvidia_icd_egl.json <<'EOF'
@@ -519,7 +519,7 @@ of them on the device the way a GPU-equipped PC should use its card:
   The startup line says `N layers in M forms other than most layers', their experts in
   the room of the biggest of those, the rest at their own size`.
 - **A fresh install starts warm.** A model downloaded a minute ago has no history,
-  so its first runs would fill the tier one routing at a time. `coli setup` copies a
+  so its first runs would fill the tier one routing at a time. `qoralis setup` copies a
   starting history into the model folder when it has none, for the catalog models
   that ship one (`c/profiles/<catalog id>.coli_usage`: Qwen3.6-35B-A3B and Qwen3.8
   Flash Next). It comes from a calibration session (16 prompts: chat in five
@@ -1396,7 +1396,7 @@ there, and the line says "not measured". The startup line says which and why:
 the MTP head on beside the chain and the expert tier, qwen38 also drafts one token per verify
 and gives the expert cache of the head a slot for every expert. The tier reserves RAM for that
 cache. `Q38_MTP_DRAFTS` and `Q38_MTP_CAP` set either. A chain that holds every layer leaves the
-head off unless `Q38_MTP=1` asks for it ([speculative.md](speculative.md)). `coli plan` reads
+head off unless `Q38_MTP=1` asks for it ([speculative.md](speculative.md)). `qoralis plan` reads
 the units through the Vulkan loader. Where only `vulkaninfo` is available, it warns and prices
 fewer than 32 units.
 
@@ -1526,13 +1526,13 @@ mirrors behind the watermarks above; the CPU's layers keep their caches on the h
 only, and nothing of them, of the head or of the tower goes up through the per-matrix
 path. A layer that does not fully reach the device is freed and the chain keeps the
 layers before it. With `COLI_VK_DENSE_HOST=0` only the N layers drop their host copies,
-and `coli plan` (`resource_plan.py`, MiMo's layout) predicts the same N from the
+and `qoralis plan` (`resource_plan.py`, MiMo's layout) predicts the same N from the
 checkpoint's header and config and credits those layers alone.
 `tests/vulkan_engines.sh partial-inkling-mimo` gates it on the fixture (every N from 0
 to 6, text and picture, the three dense forms, N from a device cap and from an upload
 failing inside a layer, chunks of 3 rows, one token at a time, prompts only, the KV
 split, a lost device, device-only weights, serve sessions and the prefix-reuse tests)
-on the CPU's tokens and logits within 1e-4 of the largest, and `coli plan`'s numbers on
+on the CPU's tokens and logits within 1e-4 of the largest, and `qoralis plan`'s numbers on
 the engine's (free, per-layer and fixed bytes, N) under each cap. Lavapipe only: no
 discrete GPU was available, so the fit's choice on a real card is not measured.
 
@@ -1721,14 +1721,14 @@ layer by layer, as its own forward does, then the head and the per-position head
 device's layers keep their mirrors, rings and convolution states as above; the CPU's
 layers keep theirs on the host, so a CPU step lowers and a lost device rebuilds the
 device's layers alone (`rebuilding the state of P positions ... (the device's layers;
-the CPU's have theirs)`). `coli plan` (`resource_plan.py`, inkling's layout, which reads
+the CPU's have theirs)`). `qoralis plan` (`resource_plan.py`, inkling's layout, which reads
 the dense-int4g64 container's forms when it is there) predicts the same N.
 `tests/vulkan_engines.sh partial-inkling-mimo` gates it on the tiny fixtures (every N
 from 0 to 8, the dense-int4g64 container, the expert containers, bf16, D = 6144 with N
 from 0 to 2, N from a device cap and from an upload failing inside a layer, chunks of 3,
 prompts only, the KV split, a lost device, device-only weights, serve sessions and the
 prefix-reuse and dashboard tests) on the CPU's tokens and every forward's logits within
-1e-4 of the largest, and `coli plan`'s numbers on the engine's under each cap, on
+1e-4 of the largest, and `qoralis plan`'s numbers on the engine's under each cap, on
 Lavapipe; no discrete GPU was available.
 
 **Inkling: not measured.** No Inkling checkpoint runs on the box (the model is 975B),
@@ -1908,7 +1908,7 @@ exit. The `partial-glm` and `partial-glm-sanitize` families
 indexer layers and a six-layer GLM-5.3 whose KDA and MLA layers alternate, so MLA layers
 run on both sides of the handoff. On Lavapipe every configuration gives the CPU's tokens,
 every logits row within 6.7e-7 (Qoralis, 43 configurations) and 7.8e-7 (glm53, 38) of the
-largest logit, and `coli plan` predicts glm53's N, free, per-layer and fixed bytes as the
+largest logit, and `qoralis plan` predicts glm53's N, free, per-layer and fixed bytes as the
 engine prints them under the four caps it is aimed with; the sanitized runs report no
 diagnostic. No discrete GPU was available, and the 780M box was busy with other work: the
 fit on a real card's budget is not measured.
@@ -3586,7 +3586,7 @@ or f16 (fmt 14): the same values in half the bytes. On OLMoE-1B-7B the dense par
 once per matrix at upload (`coli_vk_f32_fmt`): bf16 when every float has a zero low half,
 else f16 when an f16 holds every float, else the matrix stays f32 (fmt 10). The chain's
 fit, the expert tier's dense budget and the dense-host decision count each matrix at the
-format it will take, and so does `coli plan`: a BF16 or F16 tensor from the checkpoint's
+format it will take, and so does `qoralis plan`: a BF16 or F16 tensor from the checkpoint's
 header, an F32 one from its values (the one read of tensor values the planner makes).
 
 The values are the same, so the tokens are the CPU's; the logits can differ from an
@@ -3625,7 +3625,7 @@ so its chain declined and the CPU did the dense work while the GPU sat at 9%.
   also stay alive: those rows are shared with the device and already occupy RAM once.
 - **The RAM goes to the experts.** Each engine that sizes its own expert cache from
   the RAM it sees counts the dense weights as not in RAM in this mode, and so does
-  `coli plan` (`resource_plan.py`) credits only recognized matrices and formats
+  `qoralis plan` (`resource_plan.py`) credits only recognized matrices and formats
   that the engine can release. It keeps the embedding, CPU-readable vectors,
   norms and unrecognized components in the RAM reservation. Packed formats whose
   runtime layout cannot be established from the checkpoint, GLM's CLI-selected
@@ -3748,7 +3748,7 @@ never put on the device behind the fit's back.
 **Host copies, per layer.** With `COLI_VK_DENSE_HOST=0` (or its rule) only the N layers
 give their host copies back; the CPU's layers keep theirs and never read a matrix back from
 disk. The engine's RAM plan counts only the N layers' matrices out of RAM, and so does
-`coli plan` (`resource_plan.py`'s `vk_chain_fit`, which predicts N with the same rule from
+`qoralis plan` (`resource_plan.py`'s `vk_chain_fit`, which predicts N with the same rule from
 the device's budget and the checkpoint's header). The dense-host lines say it:
 
 ```
@@ -3756,7 +3756,7 @@ the device's budget and the checkpoint's header). The dense-host lines say it:
 [VK] deepseek_v4: dense weights at exit: 31 matrices on the device only (0.4 MiB of host copies dropped, the 3 of 6 layers on the device), 0 read back from disk for the CPU (0.0 MiB); RSS 0.14 GiB
 ```
 
-`coli plan` counts every buffer at the backend's least alignment, 256 bytes. A device that
+`qoralis plan` counts every buffer at the backend's least alignment, 256 bytes. A device that
 aligns storage buffers more coarsely makes the engine count more: Mesa's Dozen (the Iris Xe
 through D3D12) aligns them to 64 KiB, and its fit counted 1,379,048 bytes for the six-layer
 fixture's first layer, which Lavapipe and the plan count at 159,720. On a real model, whose
@@ -3789,7 +3789,7 @@ it Lavapipe behaves like a small card.
 1, 3, 5 and 6 of a six-layer fixture and on the other test geometries (the CPU's tokens,
 logits within V4's bound, the placed bytes the kept layers' exactly, nothing more on the
 device at exit than at setup); `COLI_VK_DEVICE_CAP_MB` aimed at 0, 1, 2, 3 and 5 layers
-from a probe's numbers (the line's N and `coli plan`'s are the aimed one); an upload
+from a probe's numbers (the line's N and `qoralis plan`'s are the aimed one); an upload
 failing inside layers 0, 1, 2 and 4 (N = that layer); prompt chunks, prefill blocks, expert
 streaming, n-gram drafts accepted and rejected, prompts only, the per-matrix path beside,
 the KV split, a lost device mid-decode, in the prompt and between drafts, serve sessions
@@ -3802,7 +3802,7 @@ reports, its allocation granularity) is not verified.
 `COLI_VK_CHAIN_LAYERS` at every k of their six-layer fixtures (V4.1's cuts at 2 and 4 hand
 the CPU's layers the index list and the candidate mask; Kimi K3's at 1, 3 and 5 cut inside
 an AttnRes block of two layers); `COLI_VK_DEVICE_CAP_MB` aimed at 0, 1, 3 and 5 layers and
-at every layer but the head (the line's N and `coli plan`'s, with the same free, per-layer
+at every layer but the head (the line's N and `qoralis plan`'s, with the same free, per-layer
 and fixed bytes); an upload failing inside layers 0, 2 and 4, and with the dense weights on
 the device only inside layer 3, where nothing is read back from disk; prompt chunks, expert
 streaming, DSpark drafts (V4.1), prompts only, the tier off, the per-matrix path beside,

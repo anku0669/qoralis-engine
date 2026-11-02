@@ -1,4 +1,4 @@
-"""`coli chat` reads a pasted image itself and sends a data: URI: the server no
+"""`qoralis chat` reads a pasted image itself and sends a data: URI: the server no
 longer opens local paths for a client (see ImageUrlPathGuard in
 test_openai_server). A path the user pastes must therefore never reach the
 request as a path."""

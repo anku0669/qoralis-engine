@@ -4187,7 +4187,7 @@ def main():
                      "there), when the gateway is elsewhere; with a gateway on this machine it runs here")
     pui.add_argument("--models-dir",action="append",default=[],metavar="DIR",
                      help="where models are, for the Models page (default: the folder coli setup "
-                     "uses, ~/colibri-models)")
+                     "uses, ~/qoralis-models)")
     pui.add_argument("--searx",default=os.environ.get("COLIBRI_SEARX",""),
                      help="a SearXNG instance for the chat's web search (default: DuckDuckGo's HTML results)")
     pui.add_argument("--no-browser",action="store_true",help="don't open the browser")
@@ -4202,7 +4202,7 @@ def main():
     pset.add_argument("--model-dir",default=None,metavar="DIR",
                       help="use a model already on disk instead of downloading one")
     pset.add_argument("--dir",default=None,metavar="DIR",
-                      help="folder for downloaded models (default ~/colibri-models)")
+                      help="folder for downloaded models (default ~/qoralis-models; existing legacy folder reused)")
     pset.add_argument("--backend",choices=("auto","cpu","vulkan","cuda"),default=None,
                       help="engine build: auto (default) picks CUDA when the toolkit builds for the "
                       "card, then Vulkan, then the CPU, and a build that fails falls back to the next")

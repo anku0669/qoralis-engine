@@ -220,7 +220,7 @@ class ContextCompactionE2E(unittest.TestCase):
 @unittest.skipUnless(os.name == "posix",
                      "the mock engine is a shebang script the gateway execs directly")
 class ResponseCeilingE2E(unittest.TestCase):
-    """#382: a gateway started without --max-tokens (what coli serve, web and chat do
+    """#382: a gateway started without --max-tokens (what qoralis serve, web and chat do
     without --ngen) lets a response run to the end of the context the engine holds, says
     so in /health for the web UI's default, and sends that ceiling with a request that
     names none."""

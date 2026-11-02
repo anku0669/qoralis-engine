@@ -8,17 +8,17 @@
 # downloads the model (safe to interrupt: run this again to continue), then
 # opens the dashboard in your browser. Later runs start Qoralis straight away.
 #
-# Options go to `coli setup` (c/coli setup --help lists them), for example:
+# Options go to `qoralis setup` (c/qoralis setup --help lists them), for example:
 #   ./start-here.sh --yes                     no questions, take the recommendation
 #   ./start-here.sh --model qwen3-coder-30b   a specific model
 #   ./start-here.sh --reconfigure             choose another model
 #   ./start-here.sh --no-gpu                  CPU only
 #   ./start-here.sh --backend vulkan          the GPU through Vulkan rather than CUDA
-# Stop: Ctrl+C in this terminal, or `c/coli stop` from another one.
+# Stop: Ctrl+C in this terminal, or `c/qoralis stop` from another one.
 # The engine build itself is c/setup.sh, unchanged.
 here=$(cd "$(dirname "$0")" && pwd)
-launcher="$here/c/coli"
-[ -f "$launcher" ] || launcher="$here/coli"
+launcher="$here/c/qoralis"
+[ -f "$launcher" ] || launcher="$here/qoralis"
 
 for candidate in python3 python; do
     if command -v "$candidate" >/dev/null 2>&1 &&

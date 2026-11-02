@@ -1,7 +1,7 @@
 """The dashboard's Brain and Profile tabs read four lines from the engine's
 stdout: EMAP, HITS, PROF, TIERS. On GLM-5.3-Flash they were empty, not because
 anything needed activating but because glm53.c emitted none of them. This
-test drives the engine the way the dashboard does -- through `coli serve`
+test drives the engine the way the dashboard does -- through `qoralis serve`
 and the /experts and /profile endpoints -- and asserts the data arrives in
 the shape the server parses, so a family that stops emitting a line fails
 here rather than as a blank tab on a user's screen.
@@ -66,10 +66,10 @@ class Glm53DashboardTest(unittest.TestCase):
                 break
             except Exception:
                 if cls.proc.poll() is not None:
-                    raise RuntimeError("coli serve exited: " + cls.proc.stdout.read()[-2000:])
+                    raise RuntimeError("qoralis serve exited: " + cls.proc.stdout.read()[-2000:])
                 time.sleep(1)
         else:
-            raise RuntimeError("coli serve did not come up in 180 s")
+            raise RuntimeError("qoralis serve did not come up in 180 s")
         model = get_json(f"http://127.0.0.1:{cls.port}/v1/models")["data"][0]["id"]
         body = json.dumps({"model": model, "prompt": "abcabcabc", "max_tokens": 3}).encode()
         req = urllib.request.Request(f"http://127.0.0.1:{cls.port}/v1/completions", data=body,

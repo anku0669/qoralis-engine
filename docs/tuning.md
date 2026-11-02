@@ -1,6 +1,6 @@
 # Tuning & runtime knobs
 
-Everything here is opt-in; the defaults are chosen so a plain `./coli chat`
+Everything here is opt-in; the defaults are chosen so a plain `./qoralis chat`
 is safe on any machine. See also [SETTINGS.md](SETTINGS.md) and
 [ENVIRONMENT.md](ENVIRONMENT.md) for the full variable inventory.
 
@@ -34,7 +34,7 @@ explicit `PIN` and `PIN_GB` settings remain authoritative.
 
 ## Resource policy
 
-`coli plan` reports the planned hot (VRAM), warm (RAM), and cold backing (disk)
+`qoralis plan` reports the planned hot (VRAM), warm (RAM), and cold backing (disk)
 tiers, the reason for each placement, and the expected bottleneck. The default
 `--policy quality` and `--policy balanced` modes preserve checkpoint quantization
 and router decisions unless `--topk` or `--topp` is passed; those explicit lossy
@@ -105,7 +105,7 @@ policy:
 ```bash
 OMP_WAIT_POLICY=active GOMP_SPINCOUNT=200000 KMP_BLOCKTIME=200 \
 OMP_PROC_BIND=close OMP_DYNAMIC=FALSE \
-COLI_CUDA=1 ./coli run --model /models/glm52_i4 "Benchmark prompt"
+COLI_CUDA=1 ./qoralis run --model /models/glm52_i4 "Benchmark prompt"
 ```
 
 The OpenMP runtime reads these variables before `main()`, so they must be set
@@ -123,21 +123,21 @@ spin has measured slower there by stealing the shared CPU/GPU power budget.
 `COLI_NO_OMP_TUNE=1` remains the explicit passive-policy kill switch.
 
 ```bash
-coli plan --model /models/glm52_i4 --policy quality
-coli run --auto-tier --policy quality "Explain MoE offloading"
+qoralis plan --model /models/glm52_i4 --policy quality
+qoralis run --auto-tier --policy quality "Explain MoE offloading"
 # Explicit research-only router reduction:
-coli run --policy experimental-fast --topk 4 "Benchmark prompt"
+qoralis run --policy experimental-fast --topk 4 "Benchmark prompt"
 ```
 
 ## Measured machine profiles
 
-`coli plan` chooses a safe starting point from capacity and topology.
-`coli tune` measures the remaining scheduling choices on the actual model and
+`qoralis plan` chooses a safe starting point from capacity and topology.
+`qoralis tune` measures the remaining scheduling choices on the actual model and
 machine, then saves a hardware/model/engine-specific profile:
 
 ```bash
-coli tune --model /models/glm52_i4
-coli run --model /models/glm52_i4 --auto-tier "Explain MoE offloading"
+qoralis tune --model /models/glm52_i4
+qoralis run --model /models/glm52_i4 --auto-tier "Explain MoE offloading"
 ```
 
 GLM generates one calibration continuation and teacher-forces it for every
@@ -328,7 +328,7 @@ drop share when the flag is active, so a miscalibrated tau is visible rather
 than silent.
 
 ```bash
-DEGRADE_ZERO=1 DEGRADE_TAU=0.03 COLI_MODEL=/nvme/glm52_i4 ./coli chat
+DEGRADE_ZERO=1 DEGRADE_TAU=0.03 COLI_MODEL=/nvme/glm52_i4 ./qoralis chat
 ```
 
 See [ENVIRONMENT.md](ENVIRONMENT.md) for the full variable reference and
@@ -337,7 +337,7 @@ measurement methodology.
 
 ## Conversations reopen warm
 
-`coli chat` persists the compressed MLA KV-cache to disk after every turn
+`qoralis chat` persists the compressed MLA KV-cache to disk after every turn
 (`.coli_kv`, ~182 KB/token, appended incrementally, crash-safe). Close the chat,
 reopen it tomorrow — the model still remembers the whole conversation and **zero
 re-prefill happens**: validated byte-identical to an uninterrupted session.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Quali file Python deve contenere un archivio di release, calcolati.
 
-#1296: `coli convert` nel pacchetto v1.10.0 moriva con "can't open file
+#1296: `qoralis convert` nel pacchetto v1.10.0 moriva con "can't open file
 'tools/convert_fp8_to_int4.py'". Il workflow copiava una lista scritta a mano,
 e la lista era indietro rispetto al codice. Tre script invocati da coli e tre
 moduli importati non c'erano.
@@ -155,8 +155,8 @@ def needed(src):
     module is: its own imports are followed too, not just its own file.
     #1296's own precedent -- a script invoked by coli missing from the
     archive -- had a sibling shape one level deeper that #1296 itself did
-    not catch: a script invoked by coli imports a module that neither
-    coli nor any file coli imports ever mentions by name, so that module
+    not catch: a script invoked by qoralis imports a module that neither
+    coli nor any file qoralis imports ever mentions by name, so that module
     was never added to `reached` and never copied, even though the
     script that needs it was. The script paths below are pushed onto the
     same import-following queue as every other reached file, so their

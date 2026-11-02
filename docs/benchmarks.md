@@ -50,7 +50,7 @@ gcc -O2 -fopenmp iobench.c -o iobench
 # after a buffered run still reads cache. Reboot or use a fresh shard for a real cold read.
 
 # 2) chat; watch the per-turn stats line (tok/s, expert hit-rate, RSS):
-COLI_MODEL=/path/to/glm52_i4 ./coli chat
+COLI_MODEL=/path/to/glm52_i4 ./qoralis chat
 
 # 3) full automated datapoint — machine info + cold/warm decode + disk, one command:
 python tools/datapoint.py --snap /path/to/model --shard /path/to/container/model-00000.safetensors
@@ -59,11 +59,11 @@ python tools/datapoint.py --snap /path/to/model --shard /path/to/container/model
 #  SERVE=1 engine alive for cold, warm-identical, and rotating-prompt measurements)
 
 # 4) record expert usage, then pin the hottest experts in your spare RAM:
-STATS=stats.txt ./coli chat
-PIN=stats.txt PIN_GB=20 ./coli chat        # scale PIN_GB to your free RAM
+STATS=stats.txt ./qoralis chat
+PIN=stats.txt PIN_GB=20 ./qoralis chat        # scale PIN_GB to your free RAM
 
 # 5) quality benchmarks (MMLU/HellaSwag/ARC):
-./coli bench
+./qoralis bench
 ```
 
 **A GPU-backend datapoint needs a correctness line next to its throughput.**
@@ -71,7 +71,7 @@ Throughput cannot tell a wrong backend from a fast one: a kernel that computes
 garbage runs at full speed and reports no error. Measured in #1502 on gfx1151, a
 HIP build produced perplexity 727 against 7.0 for the same model on the same
 machine, at identical tok/s, and only a quality check caught it. So for any row
-taken with CUDA, HIP, Metal or Vulkan engaged, record one of: a `./coli bench`
+taken with CUDA, HIP, Metal or Vulkan engaged, record one of: a `./qoralis bench`
 score within noise of the CPU run, a perplexity on a fixed text alongside the CPU
 figure, or a greedy output byte-identical to the CPU path on the same prompt. The
 last one holds only where the device and the CPU do the same arithmetic: the GPU
@@ -181,7 +181,7 @@ Real numbers from real machines, stock build (`setup.sh`, gcc 13), greedy decodi
 | Intel i9-12900K (8P+8E, avx-vnni, no avx512) · Debian trixie · **64 GB** DDR4-3200 · Samsung 990 Pro 2 TB ext4 · RTX 3090 (commit `72d3d37`, 2026-07-18) | **6.44 GB/s** O_DIRECT 8T · 5.78 GB/s buffered true-cold | int8 MTP head · cap 26/layer · default (MTP on) | 0.31 cold / 0.33 warm · hit 40-42% · MTP acceptance 43% (2.29 tok/fw) · RSS 47.9 GB · profile **48% disk / 34% matmul / 12% attn** · ~9.9 GB read/token |
 | 〃 | 〃 | **`MTP=0`** | **0.34 tok/s** · hit **54.9%** · 600 experts/token vs 1,062 with MTP on |
 | 〃 | 〃 | `MTP=0` + CUDA expert tier (3090) | 0.35-0.36 · hit 52.9-55.1% · **+13-16% over default, of which the GPU itself is +0-6%** |
-| 〃 second drive: 200 GB LV on a Crucial P310, 57 interleaved expert shards (139 GB, ~40%) symlinked — **file-level split, not block striping** | 990 Pro 6.44 + P310-LV 4.40 GB/s O_DIRECT, independent controllers | `MTP=0`, `coli serve` mux | N=1 **0.324 (+5.5%)** · N=2 **0.426 (+3.1%)** — see the note below on why this is so much smaller than #1249 |
+| 〃 second drive: 200 GB LV on a Crucial P310, 57 interleaved expert shards (139 GB, ~40%) symlinked — **file-level split, not block striping** | 990 Pro 6.44 + P310-LV 4.40 GB/s O_DIRECT, independent controllers | `MTP=0`, `qoralis serve` mux | N=1 **0.324 (+5.5%)** · N=2 **0.426 (+3.1%)** — see the note below on why this is so much smaller than #1249 |
 | 〃 | 〃 | `MTP=0 REPIN=1`, six consecutive N=2 rounds | **0.461 aggregate** · 0.404 → 0.405 → **0.456** → 0.458 → 0.433 → **0.461**: pins converge in ~3 rounds (~300 tokens) and hold |
 | Apple M4 Pro (8P+4E, 24 GB unified) · macOS 15.6 · libomp, 8 physical-core threads · **OLMoE int8**, fully resident (v1.9.0) | model in page cache; no disk in the loop | 226-token teacher-forced eval (`PPL=1`), `cap` 32 vs 64, **paired** (alternating within one session), 8 pairs | median **19.1 tok/s at cap 32** vs **16.3 at cap 64** · cap 32 wins **7 of 8 pairs** · hit rate 74.1% vs 96.7% — see the note |
 | AMD EPYC 9V45 · Azure D128ads v7 (64 cores / 128 threads, 2 NUMA) · Ubuntu 24.04 · 504 GB · 4x NVMe RAID0 ([#1384](https://github.com/JustVugg/colibri/issues/1384)) | 17.9 GB/s O_DIRECT, flat from 8 to 64 threads | int4 gs64 + int8 MTP · cap 16 · CPU only · v1.10.2 | **2.83 tok/s** rotating median · hit 97% · cold TTFT 13 s; warmed (cap 256, `COLI_NUMA=1`, 100% hit, 512-token runs) **6.91 tok/s** · expert matmul 70 ms/tok + attention 54 ms/tok |
@@ -293,7 +293,7 @@ scale-granularity/rotation/lattice ablation lives in
 ```bash
 cd c
 pip install tokenizers datasets
-./coli bench                                   # hellaswag, arc_challenge, mmlu — 40 questions each
-./coli bench hellaswag --limit 200             # one task, more questions
-./coli bench mmlu arc_challenge --ram 100      # pick tasks, set a RAM budget
+./qoralis bench                                   # hellaswag, arc_challenge, mmlu — 40 questions each
+./qoralis bench hellaswag --limit 200             # one task, more questions
+./qoralis bench mmlu arc_challenge --ram 100      # pick tasks, set a RAM budget
 ```

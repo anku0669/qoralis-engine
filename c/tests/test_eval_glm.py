@@ -997,7 +997,7 @@ class EvalGlmEvidenceTests(unittest.TestCase):
             popen.assert_not_called()
 
     def test_partial_run_still_reports_the_table_and_exits_zero(self):
-        # dev's own exit-code contract (coli bench does
+        # dev's own exit-code contract (qoralis bench does
         # `sys.exit(subprocess.call(cmd, ...))`; diag_harness.py parses
         # this tool's stdout table from a subprocess call) exits nonzero
         # ONLY when the engine produced nothing at all. A partial run --

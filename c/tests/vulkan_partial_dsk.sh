@@ -13,7 +13,7 @@
 #     V4.1's cuts at 2 and 4 hand the CPU's layers the index list and the candidate mask a
 #     chain layer made; Kimi K3's at 1 and 3 cut inside an AttnRes block;
 #   - COLI_VK_DEVICE_CAP_MB aimed at k layers from a probe's fit line (and at every layer
-#     but the head): the line's N, the rule's from the run's own numbers, and coli plan's
+#     but the head): the line's N, the rule's from the run's own numbers, and qoralis plan's
 #     (resource_plan.py: free, per-layer and fixed bytes too);
 #   - a staged upload failing inside layer k's setup: N = k, nothing of layer k on the
 #     device; with the dense weights on the device only, nothing read back from disk;
@@ -80,12 +80,12 @@ ptl_v41_probe() {
   rm -f chain.usage
   grep -q '^\[VK\] deepseek_v41 chain fit: ' "$log" || { tail -20 "$log"; fail "probe run: no fit line"; }
 }
-# ptl_plan <engine> <family> <tag> <snapshot> <log> <env...>: coli plan's prediction
+# ptl_plan <engine> <family> <tag> <snapshot> <log> <env...>: qoralis plan's prediction
 # (resource_plan.py, vk_chain_fit) for the same device and settings: the engine's free
 # bytes, per-layer bytes, fixed bytes and N, from the checkpoint's header and config alone
 ptl_plan() {
   local eng=$1 fam=$2 tag=$3 snap=$4 log=$5; shift 5
-  $PY - "$eng" "$fam" "$snap" "$log" "$@" <<'PY' || fail "$tag: coli plan predicts otherwise"
+  $PY - "$eng" "$fam" "$snap" "$log" "$@" <<'PY' || fail "$tag: qoralis plan predicts otherwise"
 import re, sys
 sys.path.insert(0, ".")
 import resource_plan as rp
@@ -99,7 +99,7 @@ layers = [int(x) for x in re.search(r"layers((?: \d+)*) B", f)[1].split()]
 n = int(re.findall(rf"\[VK\] {eng} chain: (\d+) of \d+ layers on the device", "\n".join(lines))[0])
 fit = rp.vk_chain_fit(rp.analyze_model(snap), fam, env, {"type": "cpu"})
 ok = (fit["layers"], fit["fixed"], fit["free"], fit["n"]) == (layers, num("fixed"), num("free"), n)
-print(f"   coli plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
+print(f"   qoralis plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
       f"layers {'= the engine' if fit['layers'] == layers else fit['layers']}, fixed {fit['fixed']} B, free {fit['free']} B")
 sys.exit(0 if ok else 1)
 PY

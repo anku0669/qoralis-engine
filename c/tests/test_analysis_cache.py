@@ -1,7 +1,7 @@
 """analyze_model() sidecar cache (#3).
 
 analyze_model() scans every shard header and regex-matches ~116k tensor names on
-the 372 GB model, and reran on every `coli plan/doctor/tune/run --auto-tier`. It
+the 372 GB model, and reran on every `qoralis plan/doctor/tune/run --auto-tier`. It
 now caches its result to <model>/.coli_analysis.json, keyed on each shard's and
 config.json's (size, mtime_ns), and self-invalidates. This test pins the three
 properties the cache must have, WITHOUT a real model: a hit returns the identical
@@ -81,7 +81,7 @@ class AnalysisCacheTest(unittest.TestCase):
         self.assertEqual(recovered, first)
 
     def test_write_is_atomic_no_tmp_left_behind(self):
-        # A concurrent `coli plan` on the same model dir must never see a
+        # A concurrent `qoralis plan` on the same model dir must never see a
         # half-written cache file; the write goes through a pid-suffixed tmp
         # file + os.replace. After a normal write, no .tmp file should remain
         # and the cache file itself must be valid, complete JSON.

@@ -220,9 +220,9 @@ binary: the lane is present, and neither XRT nor the helper is imported.
 ### Turning it on
 
 ```
-coli run   --xdna --model <glm-model> "..."
-coli chat  --xdna --model <glm-model>
-coli serve --xdna --model <glm-model>
+qoralis run   --xdna --model <glm-model> "..."
+qoralis chat  --xdna --model <glm-model>
+qoralis serve --xdna --model <glm-model>
 ```
 
 `--xdna` sets `COLI_XDNA=1` in the engine's environment, and the engine enables

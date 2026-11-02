@@ -37,7 +37,7 @@ import numpy as np
 
 REPO = "zai-org/GLM-5.3-Flash"
 # chat_template.jinja e' il template ufficiale delle conversazioni: senza,
-# `coli chat` renderebbe i turni a modo suo e il modello risponderebbe a un
+# `qoralis chat` renderebbe i turni a modo suo e il modello risponderebbe a un
 # prompt che non e' quello per cui e' stato addestrato.
 META_FILES = ("config.json", "generation_config.json", "tokenizer.json",
               "tokenizer_config.json", "processor_config.json",

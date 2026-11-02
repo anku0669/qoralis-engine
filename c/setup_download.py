@@ -499,4 +499,4 @@ def human_rate(bytes_per_second):
 
 
 if __name__ == "__main__":
-    sys.exit("setup_download.py is a module; run `coli setup`")
+    sys.exit("setup_download.py is a module; run `qoralis setup`")

@@ -10,9 +10,9 @@ CLI = Path(__file__).resolve().parent.parent / "coli"
 
 
 class WebDashboardUrlTest(unittest.TestCase):
-    """`coli web --host 0.0.0.0` binds every interface, but 0.0.0.0 is not an
+    """`qoralis web --host 0.0.0.0` binds every interface, but 0.0.0.0 is not an
     address a client can connect to on Windows: the readiness poll and the
-    browser must go to loopback, as `coli start` already does (setup_flow.urls)."""
+    browser must go to loopback, as `qoralis start` already does (setup_flow.urls)."""
 
     @classmethod
     def setUpClass(cls):
@@ -40,7 +40,7 @@ class WebDashboardUrlTest(unittest.TestCase):
                 mock.patch("urllib.request.urlopen", side_effect=lambda url, **_kw: polled.append(url)), \
                 mock.patch("webbrowser.open", side_effect=opened.append), \
                 mock.patch("builtins.print"):
-            coli.cmd_web(args)
+            qoralis.cmd_web(args)
         serve.assert_called_once_with(args)
         return polled, opened
 

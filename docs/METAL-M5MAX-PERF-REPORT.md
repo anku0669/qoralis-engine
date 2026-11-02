@@ -6,7 +6,7 @@
 
 - **Hardware:** Apple M5 Max — 18 CPU cores (12 P + 6 E), 40-core GPU, 128 GB unified memory
 - **Model:** GLM-5.2 int4 (744B MoE), experts streamed from SSD
-- **Workload:** `./coli run "Compare the myths of Lucifer and Prometheus"`, 1024 tokens generated
+- **Workload:** `./qoralis run "Compare the myths of Lucifer and Prometheus"`, 1024 tokens generated
 - **Constant flags:** `COLI_METAL=1 DIRECT=1 MTP=0 --ram 110`
 - Every run: identical working set — ~607 experts/token, ~74–75% hit rate, RSS ~97.9 GB, `fallback CPU 0` (all eligible blocks on GPU)
 
@@ -26,7 +26,7 @@ Winner (E) command:
 
 ```bash
 COLI_METAL=1 DIRECT=1 MTP=0 COLI_NO_OMP_TUNE=1 PIPE=1 PIPE_WORKERS=8 \
-  ./coli run --model /path/to/glm52_i4 \
+  ./qoralis run --model /path/to/glm52_i4 \
   "Compare the myths of Lucifer and Prometheus" --ram 110
 ```
 

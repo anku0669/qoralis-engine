@@ -179,7 +179,7 @@ class ResourcePlanTest(unittest.TestCase):
     def test_only_the_colibri_engine_gets_its_own_knobs(self):
         """DRAFT, PIPE, COLI_CUDA_PIPE, COLI_NUMA and PIN_GB are read by
         colibri.c and by no other engine. glm53 was excluded; every other
-        sibling was still told to set them, in `coli plan`, in `coli doctor`
+        sibling was still told to set them, in `qoralis plan`, in `qoralis doctor`
         and in the --auto-tier environment."""
         from family_registry import all_families
         from resource_plan import _auto_tune
@@ -633,7 +633,7 @@ class ResourcePlanTest(unittest.TestCase):
         self.assertEqual(delta, 3 * per_slot)
 
     def test_olmoe_plans_instead_of_refusing(self):
-        # #1066: OLMoE used to refuse in `coli plan`/`doctor` because its
+        # #1066: OLMoE used to refuse in `qoralis plan`/`doctor` because its
         # planner_geometry was None (which under-reserved as zero-byte KV). With
         # the adapter it plans, charging an fp32 K and V cache per layer sized at
         # num_attention_heads * head_dim (mirrors olmoe.c:1019-1020), no fixed
@@ -1797,7 +1797,7 @@ memInfo.free:                     23.50 GB (97%)
         self.assertEqual(plan["next_actions"][0]["priority"], "required")
         text = format_plan(plan)
         self.assertIn("next actions:", text)
-        self.assertIn("coli tune --model <model>", text)
+        self.assertIn("qoralis tune --model <model>", text)
 
     def test_trusted_storage_probe_removes_probe_action(self):
         info = analyze_model(self.model)

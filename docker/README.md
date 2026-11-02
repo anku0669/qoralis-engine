@@ -9,23 +9,23 @@ A simple guide to running **Qoralis Engine**, a local inference engine based on 
 
 ## 📋 Table of Contents
 
-* [What is Qoralis Engine?](https://github.com/JustVugg/colibri/blob/main/docker/README.md#what-is-colibr%C3%AC)
-* [Requirements](https://github.com/JustVugg/colibri/blob/main/docker/README.md#requirements)
-    * [Hardware](https://github.com/JustVugg/colibri/blob/main/docker/README.md#hardware)
-    * [Software](https://github.com/JustVugg/colibri/blob/main/docker/README.md#software)
-* [How to get started](https://github.com/JustVugg/colibri/blob/main/docker/README.md#how-to-get-started)
-    * [Step 1: Download the model](https://github.com/JustVugg/colibri/blob/main/docker/README.md#step-2-download-the-colibr%C3%AC-dockerfile)
-    * [Step 2: Download the Qoralis Engine Dockerfile](https://github.com/JustVugg/colibri/blob/main/docker/README.md#step-2-download-the-colibr%C3%AC-dockerfile)
-    * [Step 3: Build the Docker image](https://github.com/JustVugg/colibri/blob/main/docker/README.md#step-3-build-the-docker-image)
-    * [Step 4: Start Qoralis Engine](https://github.com/JustVugg/colibri/blob/main/docker/README.md#step-4-start-colibr%C3%AC)
-    * [What does that command mean?](https://github.com/JustVugg/colibri/blob/main/docker/README.md#what-does-that-command-mean)
-    * [Using Qoralis Engine](https://github.com/JustVugg/colibri/blob/main/docker/README.md#using-colibr%C3%AC)
-* [Enter the container](https://github.com/JustVugg/colibri/blob/main/docker/README.md#entering-a-linux-console-inside-the-container)
-* [Troubleshooting](https://github.com/JustVugg/colibri/blob/main/docker/README.md#troubleshooting)
-* [Technical notes](https://github.com/JustVugg/colibri/blob/main/docker/README.md#technical-notes)
-* [Frequently Asked Questions](https://github.com/JustVugg/colibri/blob/main/docker/README.md#frequently-asked-questions)
-* [Support and contributions](https://github.com/JustVugg/colibri/blob/main/docker/README.md#support-and-contributions)
-* [Testing on a low resource PC](https://github.com/JustVugg/colibri/blob/main/docker/README.md#testing-on-a-low-resource-pc)
+* [What is Qoralis Engine?](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#what-is-qoralis-engine)
+* [Requirements](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#requirements)
+    * [Hardware](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#hardware)
+    * [Software](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#software)
+* [How to get started](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#how-to-get-started)
+    * [Step 1: Download the model](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#step-2-download-the-qoralis-engine-dockerfile)
+    * [Step 2: Download the Qoralis Engine Dockerfile](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#step-2-download-the-qoralis-engine-dockerfile)
+    * [Step 3: Build the Docker image](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#step-3-build-the-docker-image)
+    * [Step 4: Start Qoralis Engine](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#step-4-start-qoralis-engine)
+    * [What does that command mean?](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#what-does-that-command-mean)
+    * [Using Qoralis Engine](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#using-qoralis-engine)
+* [Enter the container](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#entering-a-linux-console-inside-the-container)
+* [Troubleshooting](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#troubleshooting)
+* [Technical notes](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#technical-notes)
+* [Frequently Asked Questions](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#frequently-asked-questions)
+* [Support and contributions](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#support-and-contributions)
+* [Testing on a low resource PC](https://github.com/anku0669/qoralis-engine/blob/main/docker/README.md#testing-on-a-low-resource-pc)
 
 ---
 
@@ -78,7 +78,7 @@ python -m pip install -U huggingface_hub[cli]
 On Linux, use `python3` instead of `python`.
 2. **Download the model** (open the terminal in the folder where you want to save it):
 ```bash
-hf_download mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp --local-dir .
+hf_download mastouri/GLM-5.2-qoralis-enginent4-g64-with-int8-mtp --local-dir .
 ```
 
 **Example**: if you want to save it in `C:\LLM\models\glm-5.2` (Windows):
@@ -90,14 +90,14 @@ hf_download mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp --local-dir .
 
 If you are on Windows and cannot get it to work with Python:
 
-* Download manually from [Hugging Face](https://huggingface.co/mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp)
+* Download manually from [Hugging Face](https://huggingface.co/mastouri/GLM-5.2-qoralis-enginent4-g64-with-int8-mtp)
 * Unzip into a folder (e.g., `C:\LLM\models\glm-5.2`)
 
 ---
 
 ### Step 2: Download the Qoralis Engine Dockerfile
 
-1. Go to: [https://github.com/JustVugg/colibri/blob/main/docker/Dockerfile](https://github.com/JustVugg/colibri/blob/main/docker/Dockerfile)
+1. Go to: [https://github.com/anku0669/qoralis-engine/blob/main/docker/Dockerfile](https://github.com/anku0669/qoralis-engine/blob/main/docker/Dockerfile)
 2. Click the **Download** button (⬇️ icon) in the top right
 3. Save the file in a folder (e.g., `C:\LLM\Qoralis Engine`)
 
@@ -110,16 +110,16 @@ Open the terminal (PowerShell on Windows, Terminal on Mac/Linux) **in the folder
 **Windows:**
 
 ```bash
-docker build -t colibri-i .
+docker build -t qoralis-engine .
 ```
 
 **Linux/Mac:**
 
 ```bash
-sudo docker build -t colibri-i .
+sudo docker build -t qoralis-engine .
 ```
 
-Wait for it to finish (a few minutes). If everything goes well, you will see: `Successfully tagged colibri-i:latest`
+Wait for it to finish (a few minutes). If everything goes well, you will see: `Successfully tagged qoralis-engine:latest`
 
 > **This builds the code on GitHub, not the code on your disk.** The Dockerfile
 > clones the repository inside the image — that is what makes this path work
@@ -128,7 +128,7 @@ Wait for it to finish (a few minutes). If everything goes well, you will see: `S
 > [Slim image](#slim-image-developers--production) below); it copies `c/` from the build
 > context.
 
-> **If you want to receive repository updates**: First delete the old image with `docker rmi colibri-i` and rebuild.
+> **If you want to receive repository updates**: First delete the old image with `docker rmi qoralis-engine` and rebuild.
 
 ---
 
@@ -140,30 +140,30 @@ Open the terminal and type the command below (replace `C:\LLM\models\glm-5.2` wi
 
 ```bash
 $MODEL_PATH="C:\LLM\models\glm-5.2"
-docker run --rm -it --name colibri-c `
+docker run --rm -it --name qoralis-engine `
   -v "$MODEL_PATH`:/app/glm-5.2" `
   -e COLI_MODEL=/app/glm-5.2 `
-  colibri-i ./coli chat
+  qoralis-engine ./qoralis chat
 ```
 
 **Mac/Linux** (Terminal/Bash):
 
 ```bash
 MODEL_PATH="/path/to/glm-5.2"
-docker run --rm -it --name colibri-c \
+docker run --rm -it --name qoralis-engine \
   -v "$MODEL_PATH:/app/glm-5.2" \
   -e COLI_MODEL=/app/glm-5.2 \
-  colibri-i ./coli chat
+  qoralis-engine ./qoralis chat
 ```
 
 **Example for Linux:**
 
 ```bash
 MODEL_PATH="/home/user/LLM/glm-5.2"
-docker run --rm -it --name colibri-c \
+docker run --rm -it --name qoralis-engine \
   -v "$MODEL_PATH:/app/glm-5.2" \
   -e COLI_MODEL=/app/glm-5.2 \
-  colibri-i ./coli chat
+  qoralis-engine ./qoralis chat
 ```
 
 ---
@@ -177,8 +177,8 @@ docker run --rm -it --name colibri-c \
 | `-it` | Interactive mode (you can write and read) |
 | `-v "PATH:/app/glm-5.2"` | Mounts your model inside the container |
 | `-e COLI_MODEL=/app/glm-5.2` | Tells Qoralis Engine where to find the model |
-| `colibri-i` | Name of the Docker image |
-| `./coli chat` | Starts Qoralis Engine in chat mode |
+| `qoralis-engine` | Name of the Docker image |
+| `./qoralis chat` | Starts Qoralis Engine in chat mode |
 
 ---
 
@@ -218,10 +218,10 @@ The model understands **Italian, English, Chinese, and other languages**, althou
 If you want to explore the container as if it were a normal Linux machine:
 
 ```bash
-docker run --rm -it --name colibri-c \
+docker run --rm -it --name qoralis-engine \
   -v "MODEL_PATH:/app/glm-5.2" \
   -e COLI_MODEL=/app/glm-5.2 \
-  colibri-i /bin/bash
+  qoralis-engine /bin/bash
 ```
 
 Now you are inside Linux. Type `exit` to leave.
@@ -324,7 +324,7 @@ A **modern NVMe SSD** reaches 15 GB/sec. If yours is under 2-3 GB/sec, it is slo
 **Solution - Option 1** (quick):
 
 ```bash
-sudo docker build -t colibri-i .
+sudo docker build -t qoralis-engine .
 sudo docker run ... (as above, with sudo in front)
 ```
 
@@ -350,7 +350,7 @@ dir Dockerfile # Windows
 ```
 
 2. Redownload the Dockerfile from the GitHub repository
-3. Delete the old image: `docker rmi colibri-i`
+3. Delete the old image: `docker rmi qoralis-engine`
 4. Retry the build
 
 ---
@@ -378,7 +378,7 @@ Then retry the `hf_download` command.
 **Solution**:
 
 1. Wait and retry the `hf_download` command
-2. If it continues, download manually from [here](https://huggingface.co/mastouri/GLM-5.2-colibri-int4-g64-with-int8-mtp)
+2. If it continues, download manually from [here](https://huggingface.co/mastouri/GLM-5.2-qoralis-enginent4-g64-with-int8-mtp)
 3. Unzip the ZIP file into the desired folder
 
 ---
@@ -451,7 +451,7 @@ Have fun! 🐦
 In the first case, I asked a question in Italian; in the second, in Japanese; and in the third, I repeated the question in Japanese but requested an answer in Italian.
 
 ```
-PS C:\quack\llm\Qoralis\docker> docker run --rm -it --name colibri-c -v "C:\quack\llm\models\glm-5.2:/app/glm-5.2" -e COLI_MODEL=/app/glm-5.2 colibri-i ./coli chat
+PS C:\quack\llm\Qoralis\docker> docker run --rm -it --name qoralis-engine -v "C:\quack\llm\models\glm-5.2:/app/glm-5.2" -e COLI_MODEL=/app/glm-5.2 qoralis-engine ./qoralis chat
 
      ▄▀▀▀▄  ▄        Qoralis Engine v1.0
   ▄▄▄▄▀▀▀▀▄▀▀        tiny engine, immense model
@@ -507,20 +507,20 @@ instead of only the machine that built it.
 Build it from the repo root (it needs the `c/` sources as context):
 
 ```bash
-git clone https://github.com/JustVugg/colibri.git && cd Qoralis
-docker build -t Qoralis -f docker/Dockerfile.slim .
+git clone https://github.com/anku0669/qoralis-engine.git && cd qoralis-engine
+docker build -t qoralis-engine -f docker/Dockerfile.slim .
 ```
 
 Run — the model is bind-mounted at `/model`, never baked in:
 
 ```bash
-docker run --rm -v /nvme/glm52_i4:/model Qoralis info
+docker run --rm -v /nvme/glm52_i4:/model qoralis-engine info
 docker run --rm -it -v /nvme/glm52_i4:/model qoralis chat --ram 24
-docker run --rm -p 5000:5000 -v /nvme/glm52_i4:/model Qoralis \
+docker run --rm -p 5000:5000 -v /nvme/glm52_i4:/model qoralis-engine \
     serve --host 0.0.0.0 --model-id glm-5.2 --ram 24
 ```
 
-**Reaching it from another machine (or `coli web`).** Binding `--host 0.0.0.0`
+**Reaching it from another machine (or `qoralis web`).** Binding `--host 0.0.0.0`
 is not enough: the server has a DNS-rebinding guard that only trusts the Host
 header for loopback and its own bind address, so a browser pointed at
 `http://<server-ip>:<port>` gets `403 Host header not allowed`. Behind Docker's
@@ -538,8 +538,8 @@ docker run --rm -p 36873:8000 -e COLI_ALLOW_INSECURE_BIND=1 \
 explicit `--allowed-host my-server.lan` when you know the name. This is a
 LAN-exposure decision, hence opt-in alongside `COLI_ALLOW_INSECURE_BIND=1`.
 
-The entrypoint is `coli`, so the first argument is the subcommand (`info`,
-`chat`, `serve`, `run`, `plan`, `doctor`) — no `./coli` prefix. The container
+The entrypoint is `qoralis`, so the first argument is the subcommand (`info`,
+`chat`, `serve`, `run`, `plan`, `doctor`) — no `./qoralis` prefix. The container
 runs as UID 1000, so the model directory must be readable by that user
 (a directory you own already is; a root-owned one needs `chmod -R a+rX` or a
 matching `--user`).

@@ -41,7 +41,7 @@ below. The model engine itself does not require those Python packages.
 hf download deepseek-ai/DeepSeek-V4.1-Flash --local-dir ~/Models/DeepSeek-V4.1-Flash
 python3 c/tools/prepare_dsv41.py --model ~/Models/DeepSeek-V4.1-Flash   # ~1 MB sidecar, once
 make -C c deepseek_v41
-coli chat --model ~/Models/DeepSeek-V4.1-Flash
+qoralis chat --model ~/Models/DeepSeek-V4.1-Flash
 ```
 
 **DeepSeek-V4.1-Flash-1017** (October 17) is the same model with new weights: the same
@@ -51,7 +51,7 @@ encoding, byte for byte. It runs the same way:
 ```sh
 hf download deepseek-ai/DeepSeek-V4.1-Flash-1017 --local-dir ~/Models/DeepSeek-V4.1-Flash-1017
 python3 c/tools/prepare_dsv41.py --model ~/Models/DeepSeek-V4.1-Flash-1017
-coli chat --model ~/Models/DeepSeek-V4.1-Flash-1017
+qoralis chat --model ~/Models/DeepSeek-V4.1-Flash-1017
 ```
 
 It ships no `chat_template.jinja`, and nothing here needs one: the gateway writes V4.1's
@@ -66,7 +66,7 @@ decimal **strings**: they run past a double's 53-bit mantissa, and a rounded
 multiplier would silently hash every n-gram into a different -- and perfectly
 valid-looking -- row.
 
-When `--cap` is omitted, `coli chat`, `coli serve`, and `coli web` size the expert
+When `--cap` is omitted, `qoralis chat`, `qoralis serve`, and `qoralis web` size the expert
 cache from the resource plan. `--ram 120` (or `RAM_GB=120`) supplies its RAM budget;
 without either, the planner uses available memory. Dense weights, context state,
 and runtime reserves are subtracted before choosing slots per layer. `--cap N`
@@ -446,7 +446,7 @@ and costs the contention. Anything that tries again has to start from that.
 | variable | default | what it does |
 |---|---|---|
 | `COLI_KV_PREFIX` | **off on this engine** | `1` reuses the previous turn's state when the new prompt begins with what that state was built from, instead of re-reading the transcript. Off by default here and on nowhere else: see "Reusing a turn" below for what it costs. |
-| `V41_STATS` | off | per-turn accounting on stderr: the n-gram cache, the expert bytes and their rate, and how many drafts were accepted. Off by default because `coli chat` shows the engine's stderr next to the answer. |
+| `V41_STATS` | off | per-turn accounting on stderr: the n-gram cache, the expert bytes and their rate, and how many drafts were accepted. Off by default because `qoralis chat` shows the engine's stderr next to the answer. |
 | `V41_READ_DEPTH` | 8 | expert tensors read at once when a step misses the cache (see above). `1` restores the serial read the engine used to do, for an A/B. |
 | `COLI_MODEL_MIRROR` | unset | `;`/`,`-separated read-only copies of the checkpoint on other drives; expert reads split across the primary and every replica (see above). `SNAP_MIRROR` is the legacy alias. |
 | `COLI_MODEL_DIRS` | unset | `;`/`,`-separated directories holding **distinct** shards of the same container, so it can be split across drives with no second copy (see above). |

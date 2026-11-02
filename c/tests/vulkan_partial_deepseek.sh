@@ -12,7 +12,7 @@
 #     those k layers' (the placed line); with k < L the per-matrix path put nothing more
 #     there (the resident matrices at exit = at setup);
 #   - COLI_VK_DEVICE_CAP_MB aimed at k layers from a probe's fit line: the rule's N from
-#     the run's own numbers, and the line's, are k, and coli plan (resource_plan.py)
+#     the run's own numbers, and the line's, are k, and qoralis plan (resource_plan.py)
 #     predicts the same free, per-layer and fixed bytes and the same N;
 #   - a staged upload failing inside layer k's setup (COLI_VK_STAGED_FAULT=submit:n, n
 #     from a probe's per-layer counts): N = k, nothing of layer k on the device;
@@ -115,12 +115,12 @@ ptl_v4() {
   fi
   echo "   N = $want of $L, $(ptl_calc matrices deepseek_v4 v4-vk.err | cut -d' ' -f1) B of matrices on the device after setup"
 }
-# ptl_v4_plan <tag> <fixture> <log> <env...>: coli plan's prediction (resource_plan.py,
+# ptl_v4_plan <tag> <fixture> <log> <env...>: qoralis plan's prediction (resource_plan.py,
 # vk_chain_fit) for the same device and settings: the engine's free bytes, per-layer bytes,
 # fixed bytes and N, from the checkpoint's header and config alone
 ptl_v4_plan() {
   local tag=$1 fx=$2 log=$3; shift 3
-  $PY - "$fx" "$log" "$@" <<'PY' || fail "$tag: coli plan predicts otherwise"
+  $PY - "$fx" "$log" "$@" <<'PY' || fail "$tag: qoralis plan predicts otherwise"
 import re, sys
 sys.path.insert(0, ".")
 import resource_plan as rp
@@ -134,7 +134,7 @@ layers = [int(x) for x in re.search(r"layers((?: \d+)*) B", f)[1].split()]
 n = int(re.findall(r"\[VK\] deepseek_v4 chain: (\d+) of \d+ layers on the device", "\n".join(lines))[0])
 fit = rp.vk_chain_fit(rp.analyze_model(fx), "deepseek_v4", env, {"type": "cpu"})
 ok = (fit["layers"], fit["fixed"], fit["free"], fit["n"]) == (layers, num("fixed"), num("free"), n)
-print(f"   coli plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
+print(f"   qoralis plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
       f"layers {'= the engine' if fit['layers'] == layers else fit['layers']}, fixed {fit['fixed']} B, free {fit['free']} B")
 sys.exit(0 if ok else 1)
 PY

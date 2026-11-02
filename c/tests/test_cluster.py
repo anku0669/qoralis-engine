@@ -94,7 +94,7 @@ def _start(port=0):
 class ClusterWorkerReRegisterTests(unittest.TestCase):
     """The registry lives in the coordinator's memory. A worker that keeps
     running across a coordinator restart must register again, or every
-    heartbeat is refused and `coli serve --cluster-coordinator` finds no
+    heartbeat is refused and `qoralis serve --cluster-coordinator` finds no
     live expert workers until the worker itself is restarted."""
 
     @classmethod
@@ -143,7 +143,7 @@ class ClusterWorkerReRegisterTests(unittest.TestCase):
                                       types.SimpleNamespace(Event=Ticks, Thread=Inline)), \
                     mock.patch.object(coli.subprocess, "call", return_value=0), \
                     mock.patch("builtins.print"):
-                coli.cmd_cluster_worker(a)
+                qoralis.cmd_cluster_worker(a)
             self.assertEqual(servers[-1].registry.expert_endpoints(), ["10.0.0.2:9100"])
         finally:
             servers[-1].shutdown()

@@ -19,14 +19,14 @@ process still chats.
 hf download Cloudflare/clef --local-dir ~/Models/clef          # 55 GB, bf16
 python3 c/tools/convert_qwen36.py --model ~/Models/clef --out ~/Models/clef_c
 make -C c qwen36
-./c/coli serve --model ~/Models/clef_c
+./c/qoralis serve --model ~/Models/clef_c
 ```
 
 The converter writes the backbone as for Qwen3.8-27B (an f16 container,
 52 GB) and copies `joint_head_config.json` and `joint_head.safetensors` beside
 it. `coli` recognises a qwen36 container that carries both files as Clef:
-the banner says `Clef · 27B`, the API model id is `clef`, `coli info` adds a
-`decision` line, `coli doctor` checks the head against the backbone, and
+the banner says `Clef · 27B`, the API model id is `clef`, `qoralis info` adds a
+`decision` line, `qoralis doctor` checks the head against the backbone, and
 `/v1/models` lists `capabilities: ["chat", "systemone"]`.
 
 Clef's backbone is not the stock one: compared tensor by tensor with
@@ -83,7 +83,7 @@ The head runs in f32 (512 MB). The backbone runs at one of three widths,
 | int4 (`4`) | 19 GB | max \|dp\| 0.22 | 30.2 s |
 
 **Which one runs.** If you set `COLI_DENSE_BITS`, that one. Otherwise `coli
-serve`, `coli web` and `coli chat` ask the planner (`coli plan` shows the same
+serve`, `qoralis web` and `qoralis chat` ask the planner (`qoralis plan` shows the same
 numbers): when its RAM budget holds the trunk at its stored size plus the
 runtime and the KV state of 16384 tokens, Clef runs in f16, the width that
 answers like the release; when it does not, int8, and the gateway says which on
@@ -109,7 +109,7 @@ int8 unless told otherwise.
   conversations, added tokens and NFC-decomposed text in the state, the cut
   at `max_length` and a schema that does not fit. Input ids and spans
   identical, 44/44 decisions identical, max |dp| 2.1e-6 (tolerance 2e-5),
-  then the same fixture through `coli serve` and both TypeSafe SDKs.
+  then the same fixture through `qoralis serve` and both TypeSafe SDKs.
 - **The real checkpoint** (`tools/compare_clef.py`, Ryzen 7 8700GE, 8
   threads): 15 requests, 39 questions (the model card's examples, the Jev
   examples of these docs, a contract, a conversation, unicode, JSON, a
@@ -140,7 +140,7 @@ Measured on the same box, 8 threads, every request from a cold state:
 | engine, int8, the same requests | 20.4 s |
 | engine, int4, the same requests | 30.2 s |
 | reference, bf16, transformers 5.17 on the CPU, 28 of 64 layers read from disk | 10.8 s |
-| `coli serve`, int8, the request above (300 tokens), at the client | 20.6 s, of which 1.4 ms gateway |
+| `qoralis serve`, int8, the request above (300 tokens), at the client | 20.6 s, of which 1.4 ms gateway |
 
 The time is the backbone's prefill; the reference's bf16 matrix kernels are
 faster on this CPU than qwen36's int8 prefill, int4 is slower because the
@@ -153,7 +153,7 @@ in the `x-colibri-engine-ms` header.
 |---|---|---|
 | `COLI_DENSE_BITS` | f16 if the planner's budget holds it, else int8 (see above) | `16`, `8` or `4`; `COLI_DENSE_INT4` as for Qwen3.8-27B ([qwen36.md](qwen36.md#the-dense-27b)) |
 | `COLI_CLEF_MAX_LEN` | 16384 | the reference's `max_length`: the state is cut to fit it, a schema longer than it is a 422 |
-| `Q36_MAXT` | 16384 for a Clef checkpoint (8192 for the others) | the engine's context. The KV rows are allocated as a record needs them, 2 GiB at 16384 on the 27B, and `coli plan` prices them at 16384. A lower `Q36_MAXT` refuses a longer record with a 422 that names it |
+| `Q36_MAXT` | 16384 for a Clef checkpoint (8192 for the others) | the engine's context. The KV rows are allocated as a record needs them, 2 GiB at 16384 on the 27B, and `qoralis plan` prices them at 16384. A lower `Q36_MAXT` refuses a longer record with a 422 that names it |
 
 ## Limits
 

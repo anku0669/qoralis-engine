@@ -72,7 +72,7 @@ class _CgroupMount:
 
 
 # analyze_model() scans every shard header + regex-matches ~116k tensor names on the
-# 372 GB model; it reruns on every `coli plan/doctor/tune/run --auto-tier`. Its output
+# 372 GB model; it reruns on every `qoralis plan/doctor/tune/run --auto-tier`. Its output
 # is a pure function of each shard's and config.json's (size, mtime), so cache it to a
 # sidecar and self-invalidate on any change. Best-effort: any read/write failure falls
 # straight back to a full recompute (see analyze_model). Sits alongside .coli_usage/.coli_ssd.
@@ -1770,7 +1770,7 @@ def analyze_model(model):
                 sizes += list(_gguf_head_sizes(head, own_layers))
         except OSError as error:
             # Name the file. An OSError raised by read() on an already-open
-            # stream carries no filename, so `coli doctor` reported bare
+            # stream carries no filename, so `qoralis doctor` reported bare
             # "[Errno 5] Input/output error" for a bad sector or a dropped
             # network mount — indistinguishable from a corrupt download, which
             # is what the reporter in #191 assumed and re-downloaded 372 GB to
@@ -1862,7 +1862,7 @@ def analyze_model(model):
     # caller's process environment. build_plan reapplies its requested settings.
     result = _glm53_dense_tensors(result, {})
     try:  # best-effort write; a read-only model dir must never break planning.
-        # Atomic write (tmp file + os.replace): a concurrent `coli plan` on the
+        # Atomic write (tmp file + os.replace): a concurrent `qoralis plan` on the
         # same model dir must never observe a half-written cache -- write_text()
         # alone can leave a truncated file for a racing reader's json.loads to
         # choke on, which just falls back to a full recompute (harmless but
@@ -2616,7 +2616,7 @@ def ssd_probe_state(model_dir):
     <model>/.coli_ssd on its first Metal+darwin startup (colibri.c
     coli_ssd_probe_cached, issue #379). Read-only: never re-measures, never
     guesses -- mirrors S4's "read-and-display only" contract for `coli
-    doctor`/`coli plan`. Returns (state, gbs):
+    doctor`/`qoralis plan`. Returns (state, gbs):
       ("ok", gbs)        v2 cache recorded on THIS volume -- the one case the
                          engine itself would trust
       ("legacy", None)   pre-v2 bare number; the engine re-probes + upgrades
@@ -3202,7 +3202,7 @@ def _auto_tune(bottleneck_class, projected_hit, gpus, cpu_sockets, plan_has_meta
 
     # glm53 has its own loader/cache controls and does not consume the generic
     # DRAFT/PIPE/PIN/NUMA knobs below. Recommending them is worse than leaving
-    # them unset because `coli tune` then reports changes the engine ignores.
+    # them unset because `qoralis tune` then reports changes the engine ignores.
     # The same holds for every engine but colibri.c: DRAFT, PIPE, COLI_CUDA_PIPE,
     # COLI_NUMA and PIN_GB have no reader anywhere else.
     if engine_group is not None and engine_group != "colibri-core":
@@ -3280,28 +3280,28 @@ def _next_actions(bottleneck_class, projected_hit, probe_state, probe_gbs,
             "id": "measure-residency",
             "priority": "recommended",
             "reason": f"projected expert residency is {projected_hit:.0%}",
-            "command": "coli tune --model <model>",
+            "command": "qoralis tune --model <model>",
         })
         if len(planning_gpus) > 1:
             actions.append({
                 "id": "profile-interconnect",
                 "priority": "recommended",
                 "reason": "multiple GPU tiers can move the bottleneck from storage to interconnect",
-                "command": "PROF=1 coli run --auto-tier --model <model> <prompt>",
+                "command": "PROF=1 qoralis run --auto-tier --model <model> <prompt>",
             })
     elif bottleneck_class == "mixed":
         actions.append({
             "id": "profile-overlap",
             "priority": "recommended",
             "reason": "CPU expert tail and GPU work must be timed separately before retuning placement",
-            "command": "PROF=1 coli run --auto-tier --model <model> <prompt>",
+            "command": "PROF=1 qoralis run --auto-tier --model <model> <prompt>",
         })
     elif bottleneck_class in ("compute", "memory"):
         actions.append({
             "id": "measure-kernels",
             "priority": "recommended",
             "reason": "weights are resident; kernel and memory-bandwidth timings decide the next optimization",
-            "command": "PROF=1 coli run --auto-tier --model <model> <prompt>",
+            "command": "PROF=1 qoralis run --auto-tier --model <model> <prompt>",
         })
     return actions
 
@@ -3334,8 +3334,8 @@ def _family_expert_cache_knob(family_id, cache_bytes):
 
 
 # The context a chat server starts with when the operator set none. Each family's own
-# default (4096-8192) is what its engine assumes standing alone; a chat in `coli web` or
-# `coli chat` outgrew it in a few long answers (and was then compacted, or before that
+# default (4096-8192) is what its engine assumes standing alone; a chat in `qoralis web` or
+# `qoralis chat` outgrew it in a few long answers (and was then compacted, or before that
 # refused). The step chosen is the largest whose conversation state, for every KV slot,
 # takes at most this share of the memory there is: the expert cache keeps the rest.
 # Up to CHAT_CONTEXT_AGENT the share is larger: coding agents do not run below 64k
@@ -3349,7 +3349,7 @@ CHAT_CONTEXT_AGENT_SHARE = 0.25
 # slot a layer (cap_for_arch): the plan reserves their workspace at the full context,
 # so the step counts it beside the state. DeepSeek V4.1 prefills a prompt in one
 # forward, about 200 KB a token: on a 64 GB box the 262144 the state alone allowed
-# took 53.7 GB of workspace, left the cache no slot, and `coli serve` did not start.
+# took 53.7 GB of workspace, left the cache no slot, and `qoralis serve` did not start.
 CHAT_CONTEXT_WORKSPACE = ("deepseek_v41", "mimo")
 
 
@@ -3636,7 +3636,7 @@ def build_plan(model, ram_gb=0, context=4096, gpu_indices=None, vram_gb=0,
     # The plan sizes the hot tier from *free* VRAM, so running it while an engine
     # instance already holds the GPUs silently produces a tiny tier and a
     # pessimistic hit rate that describe nothing. That is exactly when a user
-    # reaches for `coli plan` -- before changing a live deployment -- so say so
+    # reaches for `qoralis plan` -- before changing a live deployment -- so say so
     # rather than let the numbers be read as a capacity answer.
     if planning_gpus:
         gpu_total = sum(g["total_bytes"] for g in planning_gpus)

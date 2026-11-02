@@ -1,14 +1,14 @@
-# colibri — CPU inference image (multi-stage: build then a slim runtime)
+# Qoralis Engine — CPU inference image (multi-stage: build then a slim runtime)
 #
 # The engine is portable C with a Python launcher/gateway. This image ships
 # ONLY the inference path (chat/serve/run/info/plan/doctor) — the ~372 GB
 # model is mounted, never baked in, and the converter (which needs torch) is
 # deliberately out of scope; convert from a source checkout instead.
 #
-#   docker build -t colibri -f docker/Dockerfile.slim .
-#   docker run --rm -v /nvme/glm52_i4:/model colibri info
-#   docker run --rm -it -v /nvme/glm52_i4:/model colibri chat --ram 24
-#   docker run --rm -p 5000:5000 -v /nvme/glm52_i4:/model colibri \
+#   docker build -t qoralis-engine -f docker/Dockerfile.slim .
+#   docker run --rm -v /nvme/glm52_i4:/model qoralis-engine info
+#   docker run --rm -it -v /nvme/glm52_i4:/model qoralis-engine chat --ram 24
+#   docker run --rm -p 5000:5000 -v /nvme/glm52_i4:/model qoralis-engine \
 #       serve --host 0.0.0.0 --model-id glm-5.2
 #
 # --------------------------------------------------------------------------
@@ -32,14 +32,16 @@ FROM debian:stable-slim
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 libgomp1 && \
     rm -rf /var/lib/apt/lists/* && \
-    useradd -m -u 1000 colibri
+    useradd -m -u 1000 qoralis
 WORKDIR /app
 
 # The engine binary plus the launcher and the files it resolves at runtime
 # (version.py, the gateway, resource planner, doctor, tokenizer headers, tools).
 COPY --from=build /src/c/colibri            ./colibri
-COPY c/coli c/version.py c/openai_server.py c/v4_dsml.py c/v41_dsml.py c/family_registry.py c/resource_plan.py c/doctor.py c/autotune.py c/image_engine.py c/term_image.py ./
+COPY c/coli c/qoralis c/version.py c/openai_server.py c/v4_dsml.py c/v41_dsml.py c/family_registry.py c/resource_plan.py c/doctor.py c/autotune.py c/image_engine.py c/term_image.py ./
 COPY c/tools/ ./tools/
+
+LABEL org.opencontainers.image.title="Qoralis Engine" org.opencontainers.image.version="2.1.0" org.opencontainers.image.source="https://github.com/anku0669/qoralis-engine"
 
 ENV COLI_MODEL=/model \
     COLI_ENGINE=/app/colibri \
@@ -50,6 +52,6 @@ VOLUME ["/model"]
 # `coli serve` default port.
 EXPOSE 5000
 
-USER colibri
-ENTRYPOINT ["python3", "/app/coli"]
+USER qoralis
+ENTRYPOINT ["python3", "/app/qoralis"]
 CMD ["info"]

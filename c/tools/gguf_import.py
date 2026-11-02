@@ -16,8 +16,8 @@ Two modes, both lossless (the ggml blocks are used or copied as they are):
                    architecture with routed experts but qwen4exp (whose engine
                    reads its GGUF in place only).
 
-Either way the directory is an ordinary Qoralis model: `coli chat`, `coli
-serve`, `coli web` and the planner treat it like any other.
+Either way the directory is an ordinary Qoralis model: `qoralis chat`, `coli
+serve`, `qoralis web` and the planner treat it like any other.
 
 Supported architectures: qwen35moe (Qwen3.5 / Qwen3.6 MoE -> qwen36 engine), qwen35 (their
 dense models -> qwen36 engine), qwen3moe (Qwen3 MoE, Qwen3-Coder -> qwen36 engine), qwen3 (the dense

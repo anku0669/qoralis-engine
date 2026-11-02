@@ -5,7 +5,7 @@ An AI coding assistant starts this process and talks JSON-RPC 2.0 to it, one
 JSON message per line on stdin and stdout (the MCP stdio transport). Nothing
 else may reach stdout: diagnostics go to stderr.
 
-Tools, all thin wrappers over setup_flow.py (the same code `coli setup` runs):
+Tools, all thin wrappers over setup_flow.py (the same code `qoralis setup` runs):
 
     detect_hardware   RAM, disk, CPU features, GPUs (Vulkan, NVIDIA)
     recommend_models  the catalog against this machine, with the default marked
@@ -16,7 +16,7 @@ Tools, all thin wrappers over setup_flow.py (the same code `coli setup` runs):
     status            setup, install progress, server state, URLs, tok/s
     logs              the tail of the server, install or build log
 
-Run it with `coli mcp`, or `python3 c/mcp_server.py`. docs/MCP_SERVER.md has
+Run it with `qoralis mcp`, or `python3 c/mcp_server.py`. docs/MCP_SERVER.md has
 the client configuration.
 """
 import glob
@@ -68,7 +68,7 @@ TOOLS = [
                      "and GPUs: Vulkan devices with type and memory, NVIDIA cards via nvidia-smi."),
      "inputSchema": _schema({"target_dir": {"type": "string",
                                             "description": "folder whose free space to report "
-                                                           "(default ~/colibri-models)"}})},
+                                                           "(default ~/qoralis-models)"}})},
     {"name": "recommend_models", "title": "Recommend models",
      "description": ("Every downloadable model against this machine: download size, RAM needed, "
                      "whether it fits and why, with the recommended default marked."),

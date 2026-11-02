@@ -2,7 +2,7 @@
 """The image engine from Python: its serve protocol, PNG, sizes, and the plan.
 
 Shared by the gateway (openai_server.py, POST /v1/images/generations) and the
-TUI (coli chat / coli run), so the two cannot disagree about what a valid
+TUI (qoralis chat / qoralis run), so the two cannot disagree about what a valid
 request is or how a picture is framed on the wire. Stdlib only.
 
 The engine (c/qwenimage, `--model DIR --serve`) speaks one line per control
@@ -133,7 +133,7 @@ class ImageEngine:
         if on_stderr is not None:
             stderr = subprocess.PIPE
         child_env = dict(os.environ if env is None else env)
-        # SNAP and SERVE=1 are how `coli stop` recognises an engine left
+        # SNAP and SERVE=1 are how `qoralis stop` recognises an engine left
         # running for a port, the same marks the text engines carry.
         child_env["SNAP"] = str(model)
         child_env["SERVE"] = "1"

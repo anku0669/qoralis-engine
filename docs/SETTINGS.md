@@ -28,9 +28,9 @@ Flags may also be given **after** the subcommand. Most flags map onto an engine 
 | `chat` | Interactive REPL chat. |
 | `serve` | Start the OpenAI-compatible HTTP server. |
 | `web` | `serve`, then open the dashboard in the browser. |
-| `stop` | Shut down a running `coli serve` and its engine (default port: the one `coli setup` configured, else `8000`). |
+| `stop` | Shut down a running `qoralis serve` and its engine (default port: the one `qoralis setup` configured, else `8000`). |
 | `setup` | One step: detect the hardware, recommend a model, build or fetch the engine (Vulkan/CUDA when usable), download with resume, write the run configuration, start. A rerun starts directly, once `make` has brought the engine up to date with the sources (a rebuild only when they changed, as after `git pull`). See [AI_SETUP.md](AI_SETUP.md). |
-| `start` | Start what `coli setup` configured (`--background`, `--no-browser`, `--json`). |
+| `start` | Start what `qoralis setup` configured (`--background`, `--no-browser`, `--json`). |
 | `status` | What is set up, install progress, server state, URLs, API model id, tok/s of the last answer (`--json`). |
 | `logs` | Tail of the background server log (`-n N`, `--install` for the install log). |
 | `mcp` | Model Context Protocol server on stdio for AI coding assistants. See [MCP_SERVER.md](MCP_SERVER.md). |
@@ -85,7 +85,7 @@ Flags may also be given **after** the subcommand. Most flags map onto an engine 
 | `--yes`, `-y` | off | Non-interactive: the recommendation and every default. |
 | `--model ID` | the recommendation | Catalog model to install (`--list` shows the ids). |
 | `--model-dir DIR` | none | Use a model already on disk instead of downloading one. |
-| `--dir DIR` | `~/colibri-models` | Folder for downloaded models. |
+| `--dir DIR` | `~/qoralis-models` | Folder for downloaded models. |
 | `--backend` | `auto` | `auto`, `cpu`, `vulkan` or `cuda`: the engine build. `auto` takes CUDA, then Vulkan, then the CPU. |
 | `--no-gpu` | off | Same as `--backend cpu`. |
 | `--host`, `--port` | `127.0.0.1`, `8000` | Where the configured server listens. |
@@ -99,8 +99,8 @@ Flags may also be given **after** the subcommand. Most flags map onto an engine 
 | `--json` | off | Machine-readable result; implies `--yes` and a background start. |
 
 The run configuration, state and logs live in `COLI_SETUP_HOME` (default
-`~/.local/share/colibri`, `~/Library/Application Support/colibri`,
-`%LOCALAPPDATA%\Qoralis`). `COLI_SETUP_CATALOG` names a JSON list of extra
+`~/.local/share/Qoralis`, `~/Library/Application Support/Qoralis`,
+`%LOCALAPPDATA%\Qoralis`). Existing macOS setups under Application Support/colibri are reused automatically when the Qoralis directory is absent. `COLI_SETUP_CATALOG` names a JSON list of extra
 catalog entries (a mirror or a private repository); `HF_ENDPOINT` and
 `HF_TOKEN` are honoured by the downloads.
 
@@ -132,7 +132,7 @@ optional model index, and runtime-equivalent size/header admission for
 
 ## `openai_server.py` — the HTTP server
 
-Run directly (or via `coli serve`). OpenAI-compatible `/v1/chat/completions`.
+Run directly (or via `qoralis serve`). OpenAI-compatible `/v1/chat/completions`.
 
 | Flag | Default | Meaning |
 |---|---|---|
@@ -144,7 +144,7 @@ Run directly (or via `coli serve`). OpenAI-compatible `/v1/chat/completions`.
 | `--api-key` | `$COLI_API_KEY` | Required bearer token. |
 | `--cors-origin` | none (repeatable) | Allowed CORS origin(s). A plain value replaces the default list; `+ORIGIN` adds to it. |
 | `--allowed-host` | `$COLI_ALLOWED_HOSTS` or none (repeatable) | Additional Host header accepted by the DNS-rebinding guard. |
-| `--cap` | `0` (auto) | Expert-cache cap; `0` = engine default (`8`, or `1` on Metal + macOS + fast model volume — #379). Without `--cap`, a `coli tune` profile or `--auto-tier`, DeepSeek V4.1, MiMo, Qwen3.6 and Qwen3.8 take the slots the RAM plan fits in the memory available at start (`coli plan` prints them). |
+| `--cap` | `0` (auto) | Expert-cache cap; `0` = engine default (`8`, or `1` on Metal + macOS + fast model volume — #379). Without `--cap`, a `qoralis tune` profile or `--auto-tier`, DeepSeek V4.1, MiMo, Qwen3.6 and Qwen3.8 take the slots the RAM plan fits in the memory available at start (`qoralis plan` prints them). |
 | `--max-tokens` | `0` (the context) | The response ceiling: a request without `max_tokens` gets it, a larger one is lowered to it. `0`: the context the engine holds. `GET /health` reports it as `max_tokens`, and the web UI starts from it. |
 | `--max-queue` | `$COLI_MAX_QUEUE` or `8` | Max queued requests. |
 | `--queue-timeout` | `$COLI_QUEUE_TIMEOUT` or `300` | Request queue timeout (s). |

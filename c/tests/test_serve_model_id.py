@@ -1,8 +1,8 @@
-"""`coli serve` announces the model that was loaded, not its family's default.
+"""`qoralis serve` announces the model that was loaded, not its family's default.
 
 MiMo-V2.6 Flash and Pro share a model_type, and so do Qwen3.6 and the dense
 Qwen3.8-27B. The registry names each by its geometry (default_model_id), and
-`coli chat` already asked it; `coli serve` took the family's default, so a Pro
+`qoralis chat` already asked it; `qoralis serve` took the family's default, so a Pro
 server listed itself in /v1/models as mimo-v2.6-flash."""
 import importlib.machinery
 import importlib.util

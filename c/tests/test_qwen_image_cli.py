@@ -1,8 +1,8 @@
 """The image family from the registry up to the commands a user types.
 
 Detection (model_index.json, no config.json), dispatch (engine, tokenizer),
-and every entry point the project rule names: `coli info`, `coli plan`,
-`coli run`, `coli chat` in both modes, and `coli doctor` not crashing. The
+and every entry point the project rule names: `qoralis info`, `qoralis plan`,
+`qoralis run`, `qoralis chat` in both modes, and `qoralis doctor` not crashing. The
 engine is tools/qwenimage_stub.py, reached through COLI_ENGINE exactly as a
 packaged engine would be.
 """

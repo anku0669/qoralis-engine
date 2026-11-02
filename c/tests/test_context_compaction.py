@@ -178,7 +178,7 @@ class ChatContextTest(unittest.TestCase):
 
 
 class ResponseCeilingTest(unittest.TestCase):
-    """#382: with no ceiling from the operator (--max-tokens 0, what coli serve, web and
+    """#382: with no ceiling from the operator (--max-tokens 0, what qoralis serve, web and
     chat pass without --ngen) a response may run to the end of the context the engine
     holds: a reasoning model's turn is its reasoning plus its answer, and a fixed number
     below the context cut some of them short."""

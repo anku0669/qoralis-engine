@@ -70,7 +70,7 @@ class PackPythonNeededTests(unittest.TestCase):
         cls.real_tree_paths = PACK.needed(HERE.parent)
 
     def make_tree(self, root):
-        """A minimal coli-shaped tree: coli imports `foo` and invokes
+        """A minimal coli-shaped tree: qoralis imports `foo` and invokes
         tools/bar.py as a subprocess; bar.py itself imports tools/baz.py,
         a module coli never mentions by name anywhere."""
         root = pathlib.Path(root)

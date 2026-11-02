@@ -20,7 +20,7 @@ available as tools: see [MCP_SERVER.md](MCP_SERVER.md).
   timeout, Ctrl+C), run the same command again: it continues where it stopped.
 - **Prefer the Linux disk on WSL.** Never put the model under `/mnt/c` (or any
   `/mnt/<drive>`): the engine streams the model from disk, and that path is
-  many times slower. The default, `~/colibri-models`, is right.
+  many times slower. The default, `~/qoralis-models`, is right.
 
 ## 0. Prerequisites
 
@@ -33,7 +33,7 @@ cd Qoralis
 ```
 
 On Windows run the commands below from PowerShell or cmd in the repository
-folder, with `py -3 c\coli` where this page writes `python3 c/coli`. If Python
+folder, with `py -3 c\coli` where this page writes `python3 c/qoralis`. If Python
 is missing on Windows, `winget install -e --id Python.Python.3.12 --scope user`
 installs it for the current user (ask first).
 
@@ -46,11 +46,11 @@ release is used, which runs on the CPU.
 
 ```bash
 python3 c/setup_hw.py --json             # RAM, disk, CPU features, GPUs
-python3 c/coli setup --list --json       # every model against this machine
+python3 c/qoralis setup --list --json       # every model against this machine
 ```
 
 `setup_hw.py --json` reports `memory.total` and `memory.available` (bytes),
-`disk.free_bytes` for `~/colibri-models` (pass another folder as an argument),
+`disk.free_bytes` for `~/qoralis-models` (pass another folder as an argument),
 `cpu.features`, `gpu.vulkan` (the Vulkan device the engine would use, with its
 `type`, `integrated` or `discrete`, and `budget_bytes` or `device_local_bytes`),
 `gpu.vulkan_icd` (a driver manifest found under the home folder, typical on
@@ -82,7 +82,7 @@ ones that run from RAM.
 Non-interactive, with the model the user chose:
 
 ```bash
-python3 c/coli setup --yes --model qwen36-35b --no-start
+python3 c/qoralis setup --yes --model qwen36-35b --no-start
 ```
 
 What it does, in order: detects the hardware, picks the engine build (see
@@ -95,7 +95,7 @@ it detached and poll the status instead of waiting:
 
 ```bash
 # Linux, macOS, WSL
-nohup python3 c/coli setup --yes --model qwen36-35b --no-start > colibri-setup.log 2>&1 &
+nohup python3 c/qoralis setup --yes --model qwen36-35b --no-start > colibri-setup.log 2>&1 &
 ```
 
 ```powershell
@@ -107,7 +107,7 @@ Start-Process -WindowStyle Hidden py -ArgumentList '-3','c\coli','setup','--yes'
 Then poll every minute or so:
 
 ```bash
-python3 c/coli status --json
+python3 c/qoralis status --json
 ```
 
 `install.phase` moves through `build`, `download`, `ready` (configured) and
@@ -124,10 +124,10 @@ rerun the same setup command.
 | `--yes`, `-y` | no questions: the recommendation and every default |
 | `--model ID` | the model to install (ids from `--list`) |
 | `--model-dir DIR` | use a model already on disk instead of downloading |
-| `--dir DIR` | where models are downloaded (default `~/colibri-models`) |
+| `--dir DIR` | where models are downloaded (default `~/qoralis-models`) |
 | `--backend auto\|cpu\|vulkan\|cuda` | force the engine build (`auto`: see below); `--no-gpu` is `--backend cpu` |
 | `--host H`, `--port N` | where the server listens (default `127.0.0.1:8000`) |
-| `--ctx N` | the context the server starts with, kept for `coli start` (default: automatic, from the memory there is); a rerun with `--ctx` on a finished setup changes it, `--ctx 0` restores automatic, and an interrupted setup keeps the choice |
+| `--ctx N` | the context the server starts with, kept for `qoralis start` (default: automatic, from the memory there is); a rerun with `--ctx` on a finished setup changes it, `--ctx 0` restores automatic, and an interrupted setup keeps the choice |
 | `--no-start` | stop after writing the configuration |
 | `--background` | start the server detached at the end |
 | `--no-browser` | do not open a browser tab |
@@ -138,12 +138,12 @@ rerun the same setup command.
 | `--json` | machine-readable result (implies `--yes` and a background start) |
 
 The configuration starts the server with `--auto-tier`, so the expert cache the
-setup's `Plan:` line prints (and a `coli tune` profile) is the one the engine gets:
+setup's `Plan:` line prints (and a `qoralis tune` profile) is the one the engine gets:
 on CUDA for every model, on Vulkan and the CPU for the families with a fixed default
 cache (Qwen3.6, Qwen3.8, Kimi K3, Inkling, DeepSeek V4 and V4.1, MiMo). The GLM
 engines and OLMoE size their cache themselves there. A setup written before this
 started those families' Vulkan or CPU engine on the default (eight slots a layer for
-Qwen3.6), and `coli start` now adds the flag to it.
+Qwen3.6), and `qoralis start` now adds the flag to it.
 
 On a completed setup, explicit `--backend`, `--no-gpu`, `--host` and `--port`
 update the saved configuration for the same model. Options left out keep their
@@ -201,7 +201,7 @@ on the CPU and prints a line like:
 ```
 
 Show that command to the user. If they run it (or let you run it), run
-`python3 c/coli setup --yes --no-start` again: the setup remembers that a GPU
+`python3 c/qoralis setup --yes --no-start` again: the setup remembers that a GPU
 was waiting for packages, sees that they are there, rebuilds the engine for
 the GPU and rewrites the configuration. The download is not repeated.
 
@@ -223,8 +223,8 @@ the usual one on WSL) is found and written into the run configuration as
 ## 3. Start
 
 ```bash
-python3 c/coli start --background --no-browser
-python3 c/coli status --json
+python3 c/qoralis start --background --no-browser
+python3 c/qoralis status --json
 ```
 
 Wait until `server.state` is `ready` (`loading` first; loading takes from
@@ -245,7 +245,7 @@ curl -s http://127.0.0.1:8000/v1/chat/completions -H 'Content-Type: application/
   -d '{"model": "<server.model_id>", "messages": [{"role": "user", "content": "Hello"}]}'
 ```
 
-`python3 c/coli start` without `--background` runs in the foreground and opens
+`python3 c/qoralis start` without `--background` runs in the foreground and opens
 the browser: that is what a person wants, not a tool call.
 
 If the configured port is taken by another program, the server moves to the
@@ -255,18 +255,18 @@ next free port and the configuration is updated; read the URLs from
 ## 4. Check, read the logs, stop
 
 ```bash
-python3 c/coli status          # human-readable; --json for the fields above
-python3 c/coli logs -n 50      # server log of a background start (a foreground one prints to its terminal)
-python3 c/coli logs --install  # log of a detached install
-python3 c/coli stop            # stops the configured server and its engine
+python3 c/qoralis status          # human-readable; --json for the fields above
+python3 c/qoralis logs -n 50      # server log of a background start (a foreground one prints to its terminal)
+python3 c/qoralis logs --install  # log of a detached install
+python3 c/qoralis stop            # stops the configured server and its engine
 ```
 
-`coli stop` without `--port` stops the server the setup configured. Rerunning
-`python3 c/coli setup` later starts the configured server directly (in the
+`qoralis stop` without `--port` stops the server the setup configured. Rerunning
+`python3 c/qoralis setup` later starts the configured server directly (in the
 foreground; add `--background --no-browser` for a detached start), with no
 download. Before it starts, `make` brings the engine up to date with the sources:
 nothing to do (a fraction of a second) unless they changed, as after a `git pull`,
-and then only what changed is rebuilt. `coli start` does the same.
+and then only what changed is rebuilt. `qoralis start` does the same.
 
 ## Files
 
@@ -298,5 +298,5 @@ says when the download is complete. Partial files end in `.part`.
 | `... toolkit cannot build for the <card> (compute X.Y, ...)` | the setup took Vulkan or the CPU; for CUDA, install the toolkit the line names and rerun with `--reconfigure` |
 | `the <engine> CUDA build failed (full log: ...)` | the setup moved to the next backend; the log says why the CUDA build failed |
 | `Already set up: ...` but the user wants another model | `--reconfigure`, or `--model ID` |
-| `server.state` stays `loading` | `coli logs -n 50`; large models take minutes to load |
+| `server.state` stays `loading` | `qoralis logs -n 50`; large models take minutes to load |
 | `plan warning: RAM budget cannot hold one expert slot` | the model does not fit in the free RAM: close programs or choose a smaller model |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The one-step setup: `coli setup`, `coli start`, `coli status`, `coli logs`.
+"""The one-step setup: `qoralis setup`, `qoralis start`, `qoralis status`, `qoralis logs`.
 
     detect -> recommend -> build or fetch the engine -> download -> configure -> start
 
@@ -12,9 +12,9 @@ What the setup writes, all in one folder (setup_home(), overridable with
 COLI_SETUP_HOME):
 
     setup.json          the run configuration: model, engine, backend, the
-                        environment and the launcher arguments `coli start` uses
+                        environment and the launcher arguments `qoralis start` uses
     install-state.json  the current phase and download progress (read by
-                        `coli status` and the MCP server while a setup runs)
+                        `qoralis status` and the MCP server while a setup runs)
     logs/serve.log      the server's output when started in the background
     logs/install.log    the output of a background install (MCP)
     runtime/            a prebuilt release, when there is no compiler
@@ -40,7 +40,7 @@ import zipfile
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 #: This checkout's own launcher. HERE is where engines are looked for and built
-#: (tests point it elsewhere); `coli stop` always comes from the real one.
+#: (tests point it elsewhere); `qoralis stop` always comes from the real one.
 COLI_SCRIPT = os.path.join(HERE, "coli")
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
@@ -88,7 +88,12 @@ def setup_home():
         base = os.environ.get("LOCALAPPDATA") or os.path.expanduser(r"~\AppData\Local")
         return os.path.join(base, "Qoralis")
     if sys.platform == "darwin":
-        return os.path.expanduser("~/Library/Application Support/colibri")
+        new_home = os.path.expanduser("~/Library/Application Support/Qoralis")
+        legacy_home = os.path.expanduser("~/Library/Application Support/colibri")
+        # Reuse an existing Colibri setup rather than stranding saved configuration.
+        if os.path.isdir(legacy_home) and not os.path.exists(new_home):
+            return legacy_home
+        return new_home
     base = os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
     return os.path.join(base, "Qoralis")
 
@@ -106,7 +111,13 @@ def log_path(name):
 
 
 def default_models_root():
-    return os.path.join(os.path.expanduser("~"), "colibri-models")
+    """Default to Qoralis storage, reusing the legacy folder on upgrades."""
+    home = os.path.expanduser("~")
+    current = os.path.join(home, "qoralis-models")
+    legacy = os.path.join(home, "colibri-models")
+    if os.path.isdir(legacy) and not os.path.exists(current):
+        return legacy
+    return current
 
 
 def _write_json(path, data):
@@ -1133,7 +1144,7 @@ def refresh_engine(family, backend, tc, path, out=print, make_args=()):
 
 def refresh_configured(cfg, out=print, tc=None):
     """The configured engine, brought up to date before a start (refresh_engine).
-    A rerun of the setup, or `coli start`, used to start the engine as it was, so
+    A rerun of the setup, or `qoralis start`, used to start the engine as it was, so
     after a `git pull` the old code kept running (#1852). Only an engine built in
     this checkout: a prebuilt one from a release archive has no sources here. Not
     while a server runs: it keeps the engine it started with. Returns
@@ -1198,7 +1209,7 @@ def urls(host, port):
 
 
 def run_environment(backend, engine, family, hw):
-    """The environment `coli start` adds for the chosen backend."""
+    """The environment `qoralis start` adds for the chosen backend."""
     env = {}
     if backend == "vulkan":
         env["COLI_VULKAN"] = "1"
@@ -1222,7 +1233,7 @@ def run_environment(backend, engine, family, hw):
 
 def applies_plan(backend, family):
     """Whether the recorded run passes --auto-tier, which applies the plan the setup
-    prints (the expert cache, RAM_GB) and a `coli tune` profile. CUDA always did. On
+    prints (the expert cache, RAM_GB) and a `qoralis tune` profile. CUDA always did. On
     Vulkan or the CPU a family with a fixed default cap needs it too, or it runs that
     default whatever the plan said: Qwen3.6 at 8 slots a layer, 3.6 tok/s where the
     plan gives 17.5 (#2003). The GLM engines and OLMoE size their cache themselves
@@ -1231,7 +1242,7 @@ def applies_plan(backend, family):
 
 
 def launcher_args(backend, model_dir, host, port, ctx=0, family=None):
-    """What `coli start` runs."""
+    """What `qoralis start` runs."""
     args = ["web", "--model", model_dir, "--host", host, "--port", str(port)]
     if backend == "cuda":
         args += ["--gpu", "auto"]
@@ -1243,7 +1254,7 @@ def launcher_args(backend, model_dir, host, port, ctx=0, family=None):
 
 
 def check_ctx(ctx, family):
-    """`coli setup --ctx`: a context the family can hold, checked before anything is
+    """`qoralis setup --ctx`: a context the family can hold, checked before anything is
     built or downloaded (#2011)."""
     if ctx < 0:
         raise SetupError("--ctx must be a number of tokens, or 0 for the automatic context")
@@ -1397,10 +1408,10 @@ def pick_port(host, preferred, tries=20):
     # OverflowError. Neither is a port setup can advertise.
     if preferred < 1:
         raise SetupError("port must be from 1 to 65535; "
-                         "rerun `coli setup --port PORT`")
+                         "rerun `qoralis setup --port PORT`")
     if preferred > 65535:
         raise SetupError("no higher port is available (maximum 65535); "
-                         "rerun `coli setup --port PORT` with a lower port")
+                         "rerun `qoralis setup --port PORT` with a lower port")
     last = min(preferred + tries - 1, 65535)
     for port in range(preferred, last + 1):
         if port_free(host, port):
@@ -1470,7 +1481,7 @@ def start_server(cfg, *, background=False, open_browser=True, out=print, wait=5.
         save_config(cfg)
     launcher = cfg["launcher"]
     if not os.path.isfile(launcher):
-        raise SetupError(f"the launcher {launcher} is gone; run `coli setup` again")
+        raise SetupError(f"the launcher {launcher} is gone; run `qoralis setup` again")
     args = list(cfg["args"])
     try:
         family = family_by_id(cfg.get("family"))
@@ -1494,7 +1505,7 @@ def start_server(cfg, *, background=False, open_browser=True, out=print, wait=5.
             return process.wait()
         except KeyboardInterrupt:
             # The server got the same Ctrl+C and drains its engine; give it the
-            # time `coli stop` gives, rather than killing it mid-save.
+            # time `qoralis stop` gives, rather than killing it mid-save.
             try:
                 return process.wait(timeout=35)
             except (subprocess.TimeoutExpired, KeyboardInterrupt):
@@ -1526,7 +1537,7 @@ def start_server(cfg, *, background=False, open_browser=True, out=print, wait=5.
     status.update(state=status["state"] if status["state"] != "stopped" else "loading",
                   pid=process.pid, log=log)
     out(f"  started in the background (pid {process.pid}); "
-        + ("ready. " if status["state"] == "ready" else "the model is loading (`coli status` "
+        + ("ready. " if status["state"] == "ready" else "the model is loading (`qoralis status` "
            "says when it is ready). ") + f"Log: {log}")
     print_urls(cfg, out)
     return status
@@ -1534,7 +1545,7 @@ def start_server(cfg, *, background=False, open_browser=True, out=print, wait=5.
 
 def note_foreground_start(pid, cmd):
     """A server in the foreground prints to its terminal, not to serve.log; say so
-    in the log, so that `coli logs` (often run from another terminal) points there
+    in the log, so that `qoralis logs` (often run from another terminal) points there
     instead of showing an older background run's lines as if they were this one's
     (#1852). Best effort: a log that cannot be written changes nothing else."""
     try:
@@ -1542,7 +1553,7 @@ def note_foreground_start(pid, cmd):
             handle.write(f"\n--- start {time.strftime('%Y-%m-%d %H:%M:%S')} in the foreground "
                          f"(pid {pid}): {' '.join(cmd)}\n"
                          f"--- its output goes to the terminal that started it, not to this log; "
-                         f"`coli start --background` writes it here\n")
+                         f"`qoralis start --background` writes it here\n")
     except OSError:
         pass
 
@@ -1551,7 +1562,7 @@ def spawn_detached(cmd, **kwargs):
     """Start a process that outlives this call, and reap it when it exits.
 
     Without the waiter a long-lived parent (the MCP server) keeps the exited
-    child as a zombie: kill(pid, 0) then still succeeds, `coli stop` waits its
+    child as a zombie: kill(pid, 0) then still succeeds, `qoralis stop` waits its
     whole drain window for a process that is already gone, and a finished
     install reads as still running."""
     process = subprocess.Popen(cmd, **kwargs)
@@ -1586,7 +1597,7 @@ def stop_server(cfg, out=print):
                             env=dict(os.environ, COLI_COLOR="0"))
     text = (result.stdout + result.stderr).strip()
     lines = [re.sub(r"\x1b\[[0-9;]*m", "", line).strip() for line in text.splitlines()]
-    # Keep what `coli stop` reports, not its banner.
+    # Keep what `qoralis stop` reports, not its banner.
     keep = ("stopping", "stopped", "nothing running", "forced", "would stop", "could not stop",
             "more rights")
     lines = [line for line in lines if any(word in line for word in keep)]
@@ -1694,7 +1705,7 @@ def choose_model(ui, rows, wanted=None, show_all=False):
                 if not row["fits"]:
                     ui.say(f"  note: {row['entry'].name}: {row['reason']}")
                 return row["entry"]
-        raise SetupError(f"unknown model {wanted!r}; `coli setup --list` shows the choices")
+        raise SetupError(f"unknown model {wanted!r}; `qoralis setup --list` shows the choices")
     fitting = [r for r in rows if r["fits"]]
     if not show_all:
         # A short menu: the recommendation first, then the next smallest
@@ -1724,7 +1735,7 @@ def choose_model(ui, rows, wanted=None, show_all=False):
         for row in hidden:
             ui.say(f"      {row['entry'].name}: {row['reason']}")
     elif hidden:
-        ui.say(f"  ({len(hidden)} more need more RAM or disk: `coli setup --list` shows why)")
+        ui.say(f"  ({len(hidden)} more need more RAM or disk: `qoralis setup --list` shows why)")
     default = next((i for i, r in enumerate(fitting, 1) if r["recommended"]), 1)
     while True:
         answer = ui.ask(f"Choose a model [Enter = {default}]:", str(default))
@@ -1734,7 +1745,7 @@ def choose_model(ui, rows, wanted=None, show_all=False):
 
 
 def models_root_for(entry, explicit=None):
-    """Where the model goes: --dir, else ~/colibri-models; on Windows a fixed
+    """Where the model goes: --dir, else ~/qoralis-models; on Windows a fixed
     drive with room when the home drive has none."""
     if explicit:
         return os.path.abspath(os.path.expanduser(explicit))
@@ -1743,7 +1754,9 @@ def models_root_for(entry, explicit=None):
     free = setup_hw.disk_free(root)
     if sys.platform == "win32" and entry and free is not None and free < need:
         for drive in setup_hw.windows_fixed_drives():
-            candidate = os.path.join(drive, "colibri-models")
+            current = os.path.join(drive, "qoralis-models")
+            legacy = os.path.join(drive, "colibri-models")
+            candidate = legacy if os.path.isdir(legacy) and not os.path.exists(current) else current
             if (setup_hw.disk_free(drive) or 0) >= need:
                 return candidate
     return root
@@ -1850,7 +1863,7 @@ def plan_summary(model_dir, ctx=0):
     try:
         from resource_plan import build_plan
         plan = build_plan(model_dir, context=ctx) if ctx else build_plan(model_dir)
-    except Exception as error:  # the plan is advice here; `coli plan` reports it fully
+    except Exception as error:  # the plan is advice here; `qoralis plan` reports it fully
         return f"plan not available ({error})", []
     ram = plan["tiers"]["ram"]
     line = (f"dense part {ram['dense_bytes'] / GB:.1f} GB in RAM, expert cache "
@@ -1989,9 +2002,9 @@ def extra_shard_dirs(family_id, saved_env=None):
     """The folders besides model_dir the engine will read shards from (a model split
     across drives): its family's split variable as start_server hands it over, the
     environment's value over the saved configuration's. Before, the launcher looked
-    in model_dir only: shards moved to a second drive with K3_DIRS made `coli start`
-    refuse a working setup, `coli status` call it unfinished, and a rerun of
-    `coli setup` would have downloaded them again (#2091)."""
+    in model_dir only: shards moved to a second drive with K3_DIRS made `qoralis start`
+    refuse a working setup, `qoralis status` call it unfinished, and a rerun of
+    `qoralis setup` would have downloaded them again (#2091)."""
     name = split_dirs_name(family_id)
     if not name:
         return []
@@ -2003,13 +2016,13 @@ def extra_shard_dirs(family_id, saved_env=None):
 
 def remember_split_dirs(cfg, out=print):
     """The split variable set in this environment, kept in the run configuration, so
-    `coli start` from any shell reads the same folders. Returns the configuration
+    `qoralis start` from any shell reads the same folders. Returns the configuration
     (saved when it changed)."""
     name = split_dirs_name(cfg.get("family"))
     value = os.environ.get(name) if name else None
     if not value or (cfg.get("env") or {}).get(name) == value:
         return cfg
-    out(f"  shards also read from: {', '.join(setup_download.split_dirs(value))} ({name}, kept for coli start)")
+    out(f"  shards also read from: {', '.join(setup_download.split_dirs(value))} ({name}, kept for qoralis start)")
     return save_config(dict(cfg, env=dict(cfg.get("env") or {}, **{name: value})))
 
 
@@ -2118,7 +2131,7 @@ def cmd_setup(a, ui=None):
                 entry = setup_catalog.by_id(resume["model"]["id"])
             except KeyError:
                 raise SetupError(f"the model of the last setup ({resume['model']['id']}) is not in "
-                                 "the catalog any more: run `coli setup --reconfigure`")
+                                 "the catalog any more: run `qoralis setup --reconfigure`")
             ui.say(f"Resuming the setup of {entry.name}.")
         else:
             rows = _recommend_for(hw, a.dir)
@@ -2243,14 +2256,14 @@ def _finish(ui, cfg, a):
         print(json.dumps(result, indent=2))
         return 0
     if a.no_start:
-        ui.say("\nReady. Start it with:  coli start   (stop: coli stop)")
+        ui.say("\nReady. Start it with:  qoralis start   (stop: qoralis stop)")
         print_urls(cfg, ui.say)
         return 0
     ui.say("\nStarting Qoralis")
     if a.background:
         status = start_server(cfg, background=True, open_browser=not a.no_browser, out=ui.say)
         write_state("started", urls=status["urls"])
-        ui.say("  stop: coli stop")
+        ui.say("  stop: qoralis stop")
         return 0
     return start_server(cfg, background=False, open_browser=not a.no_browser, out=ui.say)
 
@@ -2258,7 +2271,7 @@ def _finish(ui, cfg, a):
 def cmd_start(a):
     cfg = load_config()
     if not cfg or not config_ready(cfg):
-        raise SetupError("nothing is set up yet (or the setup did not finish): run `coli setup`")
+        raise SetupError("nothing is set up yet (or the setup did not finish): run `qoralis setup`")
     say = (lambda *_: None) if getattr(a, "json", False) else print
     reason = cuda_unused(cfg)
     if reason:
@@ -2270,7 +2283,7 @@ def cmd_start(a):
         return 0
     if a.background:
         start_server(cfg, background=True, open_browser=not a.no_browser)
-        print("  stop: coli stop")
+        print("  stop: qoralis stop")
         return 0
     return start_server(cfg, background=False, open_browser=not a.no_browser)
 
@@ -2302,7 +2315,7 @@ def cmd_status(a):
         print(json.dumps(report, indent=2))
         return 0
     if not report["configured"]:
-        print("Qoralis is not set up yet: run `coli setup`")
+        print("Qoralis is not set up yet: run `qoralis setup`")
         return 1
     setup = report["setup"]
     model = setup.get("model") or {}
@@ -2318,7 +2331,7 @@ def cmd_status(a):
     elif not setup.get("ready"):
         print(f"{'install':<10}unfinished"
               + (f" ({install['message']})" if install.get("message") else "")
-              + ": run `coli setup` to continue")
+              + ": run `qoralis setup` to continue")
     server = report.get("server") or {}
     print(f"{'server':<10}{server.get('state', 'not configured')}"
           + (f" (pid {server['pid']})" if server.get("pid") else ""))
@@ -2346,11 +2359,11 @@ def cmd_logs(a):
         except (OSError, ValueError, KeyError):
             status = None
         if status and status["state"] != "stopped":
-            # Started some other way (`coli serve` in a terminal): its output is there.
+            # Started some other way (`qoralis serve` in a terminal): its output is there.
             print(f"Qoralis is running ({status['state']}"
                   + (f", pid {status['pid']}" if status.get("pid") else "")
                   + "), started in the foreground: its output is in the terminal that "
-                  "started it; `coli start --background` writes it to this log instead")
+                  "started it; `qoralis start --background` writes it to this log instead")
         return 1
     print(text)
     return 0

@@ -97,9 +97,9 @@ Starting Qoralis
 ```
 
 **下一次**，再執行一次 `START-HERE.bat` 或 `./start-here.sh` 即可：Qoralis 會直接啟動，
-不需要下載，也不需要建置。`c/coli status` 會顯示已安裝的內容以及是否正在執行，
-`c/coli stop` 則會停止它（在 Windows 上是 `c\coli.cmd status` 與
-`c\coli.cmd stop`）。
+不需要下載，也不需要建置。`c/qoralis status` 會顯示已安裝的內容以及是否正在執行，
+`c/qoralis stop` 則會停止它（在 Windows 上是 `c\qoralis.cmd status` 與
+`c\qoralis.cmd stop`）。
 
 選項放在 `./start-here.sh` 或 `START-HERE.bat` 後面：
 
@@ -108,7 +108,7 @@ Starting Qoralis
 | `--list` | 列出每個模型與這台機器的對照，以及某個模型為什麼放不下 |
 | `--model ID` | 安裝指定的模型（id 列在[下面的表格](#which-model-for-my-machine)中） |
 | `--yes` | 不詢問任何問題：直接採用推薦 |
-| `--dir DIR` | 把模型放在另一顆硬碟上（預設為 `~/colibri-models`） |
+| `--dir DIR` | 把模型放在另一顆硬碟上（預設為 `~/qoralis-models`） |
 | `--backend vulkan`、`cuda` 或 `cpu` | 自行選擇引擎的建置方式；`--no-gpu` 等同於 `--backend cpu` |
 | `--model-dir DIR` | 使用你已經下載好的模型 |
 | `--reconfigure` | 改選另一個模型 |
@@ -123,9 +123,9 @@ Starting Qoralis
 | `to use the GPU through ..., first run: <command>` | 執行那條指令，然後再執行一次安裝程式：它會為 GPU 重新建置，不會重新下載 |
 | `the ... build failed`，例如已安裝的 CUDA toolkit 不再支援這張顯示卡時出現的 `Unsupported gpu architecture` | 安裝程式會先把 toolkit 和顯示卡對照檢查，自行選擇 Vulkan，並說明原因；如果建置仍然失敗，它會提供下一個選項（先 Vulkan，再 CPU）。`./start-here.sh --backend vulkan` 會強制使用 Vulkan；`--no-gpu` 則留在 CPU 上 |
 | `needs N GB free for the download` | 用 `--dir` 指定一個位於較大硬碟上的資料夾 |
-| 在 WSL 上，模型資料夾位於 `/mnt/c` 底下 | 把它放在 Linux 磁碟上（預設的 `~/colibri-models`）：`/mnt/c` 慢上好幾倍 |
+| 在 WSL 上，模型資料夾位於 `/mnt/c` 底下 | 把它放在 Linux 磁碟上（預設的 `~/qoralis-models`）：`/mnt/c` 慢上好幾倍 |
 | 更新了程式碼（`git pull`） | 重新執行 `./start-here.sh`：如果原始碼有變動，它會先重新編譯引擎，再啟動 |
-| 其他任何問題 | `c/coli logs -n 50` 會顯示在背景啟動的伺服器日誌（在前景啟動的伺服器會輸出到它自己的終端機），`c/coli logs --install` 則顯示安裝程式的日誌；請附上安裝程式最後印出的幾行，開一個 [issue](https://github.com/JustVugg/colibri/issues) |
+| 其他任何問題 | `c/qoralis logs -n 50` 會顯示在背景啟動的伺服器日誌（在前景啟動的伺服器會輸出到它自己的終端機），`c/qoralis logs --install` 則顯示安裝程式的日誌；請附上安裝程式最後印出的幾行，開一個 [issue](https://github.com/JustVugg/colibri/issues) |
 
 ### 讓你的 AI 助手幫你安裝
 
@@ -136,13 +136,13 @@ Starting Qoralis
 [docs/AI_SETUP.md](docs/AI_SETUP.md) 把每個步驟都寫成一條指令交給助手，
 每條指令都會產生機器可讀的結果，並要求助手在下載模型或安裝系統套件之前先詢問你。
 支援 Model Context Protocol 的助手則可以改用 Qoralis 的 MCP 伺服器：
-`coli mcp` 提供偵測硬體、推薦模型、安裝、啟動、停止與檢查 Qoralis 的工具
+`qoralis mcp` 提供偵測硬體、推薦模型、安裝、啟動、停止與檢查 Qoralis 的工具
 （[docs/MCP_SERVER.md](docs/MCP_SERVER.md)）。
 
 ### 或者手動安裝
 
 若想自己決定每一個步驟（預先建置的發布版本或從原始碼建置、下方表格中的任何模型，
-然後是 `coli chat`、`coli web` 或 `coli serve`），
+然後是 `qoralis chat`、`qoralis web` 或 `qoralis serve`），
 請見[手動安裝](#install-by-hand)，
 或參考逐一說明各平台步驟的 [Quick Start 指南](docs/quickstart.md)。
 
@@ -226,7 +226,7 @@ Starting Qoralis
 
 **來自 GGUF：已發布的檔案，按原樣讀取**
 
-`./coli import` 接收 GGUF 的第一個檔案（其他分片放在旁邊），並在旁邊寫出一個模型目錄；之後像其他模型一樣把這個目錄傳給 `--model`（[gguf.md](docs/gguf.md)）。不做轉換，也不再次量化：各個區塊按檔案中的樣子執行，從 IQ1_S 到 Q8_0、F16、BF16 與 MXFP4。上面所有聊天模型的引擎也都能讀取 GGUF（[架構列表](docs/gguf.md#supported-architectures)）；以下四個模型以 GGUF 形式發布：
+`./qoralis import` 接收 GGUF 的第一個檔案（其他分片放在旁邊），並在旁邊寫出一個模型目錄；之後像其他模型一樣把這個目錄傳給 `--model`（[gguf.md](docs/gguf.md)）。不做轉換，也不再次量化：各個區塊按檔案中的樣子執行，從 IQ1_S 到 Q8_0、F16、BF16 與 MXFP4。上面所有聊天模型的引擎也都能讀取 GGUF（[架構列表](docs/gguf.md#supported-architectures)）；以下四個模型以 GGUF 形式發布：
 
 | 模型 | GGUF | GPU | 實測 |
 |---|---|---|---|
@@ -304,9 +304,9 @@ Qwen3.8-Flash-Next 在內建顯示晶片上開啟 Vulkan，
 也是為什麼每個引擎會自行決定是否在那裡執行稠密鏈（Qwen3.6 會，Qwen3.8 不會）。
 `--backend vulkan` 則無論如何都會要求使用 Vulkan。
 
-**開啟或關閉 GPU。** `coli setup --backend vulkan` 對任何模型都使用 GPU，
-`coli setup --backend cpu`（或 `--no-gpu`）則全部在 CPU 上執行。用 Vulkan 建置的引擎
-只有在 `coli chat`、`serve` 或 `web` 的環境中有 `COLI_VULKAN=1` 時才使用 GPU
+**開啟或關閉 GPU。** `qoralis setup --backend vulkan` 對任何模型都使用 GPU，
+`qoralis setup --backend cpu`（或 `--no-gpu`）則全部在 CPU 上執行。用 Vulkan 建置的引擎
+只有在 `qoralis chat`、`serve` 或 `web` 的環境中有 `COLI_VULKAN=1` 時才使用 GPU
 （安裝程式選擇 Vulkan 時會自動設定）；沒有它，引擎就在 CPU 上執行。GPU 開啟時，
 `COLI_VK_CHAIN=0` 保留專家層 (tier)，讓稠密層在 CPU 上執行。在內建顯示晶片上，
 兩種都試試看：在一台 Intel Iris Xe（Core i7-1355U）筆電上，Qwen3.6 在 CPU 上解碼
@@ -402,20 +402,20 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 所以 Jev 用戶端只需要更改 base URL，其他什麼都不用改，就能切換到 Qoralis：
 `TYPESAFE_BASE_URL=http://127.0.0.1:8000`（未設定 `COLI_API_KEY` 而啟動的伺服器，
 會接受它原本就會傳送的金鑰）。兩個官方 SDK 在未經修改的情況下，
-都已針對 `coli serve` 測試過。
+都已針對 `qoralis serve` 測試過。
 
-同樣的模式也可以在終端機中使用（`coli chat` 中的 `/decide merge | request changes | close`），
+同樣的模式也可以在終端機中使用（`qoralis chat` 中的 `/decide merge | request changes | close`），
 以及儀表板的 System One 頁面。完整的請求與回覆格式、評分規則，以及它幫不上忙的情況：
 [docs/systemone.md](docs/systemone.md)。
 
 ## 儀表板
 
-`coli web` 會開啟它，一步安裝也會：包含聊天、System One 頁面、
+`qoralis web` 會開啟它，一步安裝也會：包含聊天、System One 頁面、
 大腦（Brain）與效能剖析（Profiling）頁面，提供淺色與深色主題。
 
 ### 新的聊天介面
 
-`coli ui` 會在執行中的 `coli serve` 旁開啟新的聊天介面：推理有自己的區塊，具備視覺塔的模型可以看圖片，還有網頁搜尋、專家地圖、即時監視器，以及已指向 Qoralis 的程式設計代理。支援七種語言。請見 [ui/README.md](ui/README.md)。
+`qoralis ui` 會在執行中的 `qoralis serve` 旁開啟新的聊天介面：推理有自己的區塊，具備視覺塔的模型可以看圖片，還有網頁搜尋、專家地圖、即時監視器，以及已指向 Qoralis 的程式設計代理。支援七種語言。請見 [ui/README.md](ui/README.md)。
 
 <p align="center">
   <img src="docs/media/ui/ui-chat.png" width="900" alt="新的聊天介面：一個問題、收合的推理、回答及其速度">
@@ -443,7 +443,7 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 
 ## 從其他應用程式使用
 
-`coli serve`（安裝程式會替你啟動它）是一個同時提供多種 API 的伺服器：
+`qoralis serve`（安裝程式會替你啟動它）是一個同時提供多種 API 的伺服器：
 
 - **相容 OpenAI**：`/v1/chat/completions`、`/v1/completions` 與
   `/v1/models`，支援串流、JSON 回覆、停止序列與 logprobs；
@@ -453,17 +453,17 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
   （[各引擎對照表](docs/api.md#tool-calling-support)）；
 - **圖片輸入**：支援 GLM-5.3-Flash、DeepSeek V4.1 Flash、MiMo-V2.6、
   Qwen3.8-Flash-Next、Qwen3.8-27B、LFM3-VL 與 Mistral-Large-4（來自 GGUF 時，
-  把 `mmproj` 檔案放在旁邊），可以是 `coli chat` 訊息中的路徑、`coli web` 或
-  `coli ui` 中的附件，或是一個 `image_url` 部分；
+  把 `mmproj` 檔案放在旁邊），可以是 `qoralis chat` 訊息中的路徑、`qoralis web` 或
+  `qoralis ui` 中的附件，或是一個 `image_url` 部分；
 - **圖片輸出**：使用 Qwen-Image-2.1，透過 `POST /v1/images/generations` 提供，
-  `coli chat` 也會直接在終端機中繪出圖片
+  `qoralis chat` 也會直接在終端機中繪出圖片
   （[qwen-image.md](docs/qwen-image.md)）；
 - **決策**：透過 `POST /v1/systemone` 提供（[見上文](#system-one-a-decision-with-a-probability)）。
-- **同時進行多個對話**：在每個文字引擎上，`coli serve --kv-slots N` 最多保留 16 個對話，
+- **同時進行多個對話**：在每個文字引擎上，`qoralis serve --kv-slots N` 最多保留 16 個對話，
   每個都有自己的快取，並把它們的下一個 token 一起解碼（[api.md](docs/api.md#isolated-kv-contexts)）。
 
 程式設計 CLI 與編輯器的連線方式，就和連接任何相容 OpenAI 的服務供應商一樣：base URL 設為
-`http://127.0.0.1:8000/v1`，模型 id 使用 `coli status` 印出的值，金鑰可填任何非空字串
+`http://127.0.0.1:8000/v1`，模型 id 使用 `qoralis status` 印出的值，金鑰可填任何非空字串
 （[docs/api.md](docs/api.md#connect-a-coding-cli-or-editor)）。
 
 <a id="how-it-works"></a>
@@ -515,7 +515,7 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
   決定起草深度，並由一道關卡略過無法回本的草稿。在起草的成本高於節省的地方（DeepSeek V4），
   它保持關閉（[speculative.md](docs/speculative.md)、[tuning.md](docs/tuning.md#speculation-and-reproducibility)）。
 
-引擎由每個模型家族各一個 C 檔案組成（GLM-5.2 為 `c/colibri.c`），
+引擎由每個模型家族各一個 C 檔案組成（GLM-5.2 為 `c/qoralisbri.c`），
 建立在共用的標頭檔之上，執行階段不需要 BLAS，也不需要 Python：
 Python 只用於安裝程式、啟動器、轉換工具與 API gateway。
 
@@ -544,7 +544,7 @@ GLM-5.2 的解碼速度，取自[完整表格](docs/benchmarks.md)：
 
 ### 一台機器上的三種後端
 
-一台 i5-13500，62 GB 記憶體，一張 RTX PRO 4000 Blackwell SFF（24 GB，70 W），每個模型由 `coli serve` 提供服務：一個新的 450 token 提示詞，然後串流輸出 128 token 的回答，包含請求的 HTTP；取兩次執行中較好的一次，單位 tok/s。
+一台 i5-13500，62 GB 記憶體，一張 RTX PRO 4000 Blackwell SFF（24 GB，70 W），每個模型由 `qoralis serve` 提供服務：一個新的 450 token 提示詞，然後串流輸出 128 token 的回答，包含請求的 HTTP；取兩次執行中較好的一次，單位 tok/s。
 
 | GGUF | CUDA 提示詞 | CUDA 解碼 | Vulkan 提示詞 | Vulkan 解碼 | CPU 提示詞 | CPU 解碼 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -558,7 +558,7 @@ GLM-5.2 的解碼速度，取自[完整表格](docs/benchmarks.md)：
 
 ### 同一台機器上的大模型
 
-仍是機器 D，每個模型都從已發布的 GGUF 透過 `coli serve` 執行：顯示卡與記憶體都放不下的部分來自兩顆 NVMe。單位為每秒 token 數，取自各模型的頁面：
+仍是機器 D，每個模型都從已發布的 GGUF 透過 `qoralis serve` 執行：顯示卡與記憶體都放不下的部分來自兩顆 NVMe。單位為每秒 token 數，取自各模型的頁面：
 
 | GGUF | 大小 | 後端 | 提示詞 | 解碼 |
 |---|---:|---|---:|---:|
@@ -591,7 +591,7 @@ GLM-5.2 的解碼速度，取自[完整表格](docs/benchmarks.md)：
 **1. 程式**。從 [Releases](https://github.com/JustVugg/colibri/releases)
 下載適用你平台的壓縮檔（Linux x86_64、macOS、Windows；不需要編譯器，
 只需要供啟動器與 API 使用的 [Python 3](https://www.python.org/downloads/)），
-解壓縮後執行 `python3 coli info`。Linux 與 Windows 的引擎內建 Vulkan（`shaders/` 就在旁邊），
+解壓縮後執行 `python3 qoralis info`。Linux 與 Windows 的引擎內建 Vulkan（`shaders/` 就在旁邊），
 macOS 的引擎內建 Metal；在 Windows 上使用 NVIDIA 顯示卡時，再加上 CUDA 壓縮檔。或者使用 `gcc`（或 clang）與 OpenMP 從原始碼建置：
 
 ```bash
@@ -610,9 +610,9 @@ GLM-5.2 請使用帶 int8 MTP head 的 group-scaled（gs64）容器
 （419 GB，不含 MTP head）。不要使用較舊的 per-row int4 鏡像：
 它們的品質實測差了約 9 個百分點，而且正是
 [#455](https://github.com/JustVugg/colibri/issues/455) 中回答不斷循環的原因。
-`./coli convert --model /nvme/glm52_i4` 會從 FP8 發布版本逐 shard 建置相同的容器，
+`./qoralis convert --model /nvme/glm52_i4` 會從 FP8 發布版本逐 shard 建置相同的容器，
 任何時候都不需要在硬碟上同時存放完整的 756 GB。如何檢查 MTP head 及其他項目：
-[quickstart.md](docs/quickstart.md#3-get-the-model)。已有的 GGUF 不需要轉換：對它的第一個檔案執行 `./coli import`（[見上文](#from-a-gguf)）。
+[quickstart.md](docs/quickstart.md#3-get-the-model)。已有的 GGUF 不需要轉換：對它的第一個檔案執行 `./qoralis import`（[見上文](#from-a-gguf)）。
 
 <a id="3-run-it"></a>
 
@@ -622,17 +622,17 @@ GLM-5.2 請使用帶 int8 MTP head 的 group-scaled（gs64）容器
 
 ```bash
 ./c/qoralis chat  --model /nvme/qwen36          # chat in the terminal
-./coli web   --model /nvme/qwen36          # API + dashboard, opens a browser
-./coli serve --model /nvme/qwen36          # API + dashboard, no browser
-./coli plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
-./coli doctor --model /nvme/qwen36         # read-only check: is everything ready?
-./coli tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
-./coli import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
-./coli ui                                  # the chat UI, next to a running coli serve
+./qoralis web   --model /nvme/qwen36          # API + dashboard, opens a browser
+./qoralis serve --model /nvme/qwen36          # API + dashboard, no browser
+./qoralis plan  --model /nvme/qwen36          # where the model will live: VRAM, RAM, disk
+./qoralis doctor --model /nvme/qwen36         # read-only check: is everything ready?
+./qoralis tune  --model /nvme/qwen36          # measure and save this machine's fastest safe settings
+./qoralis import /nvme/Flint-UD-Q4_K_XL.gguf  # a GGUF: writes Flint-UD-Q4_K_XL.colibri next to it
+./qoralis ui                                  # the chat UI, next to a running qoralis serve
 ```
 
-在 Windows 上，發布壓縮檔附有 `coli.cmd`（`coli.cmd chat --model D:\qwen36`）；
-在原始碼 checkout 中請使用 `py -3 c\coli`。`.exe` 檔案是引擎，不是啟動器。
+在 Windows 上，發布壓縮檔附有 `qoralis.cmd`（`qoralis.cmd chat --model D:\qwen36`）；
+在原始碼 checkout 中請使用 `py -3 c\qoralis`。`.exe` 檔案是引擎，不是啟動器。
 所有選項與變數：
 [SETTINGS.md](docs/SETTINGS.md)、[ENVIRONMENT.md](docs/ENVIRONMENT.md)。
 
@@ -670,7 +670,7 @@ Qoralis 希望讓前沿模型減少對稀缺硬體的依賴，並降低執行成
 | System One 與決策模型 | [systemone.md](docs/systemone.md)、[laya.md](docs/laya.md)、[gliner_decide.md](docs/gliner_decide.md)、[clef.md](docs/clef.md) |
 | GGUF 檔案：支援的架構、兩種模式、各引擎如何處理這些區塊 | [gguf.md](docs/gguf.md) |
 | Qwen3.6 引擎上的模型（Flint、Muse Spark Open、LFM3-VL）與 Mistral-Large-4 | [qwen36.md](docs/qwen36.md)、[mistral-large4.md](docs/mistral-large4.md) |
-| 聊天介面（`coli ui`） | [ui/README.md](ui/README.md) |
+| 聊天介面（`qoralis ui`） | [ui/README.md](ui/README.md) |
 | Vulkan：專家層級、稠密鏈、沒有 Resizable BAR 的顯示卡 | [vulkan.md](docs/vulkan.md) |
 | CUDA，以及 Qwen3.6 的 CUDA 層級 | [cuda.md](docs/cuda.md)、[qwen36-cuda-tier.md](docs/qwen36-cuda-tier.md) |
 | Apple Silicon、Windows | [metal.md](docs/metal.md)、[windows.md](docs/windows.md) |
@@ -715,12 +715,12 @@ c/
 │
 ├── coli                  user-facing CLI
 ├── setup_*.py            the one-step setup: hardware, catalog, downloads, flow
-├── mcp_server.py         the MCP server (coli mcp)
+├── mcp_server.py         the MCP server (qoralis mcp)
 ├── openai_server.py      OpenAI- and Anthropic-compatible HTTP gateway
-├── resource_plan.py      RAM/VRAM planner behind coli plan and coli doctor
+├── resource_plan.py      RAM/VRAM planner behind qoralis plan and qoralis doctor
 ├── tools/                conversion, fixtures and benchmarks
 └── tests/                dependency-free C and Python tests
-ui/                       the chat UI (coli ui)
+ui/                       the chat UI (qoralis ui)
 web/                      the dashboard (a pure API client)
 desktop/                  Tauri desktop shell around the dashboard
 docker/                   container images

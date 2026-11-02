@@ -1,10 +1,10 @@
 """The one-step setup flow: backend choice, run configuration, engine
-resolution, the whole `coli setup` against a fake hub, and start/status/stop.
+resolution, the whole `qoralis setup` against a fake hub, and start/status/stop.
 
 No network, no real model, no real build: the hub is tests/fake_hub.py, the
 hardware report is canned, the engine is a file that names the Vulkan loader,
-and the server is a twenty-line stand-in that answers /health like `coli web`
-does and writes the same pidfile, so the real `coli stop` can stop it.
+and the server is a twenty-line stand-in that answers /health like `qoralis web`
+does and writes the same pidfile, so the real `qoralis stop` can stop it.
 
 Every test that depends on an OS models it with modeled(): it patches the
 setup's host_os()/host_machine(), never sys.platform, so a Linux test runs the
@@ -135,6 +135,40 @@ class HomeTestCase(unittest.TestCase):
         patcher = mock.patch.dict(os.environ, {"COLI_SETUP_HOME": self.home})
         patcher.start()
         self.addCleanup(patcher.stop)
+
+
+class StorageDirectoryCompatibility(unittest.TestCase):
+    def test_fresh_install_uses_qoralis_models_directory(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home}, clear=False):
+            expected = os.path.join(home, "qoralis-models")
+            self.assertEqual(setup_flow.default_models_root(), expected)
+
+    def test_existing_legacy_models_directory_is_reused(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home}, clear=False):
+            legacy = os.path.join(home, "colibri-models")
+            os.makedirs(legacy)
+            self.assertEqual(setup_flow.default_models_root(), legacy)
+
+    def test_new_models_directory_wins_when_both_exist(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home}, clear=False):
+            legacy = os.path.join(home, "colibri-models")
+            current = os.path.join(home, "qoralis-models")
+            os.makedirs(legacy)
+            os.makedirs(current)
+            self.assertEqual(setup_flow.default_models_root(), current)
+
+    def test_existing_macos_setup_directory_is_reused(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "COLI_SETUP_HOME": ""}, clear=False), \
+                mock.patch.object(setup_flow.sys, "platform", "darwin"):
+            legacy = os.path.join(home, "Library", "Application Support", "colibri")
+            os.makedirs(legacy)
+            self.assertEqual(setup_flow.setup_home(), legacy)
+
+    def test_fresh_macos_setup_uses_qoralis_directory(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "COLI_SETUP_HOME": ""}, clear=False), \
+                mock.patch.object(setup_flow.sys, "platform", "darwin"):
+            expected = os.path.join(home, "Library", "Application Support", "Qoralis")
+            self.assertEqual(setup_flow.setup_home(), expected)
 
 
 class BackendChoice(unittest.TestCase):
@@ -678,7 +712,7 @@ class RunConfiguration(HomeTestCase):
                     "cuda", "/m", "127.0.0.1", 8000, family=family_by_id(family)))
 
     def test_ctx_is_recorded_and_checked(self):
-        # #2011: `coli setup --ctx N` is kept for `coli start`, and a context the family
+        # #2011: `qoralis setup --ctx N` is kept for `qoralis start`, and a context the family
         # cannot hold stops the setup before anything is built
         args = setup_flow.launcher_args("vulkan", "/m", "127.0.0.1", 8000, 32768)
         self.assertEqual(args[args.index("--ctx") + 1], "32768")
@@ -914,7 +948,7 @@ class Releases(HomeTestCase):
 
     #: What the release workflow packs, per OS (.github/workflows/release.yml).
     LAYOUTS = {"linux": ("linux-x86_64.tar.gz", ("coli", "qwen36")),
-               "win32": ("windows-x86_64.zip", ("coli", "coli.cmd", "qwen36.exe"))}
+               "win32": ("windows-x86_64.zip", ("coli", "qoralis.cmd", "qwen36.exe"))}
 
     def make_archive(self, os_name, vulkan=False):
         """A release archive; `vulkan`, one since 2.0: Vulkan engines and their shaders."""
@@ -1105,7 +1139,7 @@ class Releases(HomeTestCase):
 
 
 class WholeSetup(HomeTestCase):
-    """`coli setup --yes` from nothing to a written configuration, then a rerun."""
+    """`qoralis setup --yes` from nothing to a written configuration, then a rerun."""
 
     def setUp(self):
         super().setUp()
@@ -1407,7 +1441,7 @@ class WholeSetup(HomeTestCase):
         self.assertEqual(cfg["backend"], "vulkan")
         self.assertNotIn("VK_ICD_FILENAMES", cfg["env"])        # the loader finds Windows drivers itself
         self.assertIn('same as: set "COLI_VULKAN=1" && set "COLI_VK_SHADERS=', text)
-        self.assertIn(" && coli web --model ", text)
+        self.assertIn(" && qoralis web --model ", text)
         self.assertIn("System  Windows 11", text)
 
     def test_a_missing_engine_is_rebuilt_without_asking_again(self):
@@ -1701,7 +1735,7 @@ server.serve_forever()
 
 
 class ServerControl(HomeTestCase):
-    """Runs on Windows too: `coli stop` ends the stand-in with TerminateProcess
+    """Runs on Windows too: `qoralis stop` ends the stand-in with TerminateProcess
     there (its SIGTERM handler simply never runs) and removes the pidfile itself."""
 
     def setUp(self):
@@ -1967,7 +2001,7 @@ class ServerControl(HomeTestCase):
 
 class ForegroundLogs(HomeTestCase):
     """#1852: the server the setup starts in the foreground prints to its terminal,
-    and `coli logs` (from another terminal) said only "no serve log yet"."""
+    and `qoralis logs` (from another terminal) said only "no serve log yet"."""
 
     def logs(self):
         out = io.StringIO()
@@ -1981,9 +2015,9 @@ class ForegroundLogs(HomeTestCase):
         code, text = self.logs()
         self.assertEqual(code, 0)
         last = text.strip().splitlines()[-2:]
-        self.assertIn("in the foreground (pid 4242): python3 coli web --port 8000", last[0])
+        self.assertIn("in the foreground (pid 4242): python3 qoralis web --port 8000", last[0])
         self.assertIn("its output goes to the terminal that started it", last[1])
-        self.assertIn("`coli start --background` writes it here", last[1])
+        self.assertIn("`qoralis start --background` writes it here", last[1])
 
     def test_no_log_but_a_running_server_says_where_to_look(self):
         setup_flow.save_config({"status": "ready", "port": 8000, "host": "127.0.0.1"})
@@ -2071,10 +2105,10 @@ class SplitModel(HomeTestCase):
             self.assertEqual(setup_flow.cmd_setup(setup_args()), 0)
         said = out.getvalue()
         self.assertIn("Already set up", said)
-        self.assertIn(f"shards also read from: {self.other} (K3_DIRS, kept for coli start)", said)
+        self.assertIn(f"shards also read from: {self.other} (K3_DIRS, kept for qoralis start)", said)
         self.assertEqual(setup_flow.load_config()["env"]["K3_DIRS"], self.other)
         del os.environ["K3_DIRS"]
-        self.assertTrue(setup_flow.config_ready(setup_flow.load_config()), "coli start from a shell without K3_DIRS")
+        self.assertTrue(setup_flow.config_ready(setup_flow.load_config()), "qoralis start from a shell without K3_DIRS")
         cfg = setup_flow.load_config()
         self.assertIs(setup_flow.remember_split_dirs(cfg, out=lambda *_: None), cfg, "nothing new to keep")
 
@@ -2275,7 +2309,7 @@ class CommandLine(HomeTestCase):
     def test_start_before_setup_says_what_to_do(self):
         result = self.coli("start")
         self.assertEqual(result.returncode, 1)
-        self.assertIn("coli setup", result.stderr)
+        self.assertIn("qoralis setup", result.stderr)
 
 
 class LinuxVulkanHeadersTests(unittest.TestCase):

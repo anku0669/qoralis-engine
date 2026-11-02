@@ -89,7 +89,7 @@ help in proportion to the RAM you can give them.
 | `--audio file.dmel [-p "text"]` | spoken input: raw u8 DMel frames `[n_frames, 80]`, one `<\|audio\|>` position per frame (implies `--chat`) |
 | `[cap] [bits] [ref.json]` | token-exact oracle harness against a `tools/make_tiny_inkling.py` fixture (CI-style validation; `tools/make_tiny_inkling_audio.py` for the audio path) |
 
-`coli chat` / `coli serve` / `coli web` render the same template through the
+`qoralis chat` / `qoralis serve` / `qoralis web` render the same template through the
 gateway, so there is nothing to pass there.
 
 ## Audio input (DMel)

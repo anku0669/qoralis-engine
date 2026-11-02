@@ -76,12 +76,12 @@ ptlqo_gate() {
   done
 }
 
-# ptlqo_plan <engine> <tag> <log> <env...>: coli plan's prediction (resource_plan.py,
+# ptlqo_plan <engine> <tag> <log> <env...>: qoralis plan's prediction (resource_plan.py,
 # vk_chain_fit with the run's settings, the model its SNAP) against the engine's fit line
 # in <log>: the same free bytes, per-layer bytes, fixed bytes and N.
 ptlqo_plan() {
   local eng=$1 tag=$2 log=$3; shift 3
-  $PY - "$eng" "$log" "$@" <<'PY' || fail "$tag: coli plan predicts otherwise"
+  $PY - "$eng" "$log" "$@" <<'PY' || fail "$tag: qoralis plan predicts otherwise"
 import re, sys
 sys.path.insert(0, ".")
 import resource_plan as rp
@@ -96,7 +96,7 @@ n = int(re.findall(rf"\[VK\] {eng} chain: (\d+) of \d+ layers on the device", "\
 info = rp.analyze_model(env["SNAP"])
 fit = rp.vk_chain_fit(info, info["resolved_family"].descriptor.id, env, {"type": "cpu"})
 ok = (fit["layers"], fit["fixed"], fit["free"], fit["n"]) == (layers, num("fixed"), num("free"), n)
-print(f"   coli plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
+print(f"   qoralis plan: N = {fit['n']} of {fit['L']} ({'as the engine' if ok else 'the engine: %d' % n}), "
       f"layers {'= the engine' if fit['layers'] == layers else fit['layers']}, fixed {fit['fixed']} B, free {fit['free']} B")
 sys.exit(0 if ok else 1)
 PY
@@ -104,7 +104,7 @@ PY
 # ptlqo_cap <engine> <tag> <ks> <env...> -- <argv...>: a probe under a 256 MiB cap (at or
 # below 256 MiB the pools' blocks are 64 KiB whatever the cap, ptl_calc cap recomputing
 # their share), then for each k the COLI_VK_DEVICE_CAP_MB under which exactly k layers fit:
-# the fit's own N, the rule's N from its line and coli plan's (ptlqo_plan) are all k, the
+# the fit's own N, the rule's N from its line and qoralis plan's (ptlqo_plan) are all k, the
 # CPU's tokens and logits. COLI_VK_TIER_RESERVE_GB=0.04: the reserve holds the first
 # chunk's scratch and the KV mirrors once the tier has taken the rest.
 ptlqo_cap() {

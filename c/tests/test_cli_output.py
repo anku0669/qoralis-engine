@@ -143,10 +143,10 @@ class InteractivePromptTest(unittest.TestCase):
 
 
 class ChatCapForwardingTest(unittest.TestCase):
-    """#379/#386 r2 (F9): `coli chat` on a non-glm model spawns openai_server
+    """#379/#386 r2 (F9): `qoralis chat` on a non-glm model spawns openai_server
     as its local server. An explicit --cap must ride along on that command
     line (it was silently eaten for years -- keeping it is a DISCLOSED
-    behavior change: a long-ignored `coli chat --cap 32` now takes effect),
+    behavior change: a long-ignored `qoralis chat --cap 32` now takes effect),
     and an absent --cap must stay absent so openai_server's arch-keyed
     default (cap_for_arch) applies. This drives the real cmd_chat with the
     process boundary faked, and pins the argv it builds."""
@@ -195,7 +195,7 @@ class ChatCapForwardingTest(unittest.TestCase):
              mock.patch.object(coli, "chat_attached"), \
              mock.patch.object(coli, "Spinner", FakeSpinner), \
              mock.patch("subprocess.Popen", FakeProc):
-            coli.cmd_chat(args)
+            qoralis.cmd_chat(args)
         return captured["cmd"]
 
     def test_explicit_cap_rides_along(self):
@@ -340,7 +340,7 @@ class BannerModelLineTest(unittest.TestCase):
                              "printed when no model was given")
 
     def test_unreadable_model_falls_back_instead_of_raising(self):
-        """`coli info` banners before validating the path; it must not crash."""
+        """`qoralis info` banners before validating the path; it must not crash."""
         self.assertEqual(self.coli.model_banner_line("/nonexistent/xyz"),
                          self.coli.model_banner_line(None))
 
@@ -442,8 +442,8 @@ class OmpThreadsForEveryEngineTest(unittest.TestCase):
 
 
 class ServerRestartingTest(unittest.TestCase):
-    """#2290: a coli serve whose engine died answers /health 503 "restarting" while it
-    starts the engine again; coli chat waits for that server instead of starting a second."""
+    """#2290: a qoralis serve whose engine died answers /health 503 "restarting" while it
+    starts the engine again; qoralis chat waits for that server instead of starting a second."""
 
     @classmethod
     def setUpClass(cls):
@@ -506,7 +506,7 @@ class ServerRestartingTest(unittest.TestCase):
              mock.patch.object(coli, "chat_attached") as attached, \
              mock.patch.object(coli, "Spinner", FakeSpinner), \
              mock.patch.object(coli.time, "sleep"):
-            coli.cmd_chat(args)
+            qoralis.cmd_chat(args)
         attached.assert_called_once_with(args, "http://127.0.0.1:8000", "flint-colibri")
 
 

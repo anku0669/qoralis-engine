@@ -1,4 +1,4 @@
-"""`coli chat` on GLM-5.2 must keep reading the engine's stderr whatever the locale.
+"""`qoralis chat` on GLM-5.2 must keep reading the engine's stderr whatever the locale.
 
 cmd_chat drains the engine's stderr into a temporary log opened in the
 locale's code page. The engine writes UTF-8: its per-layer progress line is
@@ -133,7 +133,7 @@ DRIVER = textwrap.dedent("""
          mock.patch("builtins.input", fake_input), \\
          mock.patch.object(sys, "stdout", out):
         try:
-            coli.cmd_chat(args)
+            qoralis.cmd_chat(args)
         except SystemExit as exit_:
             code = str(exit_)
     print(json.dumps({"output": out.getvalue(), "turns": len(sent), "ticks": ticks,
@@ -152,7 +152,7 @@ def chat(scenario, turns=2):
                                      "1" if scenario == "chat" else "0"],
                                     env=CHILD_ENV, capture_output=True, timeout=90)
         except subprocess.TimeoutExpired:
-            raise AssertionError(f"{scenario}: `coli chat` hung (engine blocked on a full stderr pipe)")
+            raise AssertionError(f"{scenario}: `qoralis chat` hung (engine blocked on a full stderr pipe)")
     if result.returncode:
         raise AssertionError(result.stderr.decode("utf-8", "replace")[-3000:])
     report = json.loads(result.stdout.decode("ascii").strip().splitlines()[-1])

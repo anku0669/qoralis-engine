@@ -292,26 +292,9 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 
 `qoralis ui` は、実行中の `qoralis serve` の横で新しいチャットを開きます：推論は専用のブロックに、ビジョンタワーを持つモデルでは画像、Web 検索、エキスパートマップ、ライブモニター、そして Qoralis に向けて設定済みのコーディングエージェント。7 言語に対応。[ui/README.md](ui/README.md) を参照してください。
 
-<p align="center">
-  <img src="docs/media/ui/ui-chat.png" width="900" alt="新しいチャット UI：質問、折りたたまれた推論、回答とその速度">
-</p>
-<p align="center"><em>i5-13500 の CPU 上の LFM3-VL-2B、32 tok/s。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-monitor.png" width="900" alt="モニター：モデルの状態、速度、書き出したトークン、プロンプト、エンジンの CPU と RAM">
-</p>
-<p align="center"><em>LFM3-VL-2B が書いている間の<strong>モニター</strong>：31.6 tok/s、プロンプトは 0.1 秒で読み取り、RAM 2.1 GB。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-experts.png" width="900" alt="エキスパートマップを開いたチャット：OLMoE の 16 ブロックそれぞれでエキスパートごとに 1 セル">
-</p>
-<p align="center"><em>チャットの横に<strong>エキスパートマップ</strong>を開いた OLMoE：ブロックごとにエキスパート 1 個につき 1 セル、このステップで選ばれたものは白、この回答で使われたものはアンバー。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-systemone.png" width="900" alt="System One ページ：1 回だけ読まれるプルリクエスト、許可された各回答の確率、そしてモデルの確信度">
-</p>
-<p align="center"><em><strong>System One</strong>：モデルに文書と、選んでよい回答だけを渡します。ここでは RTX PRO 4000 上の Qwen3.6-35B が、キャッシュのサイズ上限を壊すプルリクエストを読みます：
-<strong>request changes が 81%</strong>、エントロピー 0.56（不確か）、読み取り 98 トークン、生成 0 トークンです。</em></p>
 
 **Profiling** ページは、各ターンがどこで時間を使っているかをフェーズごとに示し、直近 30 ターンを推移として表示します。
 

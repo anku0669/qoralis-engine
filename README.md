@@ -49,6 +49,12 @@ Download them from [GitHub Releases](https://github.com/anku0669/qoralis-engine/
 The desktop shell connects to an OpenAI-compatible inference server you configure
 in the app; model weights and the inference engine remain separately installed.
 
+**macOS first launch:** the Apple Silicon app is ad-hoc code-signed to avoid the
+“damaged and can't be opened” failure. It is not Developer ID notarized, so
+macOS may still ask you to approve it: in Finder, Control-click **Qoralis
+Engine.app**, choose **Open**, then confirm **Open**. Only install releases
+downloaded from this repository and verify the DMG against `SHA256SUMS.txt`.
+
 <a id="get-started"></a>
 <a id="the-one-step-way"></a>
 

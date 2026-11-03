@@ -567,8 +567,31 @@ jobs:
         run: cargo install tauri-cli --locked --version "^2.0.0"
 
       - name: Build native desktop installer
+        if: matrix.os == 'macos-latest'
+        working-directory: desktop
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+        run: cargo tauri build --bundles "${{ matrix.bundles }}"
+
+      - name: Build native desktop installer (non-macOS)
+        if: matrix.os != 'macos-latest'
         working-directory: desktop
         run: cargo tauri build --bundles "${{ matrix.bundles }}"
+
+      - name: Verify macOS application signature
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$(find desktop/src-tauri/target/release/bundle/macos -maxdepth 1 -type d -name '*.app' -print -quit)"
+          test -n "$app" || { echo "macOS app bundle not found"; exit 1; }
+          codesign --verify --deep --strict --verbose=2 "$app"
+          details="$(codesign -dv --verbose=4 "$app" 2>&1 || true)"
+          printf '%s\n' "$details"
+          grep -q 'Signature=adhoc' <<<"$details" || {
+            echo "Expected an ad-hoc code signature; refusing to publish an unsigned app."
+            exit 1
+          }
 
       - name: Stage release installers
         shell: bash

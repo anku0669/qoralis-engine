@@ -1,0 +1,117 @@
+name: Repair the v2.1.0 macOS desktop release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/macos-dmg-hotfix.yml'
+      - 'desktop/src-tauri/tauri.conf.json'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-and-replace-dmg:
+    name: Build, sign, verify, and replace macOS DMG
+    runs-on: macos-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v2.1.0
+      ASSET: Qoralis-Engine-v2.1.0-macos-arm64.dmg
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri -> target
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix web
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --locked --version "^2.0.0"
+
+      - name: Build ad-hoc signed Apple Silicon DMG
+        working-directory: desktop
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+        run: cargo tauri build --bundles dmg
+
+      - name: Verify app bundle and packaged DMG signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$(find desktop/src-tauri/target/release/bundle/macos -maxdepth 1 -type d -name '*.app' -print -quit)"
+          dmg="$(find desktop/src-tauri/target/release/bundle/dmg -maxdepth 1 -type f -name '*.dmg' -print -quit)"
+          test -n "$app" || { echo "macOS app bundle not found"; exit 1; }
+          test -n "$dmg" || { echo "DMG not found"; exit 1; }
+
+          codesign --verify --deep --strict --verbose=2 "$app"
+          details="$(codesign -dv --verbose=4 "$app" 2>&1 || true)"
+          printf '%s\n' "$details"
+          grep -q 'Signature=adhoc' <<<"$details" || {
+            echo "Expected an ad-hoc signature; the DMG will not be published."
+            exit 1
+          }
+
+          mkdir -p /tmp/qoralis-dmg-mount
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint /tmp/qoralis-dmg-mount
+          mounted_app="$(find /tmp/qoralis-dmg-mount -maxdepth 2 -type d -name '*.app' -print -quit)"
+          test -n "$mounted_app" || { hdiutil detach /tmp/qoralis-dmg-mount; echo "App missing from DMG"; exit 1; }
+          codesign --verify --deep --strict --verbose=2 "$mounted_app"
+          mounted_details="$(codesign -dv --verbose=4 "$mounted_app" 2>&1 || true)"
+          grep -q 'Signature=adhoc' <<<"$mounted_details" || {
+            hdiutil detach /tmp/qoralis-dmg-mount
+            echo "Packaged app lost its ad-hoc signature."
+            exit 1
+          }
+          hdiutil detach /tmp/qoralis-dmg-mount
+
+          mkdir -p release-assets release-checksums
+          cp "$dmg" "release-assets/$ASSET"
+          shasum -a 256 "release-assets/$ASSET"
+
+      - name: Update release checksum and replace only the macOS installer
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern SHA256SUMS.txt --dir release-checksums
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+
+          name = "Qoralis-Engine-v2.1.0-macos-arm64.dmg"
+          artifact = Path("release-assets") / name
+          sums = Path("release-checksums/SHA256SUMS.txt")
+          digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+          lines = sums.read_text(encoding="utf-8").splitlines()
+          indexes = [i for i, line in enumerate(lines)
+                     if line.split(maxsplit=1)[-1].lstrip("*") == name]
+          if len(indexes) != 1:
+              raise SystemExit(f"Expected exactly one checksum entry for {name}; found {len(indexes)}")
+          lines[indexes[0]] = f"{digest}  {name}"
+          sums.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          print(f"Updated {name}: sha256:{digest}")
+          PY
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" \
+            "release-assets/$ASSET" release-checksums/SHA256SUMS.txt --clobber
+
+      - name: Confirm GitHub now serves the repaired asset and checksum
+        run: |
+          set -euo pipefail
+          expected="sha256:$(shasum -a 256 "release-assets/$ASSET" | awk '{print $1}')"
+          actual="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+            --jq '.assets[] | select(.name == "'"$ASSET"'") | .digest')"
+          test "$actual" = "$expected" || {
+            echo "Release asset digest mismatch: expected $expected, got $actual"
+            exit 1
+          }
+          echo "Verified published $ASSET ($actual)"

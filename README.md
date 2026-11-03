@@ -481,27 +481,9 @@ page, the Brain and the Profiling page, in a light or a dark theme.
 pictures for models with a vision tower, web search, the expert map, a live monitor, and
 coding agents opened already pointed at colibri. Seven languages. See [ui/README.md](ui/README.md).
 
-<p align="center">
-  <img src="docs/media/ui/ui-chat.png" width="900" alt="the chat UI: a question, the reasoning folded, the answer, and its speed">
-</p>
-<p align="center"><em>LFM3-VL-2B on an i5-13500's CPU, 32 tok/s.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-monitor.png" width="900" alt="the monitor: the model's state, its speed, the tokens written, the prompt, the engine's CPU and RAM">
-</p>
-<p align="center"><em>The <strong>monitor</strong> while LFM3-VL-2B writes: 31.6 tok/s, the prompt read in 0.1 s, 2.1 GB of RAM.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-experts.png" width="900" alt="the chat with the expert map open: a cell per expert in each of OLMoE's 16 blocks">
-</p>
-<p align="center"><em>OLMoE with the <strong>expert map</strong> open beside the chat: a cell per expert in each block, white when chosen in this step,
-amber when used in this answer.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-systemone.png" width="900" alt="the System One page: a pull request read once, a probability for every allowed answer, and how sure the model is">
-</p>
-<p align="center"><em><strong>System One</strong>: give the model a document and the only answers it may pick. Here Qwen3.6-35B on an RTX PRO 4000
-reads a pull request that breaks a cache's size limit: <strong>request changes at 81%</strong>, entropy 0.56 (unsure), 98 tokens read, 0 generated.</em></p>
 
 The **Profiling** page shows where each turn spends its time, phase by phase,
 with the last 30 turns as a trend.

@@ -492,27 +492,9 @@ pagina System One, il Brain e la pagina Profiling, in tema chiaro o scuro.
 immagini per i modelli con la torre visiva, la ricerca web, la mappa degli expert, un monitor dal vivo e gli
 agenti di programmazione già puntati su colibri. Sette lingue. Vedi [ui/README.md](ui/README.md).
 
-<p align="center">
-  <img src="docs/media/ui/ui-chat.png" width="900" alt="la nuova chat: una domanda, il ragionamento chiuso, la risposta e la sua velocità">
-</p>
-<p align="center"><em>LFM3-VL-2B sulla CPU di un i5-13500, 32 tok/s.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-monitor.png" width="900" alt="il monitor: lo stato del modello, la velocità, i token scritti, il prompt, CPU e RAM del motore">
-</p>
-<p align="center"><em>Il <strong>monitor</strong> mentre LFM3-VL-2B scrive: 31,6 tok/s, il prompt letto in 0,1 s, 2,1 GB di RAM.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-experts.png" width="900" alt="la chat con la mappa degli expert aperta: una cella per expert in ognuno dei 16 blocchi di OLMoE">
-</p>
-<p align="center"><em>OLMoE con la <strong>mappa degli expert</strong> aperta accanto alla chat: una cella per expert in ogni blocco, bianca se scelto
-in questo passo, ambra se usato in questa risposta.</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-systemone.png" width="900" alt="la pagina System One: una pull request letta una volta, una probabilità per ogni risposta ammessa, e quanto il modello è sicuro">
-</p>
-<p align="center"><em><strong>System One</strong>: dai al modello un documento e le sole risposte che può scegliere. Qui Qwen3.6-35B su una RTX PRO 4000
-legge una pull request che rompe il limite di una cache: <strong>request changes all'81%</strong>, entropia 0,56 (incerto), 98 token letti, 0 generati.</em></p>
 
 La pagina **Profiling** mostra dove ogni turno spende il suo tempo, fase per
 fase, con gli ultimi 30 turni come tendenza.

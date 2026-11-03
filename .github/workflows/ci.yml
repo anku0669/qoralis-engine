@@ -8,12 +8,14 @@ on:
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'research/**'
       - '.github/workflows/**'
   push:
     branches: [dev, main]
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'research/**'
       - '.github/workflows/**'
 
 # Keep only the newest run for each branch. This prevents rapid pushes from

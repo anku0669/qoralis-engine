@@ -10,12 +10,14 @@ on:
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'research/**'
       - '.github/workflows/**'
   pull_request:
     branches: [main, dev]
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'research/**'
       - '.github/workflows/**'
 
 permissions:

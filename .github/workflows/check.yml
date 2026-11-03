@@ -6,8 +6,17 @@ name: check
 on:
   push:
     branches: [main, dev]
+    # Do not compile every engine for documentation and marketing-only edits.
+    paths-ignore:
+      - '**.md'
+      - 'landing/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, dev]
+    paths-ignore:
+      - '**.md'
+      - 'landing/**'
+      - '.github/workflows/**'
 
 permissions:
   contents: read

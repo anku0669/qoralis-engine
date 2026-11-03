@@ -3,8 +3,24 @@ name: CI
 on:
   pull_request:
     branches: [dev, main]
+    # Documentation and the static marketing page do not change engine code.
+    # Keep the full cross-platform matrix for implementation changes.
+    paths-ignore:
+      - '**.md'
+      - 'landing/**'
+      - '.github/workflows/**'
   push:
     branches: [dev, main]
+    paths-ignore:
+      - '**.md'
+      - 'landing/**'
+      - '.github/workflows/**'
+
+# Keep only the newest run for each branch. This prevents rapid pushes from
+# stacking another 100+ check matrix behind an obsolete commit.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # CI only reads the tree; no job here writes to the repo. Pin the token to
 # read-only so a compromised step (or action) cannot push, tag or release.

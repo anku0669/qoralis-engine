@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: qoralis-macos-dmg-hotfix-v2-1-0
+  cancel-in-progress: true
+
 jobs:
   rebuild-and-replace-dmg:
     name: Build, sign, verify, and replace macOS DMG
@@ -98,7 +102,7 @@ jobs:
           if len(indexes) != 1:
               raise SystemExit(f"Expected exactly one checksum entry for {name}; found {len(indexes)}")
           lines[indexes[0]] = f"{digest}  {name}"
-          sums.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          sums.write_text("\n".join(lines) + "\n", encoding="utf-8")
           print(f"Updated {name}: sha256:{digest}")
           PY
           gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" \

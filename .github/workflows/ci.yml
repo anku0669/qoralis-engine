@@ -8,6 +8,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'desktop/**'
       - 'research/**'
       - '.github/workflows/**'
   push:
@@ -15,6 +16,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'landing/**'
+      - 'desktop/**'
       - 'research/**'
       - '.github/workflows/**'
 

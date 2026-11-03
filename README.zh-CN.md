@@ -287,25 +287,9 @@ curl -s http://127.0.0.1:8000/v1/systemone -H 'Content-Type: application/json' -
 
 `qoralis ui` 在正在运行的 `qoralis serve` 旁边打开新的聊天界面：推理有自己的区块，带视觉塔的模型可以看图片，还有网页搜索、专家地图、实时监视器，以及已经指向 Qoralis 的编程智能体。支持七种语言。参见 [ui/README.md](ui/README.md)。
 
-<p align="center">
-  <img src="docs/media/ui/ui-chat.png" width="900" alt="新的聊天界面：一个问题、折叠的推理、回答及其速度">
-</p>
-<p align="center"><em>LFM3-VL-2B 在 i5-13500 的 CPU 上，32 tok/s。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-monitor.png" width="900" alt="监视器：模型状态、速度、已写出的 token、提示词、引擎的 CPU 和内存">
-</p>
-<p align="center"><em>LFM3-VL-2B 写作时的<strong>监视器</strong>：31.6 tok/s，提示词 0.1 秒读完，内存 2.1 GB。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-experts.png" width="900" alt="打开专家地图的聊天：OLMoE 16 个区块中每个专家一格">
-</p>
-<p align="center"><em>OLMoE 在聊天旁打开<strong>专家地图</strong>：每个区块中每个专家一格，本步选中的为白色，本次回答用到的为琥珀色。</em></p>
 
-<p align="center">
-  <img src="docs/media/ui/ui-systemone.png" width="900" alt="System One 页面：一个拉取请求只读一次，每个允许的答案各有一个概率，以及模型有多确定">
-</p>
-<p align="center"><em><strong>System One</strong>：给模型一份文档，以及它唯一可以选择的几个答案。图中 RTX PRO 4000 上的 Qwen3.6-35B 读取一个破坏了缓存大小上限的拉取请求：<strong>request changes 的概率为 81%</strong>，熵 0.56（不确定），读取 98 个 token，生成 0 个。</em></p>
 
 **性能剖析**（Profiling）页面按阶段显示每一轮的时间花在了哪里，并以最近 30 轮作为趋势。
 
